@@ -1,0 +1,33 @@
+# File dan folder yang tidak perlu masuk ke image
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+*.class
+
+# Build tool
+# Ignore everything in target except the JAR
+target/*
+!target/*.jar
+build/
+
+# OS/Editor files
+.DS_Store
+Thumbs.db
+
+# Test logs
+*.log
+
+# Environment
+.env
+*.env
+
+# Render or deployment config (opsional)
+render.yaml
+
+# Lainnya
+node_modules/

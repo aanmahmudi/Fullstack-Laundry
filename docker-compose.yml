@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    ports: 
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: subrutin
+      POSTGRES_PASSWORD: subrutin
+      POSTGRES_DB: db-laundry
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
+
+  frontend:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    environment:
+      TZ: Asia/Jakarta
+
+  app:
+    build: ./backend
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    environment:
+      TZ: Asia/Jakarta

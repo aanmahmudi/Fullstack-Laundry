@@ -1,0 +1,120 @@
+logging:
+  level:
+    '[com.laundry.BE_Laundry]': TRACE
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+spring:
+  mvc:
+    log-request-details: true
+
+  docker:
+    compose:
+      enabled: true
+      file: docker-compose.yml
+
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: YOUR_MAILTRAP_USERNAME
+    password: YOUR_MAILTRAP_PASSWORD
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          auth: true
+          stattls:
+            enable: true
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+    hibernate:
+      ddl-auto: update
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+
+  web:
+    resources:
+      static-locations: file:uploads/
+
+server:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  jackson:
+    time-zone: Asia/Jakarta
+  datasource:
+    url: jdbc:postgresql://<HOST>:<PORT>/<DB_NAME>
+    driver-class-name: org.postgresql.Driver
+    username: your_default_db_user
+    password: your_default_db_password
+    hikari:
+      connection-timeout: 300000
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      maximum-pool-size: 10
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://<HOST>:<PORT>/<DB_NAME>
+    driver-class-name: org.postgresql.Driver
+    username: your_docker_db_user
+    password: your_docker_db_password
+    hikari:
+      connection-timeout: 300000
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      maximum-pool-size: 10
+server:
+  port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: railway
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      connection-timeout: 300000
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      maximum-pool-size: 10
+server:
+  port: 8080

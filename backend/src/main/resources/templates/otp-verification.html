@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>OTP Verification</title>
+<meta charset="UTF-8">
+</head>
+<body>
+	<h2>Verifikasi OTP</h2>
+
+	<form onSubmit="event.preventDefault(); verifyOtp();">
+		<input type="hidden" id="email" name="email" th:value="${email}" />
+		<p>Email <span id="email-debug"></span></p>
+		<label>Kode Otp:</label>
+		<input type="text" id="otp" required/><br><br>
+		<button type="submit">Verifikasi</button>
+	</form>
+
+<script>
+	
+	//debug
+	document.addEventListener("DOMContentLoaded", function(){
+		document.getElementById("email-debug").innerText = document.getElementById("email").value;
+		
+		console.log("Isi email:", document.getElementById("email").value);
+	});
+	
+	function verifyOtp(){
+		const email = document.getElementById("email").value;
+		const otp = document.getElementById("otp").value;
+		
+		console.log("Isi email:", document.getElementById("email").value);
+		
+		//validasi input
+		if (!email || !otp){
+			alert ("Email dan OTP Tidak boleh kosong");
+			return;
+		}
+		
+		//validasi otp
+		if (!/^\d{6}$/.test(otp)){
+			alert("OTP 6 Digit Angka");
+			return
+		}
+	
+			
+		fetch('/api/otp/verify', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: email, otp: otp })
+		})
+		.then(response => {
+			if (response.ok){
+				alert("OTP Verifikasi berhasil");
+			} else {
+				alert("OTP Verifikasi gagal")
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log("Success:", data);
+			alert(JSON.stringify(data));
+				//document.getElementById("result").style.color = "blue";
+				//document.getElementById("result").innerText = "Verifikasi Berhasil";
+				
+				//redirect kalau perlu
+				//window.Location.href = "/Login";
+		})
+		.catch(error => {
+			console.error("Error:", error);
+			alert("OTP Verification failed")
+		});
+	}		
+</script>
+</body>
+</html>

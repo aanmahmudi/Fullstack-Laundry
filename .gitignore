@@ -1,0 +1,48 @@
+# Ignore all target folders except jar
+target/
+!target/*.jar
+
+# Ignore sensitive files and config
+src/main/resources/application.yml
+src/main/java/com/laundry/BE_Laundry/Config/
+
+
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Build folders
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE/Build ignores
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.idea
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Logs
+*.log
+
+# Ignore sensitive config files
+application.yml
+application-docker.yml
+application-railway.yml
+.env
+.env.*

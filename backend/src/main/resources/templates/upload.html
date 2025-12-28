@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Upload Dokumen</title>
+</head>
+<body>
+	<h2>Upload Foto</h2>
+	
+	<input type="hidden" id="customerEmail" th:value="${email}"/>
+	
+<!-- Upload Photo -->
+	<form  id = "photoForm" enctype="multipart/form-data" method="post" action="upload-data">
+		<input type = "file" name="file" accept="image/*" required />
+		<input type = "hidden" name="customerId" th:value="${customerId}"/>
+		<input type = "hidden" name="email" th:value="${email}"/> 
+		<button type="submit">Upload Foto</button>
+	</form>
+	<p id ="photoResult"></p>
+
+	<h2>Upload PDF</h2>
+
+<!-- Upload PDF -->
+	<form id = "pdfForm" enctype="multipart/form-data" method="post" action="upload-data">
+		<input type = "file" name="file" accept="application/pdf" required />
+		<input type = "hidden" name="customerId" th:value="${customerId}"/>	
+		<input type = "hidden" name="email" th:value="${email}"/> 			
+		<button type="submit">Upload PDF</button>
+	</form>
+	<p id="pdfResult"></p>
+	
+	<button id="nextBtn" style="display: none;" onclick="goToOtp()">Next: OTP</button>
+
+<script>
+	let photoUploaded = false;
+	let pdfUploaded = false;
+	
+	function goToOtp(){
+		const email = document.getElementById("customerEmail").value ;
+		window.location.href = "/otp?email=" + encodeURIComponent (email);
+	}
+	
+	function checkAndRedirectToOTP(){
+		if (photoUploaded && pdfUploaded){
+			//Redirect ke halaman input otp
+			document.getElementById("nextBtn").style.display = "inline-block";
+		}
+	}
+
+    // Upload Foto
+    document.getElementById("photoForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const email = document.getElementById("customerEmail").value;
+
+        fetch('/api/customers/upload/photo', {
+            method: 'POST',
+            body: formData
+        })
+        .then(async res => {
+        	const text = await res.text();
+        	try {
+        		return JSON.parse(text);
+        	}catch (e){
+        		throw new Error("Invalid JSON Response: " + text);
+        	}
+        })
+        .then(data => {
+        	console.log("Response data:", data);
+        	if (data.data && data.data.fileUrl){
+        		document.getElementById("photoResult").innerText = "Foto Berhasil diupload";
+                photoUploaded = true;
+                checkAndRedirectToOTP();
+        	} else {
+                document.getElementById("photoResult").innerText = "Gagal upload foto: " + (data.error || "Unknown error");
+        	}
+        })
+        .catch(err => {
+            document.getElementById("photoResult").innerText = "Error: " + err.message;
+        });
+    });
+
+    // Upload PDF
+    document.getElementById("pdfForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const email = document.getElementById("customerEmail").value;
+
+        fetch('/api/customers/upload/pdf', {
+            method: 'POST',
+            body: formData
+        })
+        .then(async res => {
+        	const text = await res.text();
+        	try {
+        		return JSON.parse(text);
+        	}catch (e){
+        		throw new Error("Invalid JSON Response: " + text);
+        	}
+        })
+        .then(data => {
+        	console.log("Response data:", data);
+        	if (data.data && data.data.fileUrl){
+        		document.getElementById("pdfResult").innerText = "PDF Berhasil diupload";
+                pdfUploaded = true;
+                checkAndRedirectToOTP();
+        	} else {
+                document.getElementById("pdfResult").innerText = "Gagal upload pdf: " + (data.error || "Unknown error");
+        	}
+        })
+        .catch(err => {
+            document.getElementById("pdfResult").innerText = "Error: " + err.message;
+        });
+    });
+</script>
+</body>
+</html>

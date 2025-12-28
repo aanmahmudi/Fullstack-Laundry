@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Customer • Laundry App</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <header id="app-header"></header>
+    <main>
+      <section>
+        <h2>Customer</h2>
+        <div class="actions">
+          <button id="btn-load-customers">Muat Customer</button>
+        </div>
+        <ul id="customers-list" class="list"></ul>
+
+        <h3>Register Customer</h3>
+        <form id="form-register" class="form-grid">
+          <label>
+            Nama
+            <input type="text" name="username" required />
+          </label>
+          <label>
+            Tempat Lahir
+            <input type="text" name="placeOfBirth" />
+          </label>
+          <label>
+            Tanggal Lahir
+            <input type="date" name="dateOfBirth" required />
+          </label>
+          <label class="full">
+            Alamat
+            <input type="text" name="address" />
+          </label>
+          <label>
+            No. HP (12–13 digit)
+            <input type="text" name="phoneNumber" required pattern="[0-9]{12,13}" inputmode="numeric" title="Harus 12–13 digit angka" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            Password (min 8)
+            <input type="password" name="password" required minlength="8" />
+          </label>
+          <label>
+            Foto URL
+            <input type="url" name="photoUrl" />
+          </label>
+          <label>
+            Dokumen URL
+            <input type="url" name="documentUrl" />
+          </label>
+          <button type="submit">Daftar</button>
+        </form>
+        <div id="register-msg" class="msg"></div>
+      </section>
+    </main>
+    <footer><small>&copy; Laundry App</small></footer>
+
+    <script src="../js/ui/header.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/pages/customers.js"></script>
+  </body>
+  </html>

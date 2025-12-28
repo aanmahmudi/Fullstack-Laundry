@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>Register Customer</h2>
+    
+    <div th:if="${errorMessage}" style="color: red">
+    	<p th:text="${errorMessage}"></p>
+    </div>
+    <form th:object="${registerDTO}" action="/register" method="post">
+        <label>Username:</label><br>
+        <input type="text" th:field="*{username}" required/><br>
+
+        <label>Place of Birth:</label><br>
+        <input type="text" th:field="*{placeOfBirth}" required/><br>
+
+        <label>Date of Birth:</label><br>
+        <input type="date" th:field="*{dateOfBirth}" required/><br>
+
+        <label>Address:</label><br>
+        <input type="text" th:field="*{address}"/><br>
+
+        <label>Phone Number:</label><br>
+        <input type="text" th:field="*{phoneNumber}"/><br>
+
+        <label>Email:</label><br>
+        <input type="email" th:field="*{email}" required/><br>
+
+        <label>Password:</label><br>
+        <input type="password" th:field="*{password}" required/><br>
+
+        <label>Role:</label><br>
+        <select th:field="*{role}">
+            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+        </select><br><br>
+
+        <button type="submit">Register</button>
+    </form>
+    
+    <p id="result" style="color: red;"></p>
+
+	<script>
+        function submitForm() {
+            const formData = {
+                username: document.querySelector('[name="username"]').value,
+                placeOfBirth: document.querySelector('[name="placeOfBirth"]').value,
+                dateOfBirth: document.querySelector('[name="dateOfBirth"]').value,
+                address: document.querySelector('[name="address"]').value,
+                phoneNumber: document.querySelector('[name="phoneNumber"]').value,
+                email: document.querySelector('[name="email"]').value,
+                password: document.querySelector('[name="password"]').value,
+                role: document.querySelector('[name="role"]').value
+            };
+
+            fetch('/api/customers/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(async response => {
+            	if (!response.ok){
+            		const errorData = await response.json();
+            		throw new Error(errorData.message || "Terjadi Kesalahan");
+            	}
+            	return response.json();
+            })
+            .then(data => {
+            	//Asumsi API Register balikin
+            	window.location.href = '/upload?id=' + data.customerId;
+            })
+            .catch(async error => {
+            	try {
+            		const errorJson = JSON.parse(error.message);
+            		document.getElementById("result").innerText = "Gagal Daftar: " + errorJson.message;
+            	} catch (e){
+            		document.getElementById("result").innerText = "Gagal Daftar: " + error.message;
+            	}
+            });
+        }
+    </script>
+    
+</body>
+</html>

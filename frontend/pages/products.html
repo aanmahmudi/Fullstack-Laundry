@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Produk • Laundry App</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <header id="app-header"></header>
+    <main>
+      <section>
+        <h2>Produk</h2>
+        <div class="actions">
+          <button id="btn-load-products">Muat Produk</button>
+        </div>
+        <ul id="products-list" class="list"></ul>
+
+        <h3>Tambah Produk</h3>
+        <form id="form-product" class="form-grid">
+          <label>
+            Nama
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            Harga
+            <input type="number" step="0.01" name="price" required />
+          </label>
+          <label>
+            Foto URL
+            <input type="url" name="photoUrl" />
+          </label>
+          <label class="full">
+            Deskripsi
+            <textarea name="description" rows="3"></textarea>
+          </label>
+          <button type="submit">Simpan Produk</button>
+        </form>
+        <div id="product-msg" class="msg"></div>
+      </section>
+    </main>
+    <footer><small>&copy; Laundry App</small></footer>
+
+    <script src="../js/ui/header.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/pages/products.js"></script>
+  </body>
+  </html>

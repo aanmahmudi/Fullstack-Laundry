@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Transaksi • Laundry App</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body>
+    <header id="app-header"></header>
+    <main>
+      <section>
+        <h2>Transaksi</h2>
+        <div class="actions">
+          <button id="btn-load-transactions">Muat Transaksi</button>
+        </div>
+        <ul id="transactions-list" class="list"></ul>
+
+        <h3>Buat Transaksi</h3>
+        <form id="form-transaction" class="form-grid">
+          <label>
+            Customer ID
+            <input type="number" name="customerId" required />
+          </label>
+          <label>
+            Product ID
+            <input type="number" name="productId" required />
+          </label>
+          <label>
+            Quantity
+            <input type="number" name="quantity" required />
+          </label>
+          <button type="submit">Buat Transaksi</button>
+        </form>
+        <div id="transaction-msg" class="msg"></div>
+
+        <h3>Pembayaran</h3>
+        <form id="form-payment" class="form-grid">
+          <label>
+            Transaction ID
+            <input type="number" name="transactionId" required />
+          </label>
+          <label>
+            Jumlah Bayar
+            <input type="number" step="0.01" name="paymentAmount" required />
+          </label>
+          <button type="submit">Bayar</button>
+        </form>
+        <div id="payment-msg" class="msg"></div>
+      </section>
+    </main>
+    <footer><small>&copy; Laundry App</small></footer>
+
+    <script src="../js/ui/header.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/pages/transactions.js"></script>
+  </body>
+  </html>
