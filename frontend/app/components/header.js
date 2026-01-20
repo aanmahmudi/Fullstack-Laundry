@@ -1,11 +1,11 @@
 import { navigate } from '../core/router.js?v=20260119';
-import { State } from '../core/state.js';
+import { State } from '../core/state.js?v=fix3';
 
 export function renderHeader(el) {
   function render() {
     // Sembunyikan header jika di halaman auth
     const hash = window.location.hash;
-    const isAuthPage = hash.includes('login') || hash.includes('register') || hash.includes('forgot-password') || hash.includes('verify');
+    const isAuthPage = hash.includes('login') || hash.includes('register') || hash.includes('forgot-password') || hash.includes('verify') || hash.includes('reset-password') || hash.includes('verify-reset-otp') || hash.includes('new-password');
     
     if (isAuthPage) {
       el.style.display = 'none';

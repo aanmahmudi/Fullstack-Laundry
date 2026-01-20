@@ -1,6 +1,7 @@
 const CART_KEY = 'laundry_cart';
 const AUTH_KEY = 'laundry_user';
 const PENDING_EMAIL_KEY = 'laundry_pending_email';
+const PENDING_OTP_KEY = 'laundry_pending_otp';
 
 export const State = {
   getCart() {
@@ -53,4 +54,11 @@ export const State = {
   },
   getPendingEmail() { return localStorage.getItem(PENDING_EMAIL_KEY) || null; },
   clearPendingEmail() { localStorage.removeItem(PENDING_EMAIL_KEY); },
+
+  setPendingOTP(otp) {
+    if (otp) localStorage.setItem(PENDING_OTP_KEY, String(otp));
+    else localStorage.removeItem(PENDING_OTP_KEY);
+  },
+  getPendingOTP() { return localStorage.getItem(PENDING_OTP_KEY) || null; },
+  clearPendingOTP() { localStorage.removeItem(PENDING_OTP_KEY); },
 };

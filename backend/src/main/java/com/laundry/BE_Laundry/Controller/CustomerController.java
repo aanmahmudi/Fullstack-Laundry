@@ -32,6 +32,7 @@ import com.laundry.BE_Laundry.DTO.ApiResponse;
 import com.laundry.BE_Laundry.DTO.CustomerLoginDTO;
 import com.laundry.BE_Laundry.DTO.OTPVerificationDTO;
 import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
+import com.laundry.BE_Laundry.DTO.ResetPasswordDTO;
 import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
 import com.laundry.BE_Laundry.DTO.VerifyTokenDTO;
 import com.laundry.BE_Laundry.Model.Customer;
@@ -134,6 +135,27 @@ public class CustomerController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured:" + ex.getMessage());
 		}
 
+	}
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> payload) {
+		String email = payload.get("email");
+		try {
+			customerService.forgotPassword(email);
+			return ResponseEntity.ok(Map.of("message", "OTP for password reset has been sent to your email."));
+		} catch (Exception ex) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Error: " + ex.getMessage()));
+		}
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDTO resetDTO) {
+		try {
+			customerService.resetPassword(resetDTO.getEmail(), resetDTO.getOtp(), resetDTO.getNewPassword());
+			return ResponseEntity.ok(Map.of("message", "Password has been reset successfully."));
+		} catch (Exception ex) {
+			return ResponseEntity.badRequest().body(Map.of("message", "Error: " + ex.getMessage()));
+		}
 	}
 
 	@GetMapping

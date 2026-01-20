@@ -28,6 +28,8 @@ public class WebAccessConfig {
 				"/api/customers/login",
 				"/api/customers/logout",
 				"/api/customers/update-password",
+				"/api/customers/forgot-password",
+				"/api/customers/reset-password",
 				"/api/customers",
 				"/api/customers/**",
 				"/api/customers/upload/photo",
@@ -39,6 +41,9 @@ public class WebAccessConfig {
 				"/api/otp/send",
 				"/spi/otp/otp",
 				"/api/otp/verify",
+				"/api/otp/verify-reset",
+				"/api/otp/resend",
+				"/api/otp/check",
 				"/api/token/send",
 				"/api/token/verify",
 				
@@ -48,8 +53,7 @@ public class WebAccessConfig {
 				"/api/transactions",
 				"/api/transactions/**",
 				"/api/transactions/payment",
-				"/api/transactions/paid",
-				"/api/transactions/**/payment"
+				"/api/transactions/paid"
 		};
 	}
 

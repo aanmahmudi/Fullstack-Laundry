@@ -6,8 +6,8 @@ import { CheckoutPage } from '../pages/checkout.js';
 import { OrdersPage } from '../pages/orders.js';
 import { OrderDetailPage } from '../pages/order-detail.js';
 // Cache-busting import untuk memastikan perubahan AuthPage terbaca di browser
-import { AuthPage } from '../pages/auth.js?v=20260120';
-import { State } from './state.js';
+import { AuthPage } from '../pages/auth.js?v=fix3';
+import { State } from './state.js?v=fix3';
 
 let outletEl = null;
 
@@ -24,6 +24,8 @@ const routes = [
   { pattern: '#/login', render: AuthPage },
   { pattern: '#/register', render: AuthPage },
   { pattern: '#/forgot-password', render: AuthPage },
+  { pattern: '#/verify-reset-otp', render: AuthPage },
+  { pattern: '#/new-password', render: AuthPage },
   { pattern: '#/verify', render: AuthPage },
 ];
 

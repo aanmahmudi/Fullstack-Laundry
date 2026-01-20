@@ -1,4 +1,4 @@
-import { State } from '../core/state.js';
+import { State } from '../core/state.js?v=fix3';
 import { showModal } from '../components/modal.js';
 
 export function AuthPage() {
@@ -6,6 +6,8 @@ export function AuthPage() {
   const hash = window.location.hash;
   let view = 'login';
   if (hash.includes('register')) view = 'register';
+  else if (hash.includes('verify-reset-otp')) view = 'verify-reset-otp';
+  else if (hash.includes('new-password')) view = 'new-password';
   else if (hash.includes('verify')) view = 'verify';
   else if (hash.includes('forgot-password')) view = 'forgot-password';
 
@@ -16,6 +18,8 @@ export function AuthPage() {
     const register = document.getElementById('form-register');
     const verify = document.getElementById('form-verify');
     const forgotForm = document.getElementById('form-forgot');
+    const verifyResetForm = document.getElementById('form-verify-reset-otp');
+    const newPasswordForm = document.getElementById('form-new-password');
     
     const msg = document.getElementById('auth-msg');
     const verifyEmailDisplay = document.getElementById('verify-email-display');
@@ -87,9 +91,89 @@ export function AuthPage() {
     }
 
     if (forgotForm) {
-      forgotForm.addEventListener('submit', (e) => {
+      forgotForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        showModal('Jika lupa password, silakan hubungi admin atau gunakan fitur reset jika tersedia.');
+        const email = forgotForm.querySelector('input[name="email"]').value;
+        if (!email) return;
+        
+        msg.textContent = 'Mengirim OTP...'; msg.classList.remove('error');
+        try {
+          await API.apiPost('/api/customers/forgot-password', { email });
+          State.setPendingEmail(email);
+          window.location.hash = '#/verify-reset-otp';
+        } catch (err) {
+          msg.textContent = err.message || 'Gagal mengirim OTP'; msg.classList.add('error');
+        }
+      });
+    }
+
+    if (verifyResetForm) {
+      verifyResetForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const otpInput = verifyResetForm.querySelector('input[name="otp"]');
+        const otp = (otpInput.value || '').trim();
+        if (!otp) { msg.textContent = 'Masukkan OTP'; msg.classList.add('error'); return; }
+        
+        const email = State.getPendingEmail();
+        if (!email) { msg.textContent = 'Sesi kadaluarsa. Silakan mulai ulang.'; msg.classList.add('error'); return; }
+
+        msg.textContent = 'Memverifikasi OTP...'; msg.classList.remove('error');
+        try {
+           await API.apiPost('/api/otp/verify-reset', { email, otp });
+           State.setPendingOTP(otp);
+           msg.textContent = '';
+           window.location.hash = '#/new-password';
+        } catch (err) {
+           msg.textContent = err.message || 'OTP Salah atau Kadaluarsa'; msg.classList.add('error');
+        }
+      });
+
+      const resendReset = document.getElementById('resend-reset-otp');
+      if (resendReset) {
+        resendReset.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const email = State.getPendingEmail();
+          if (!email) { msg.textContent = 'Sesi kadaluarsa. Silakan mulai ulang.'; msg.classList.add('error'); return; }
+          
+          msg.textContent = 'Mengirim ulang OTP...'; msg.classList.remove('error');
+          try {
+            await API.apiPost('/api/customers/forgot-password', { email });
+            showModal('OTP reset password telah dikirim ulang ke email Anda.');
+            msg.textContent = '';
+          } catch (err) {
+            msg.textContent = err.message || 'Gagal mengirim ulang OTP'; msg.classList.add('error');
+          }
+        });
+      }
+    }
+
+    if (newPasswordForm) {
+      newPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const newPwd = newPasswordForm.querySelector('input[name="newPassword"]').value;
+        const confirmPwd = newPasswordForm.querySelector('input[name="confirmNewPassword"]').value;
+        
+        if (newPwd.length < 8) {
+           msg.textContent = 'Password minimal 8 karakter'; msg.classList.add('error'); return;
+        }
+        if (newPwd !== confirmPwd) {
+           msg.textContent = 'Konfirmasi password tidak cocok'; msg.classList.add('error'); return;
+        }
+
+        msg.textContent = 'Mereset password...'; msg.classList.remove('error');
+        try {
+          const email = State.getPendingEmail();
+          const otp = State.getPendingOTP();
+          if (!email || !otp) throw new Error('Sesi kadaluarsa, silakan ulang dari awal.');
+          
+          await API.apiPost('/api/customers/reset-password', { email, otp, newPassword: newPwd });
+          showModal('Password berhasil direset. Silakan login dengan password baru.');
+          State.clearPendingEmail();
+          State.clearPendingOTP();
+          window.location.hash = '#/login';
+        } catch (err) {
+           msg.textContent = err.message || 'Gagal mereset password'; msg.classList.add('error');
+        }
       });
     }
 
@@ -196,12 +280,16 @@ function authForms(view) {
   const isRegister = view === 'register';
   const isVerify = view === 'verify';
   const isForgot = view === 'forgot-password';
+  const isVerifyReset = view === 'verify-reset-otp';
+  const isNewPassword = view === 'new-password';
 
   let title = 'Login';
   let subtitle = 'Masukkan email/username dan password';
   if (isRegister) { title = 'Sign Up'; subtitle = 'Lengkapi data untuk membuat akun baru'; }
   else if (isVerify) { title = 'Verifikasi OTP'; subtitle = 'Masukkan kode OTP yang dikirim ke email Anda'; }
   else if (isForgot) { title = 'Lupa Password'; subtitle = 'Masukkan email untuk reset password'; }
+  else if (isVerifyReset) { title = 'Verifikasi OTP'; subtitle = 'Masukkan OTP reset password'; }
+  else if (isNewPassword) { title = 'Buat Password Baru'; subtitle = 'Masukkan password baru Anda'; }
 
   return `
     <div class="panel auth-card">
@@ -308,7 +396,41 @@ function authForms(view) {
           </div>
           <small class="field-error"></small>
         </label>
-        <button class="btn purple full-width" type="submit">Reset Password</button>
+        <button class="btn purple full-width" type="submit">Kirim OTP Reset</button>
+        <div class="auth-footer">
+           <a href="#/login">Kembali ke Login</a>
+        </div>
+      </form>
+
+      <form id="form-verify-reset-otp" class="form-vertical" style="display:${isVerifyReset ? 'block' : 'none'}">
+        <p class="muted">Masukkan OTP yang dikirim ke email Anda.</p>
+        <label style="margin-bottom: 24px;">OTP
+          <div class="input-with-icon">
+            <span class="icon">🔢</span>
+            <input name="otp" type="text" required placeholder="Kode OTP" />
+          </div>
+        </label>
+        <button class="btn purple full-width" type="submit">Lanjut</button>
+        <div class="auth-footer">
+           <a href="#" id="resend-reset-otp">Kirim ulang OTP</a>
+           <a href="#/login">Kembali ke Login</a>
+        </div>
+      </form>
+
+      <form id="form-new-password" class="form-vertical" style="display:${isNewPassword ? 'block' : 'none'}">
+        <label>Password Baru
+          <div class="input-with-icon">
+            <span class="icon">🔒</span>
+            <input name="newPassword" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
+          </div>
+        </label>
+        <label>Konfirmasi Password Baru
+          <div class="input-with-icon">
+            <span class="icon">🔒</span>
+            <input name="confirmNewPassword" type="password" required minlength="8" placeholder="Ulangi password baru" />
+          </div>
+        </label>
+        <button class="btn purple full-width" type="submit">Simpan Password</button>
         <div class="auth-footer">
            <a href="#/login">Kembali ke Login</a>
         </div>

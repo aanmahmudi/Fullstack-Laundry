@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,8 +69,28 @@ public class OTPController {
 		}
 	}
 
+	@PostMapping("/verify-reset")
+	public ResponseEntity<Map<String, String>> verifyReset(@RequestBody @Valid OTPVerificationDTO otpVerify) {
+		try {
+			otpService.checkOtp(otpVerify.getEmail(), otpVerify.getOtp());
+			logger.info("OTP reset verified for {}", otpVerify.getEmail());
+			
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "OTP Valid");
+			return ResponseEntity.ok(response);
+		} catch (IllegalArgumentException ex) {
+			Map<String, String> response = new HashMap<>();
+			response.put("error", ex.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (Exception ex) {
+			Map<String, String> response = new HashMap<>();
+			response.put("error", "An error occurred:" + ex.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+
 	@PostMapping("/resend")
-	public ResponseEntity<?> resend(@RequestBody @Valid OTPVerificationDTO resend) {
+	public ResponseEntity<?> resend(@RequestBody @Valid OTPSendDTO resend) {
 		String email = resend.getEmail();
 		try {
 			otpService.generate(email);
@@ -84,6 +103,17 @@ public class OTPController {
 			logger.error("Unexcepted error while resend OTP to {}: {}", email, ex.getMessage(), ex);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured while resend OTP");
 		}
+	}
+
+	@GetMapping("/check")
+	public ResponseEntity<?> checkOtp(@RequestParam String email) {
+		return customerRepository.findByEmail(email)
+				.map(c -> {
+					Map<String, String> response = new HashMap<>();
+					response.put("otp", c.getVerificationOtp());
+					return ResponseEntity.ok(response);
+				})
+				.orElse(ResponseEntity.notFound().build());
 	}
 
 

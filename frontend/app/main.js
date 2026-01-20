@@ -1,5 +1,5 @@
-import { initRouter, navigate } from './core/router.js?v=20260120';
-import { renderHeader } from './components/header.js?v=20260119';
+import { initRouter, navigate } from './core/router.js?v=fix3';
+import { renderHeader } from './components/header.js?v=fix3';
 
 function bootstrap() {
   renderHeader(document.getElementById('app-header'));

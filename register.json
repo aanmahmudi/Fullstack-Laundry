@@ -1,0 +1,9 @@
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123",
+  "placeOfBirth": "Jakarta",
+  "dateOfBirth": "1990-01-01",
+  "phoneNumber": "081234567890",
+  "address": "Jalan Test"
+}

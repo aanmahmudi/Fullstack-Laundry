@@ -1,9 +1,11 @@
 services:
   db:
-    image: postgres
+    image: postgres:16
     restart: always
     ports: 
-      - "5432:5432"
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: subrutin
       POSTGRES_PASSWORD: subrutin
@@ -33,3 +35,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db-laundry
       SPRING_DATASOURCE_USERNAME: subrutin
       SPRING_DATASOURCE_PASSWORD: subrutin
+    dns:
+      - 8.8.8.8
+
+volumes:
+  postgres_data:

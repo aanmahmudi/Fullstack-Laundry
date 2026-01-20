@@ -32,6 +32,7 @@ public class CustomerService {
 	private final CustomerRepository customerRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final EmailService emailService;
+	private final OTPService otpService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
@@ -110,6 +111,30 @@ public class CustomerService {
 		}
 
 		customer.setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
+		customerRepository.save(customer);
+	}
+	
+	public void forgotPassword(String email) {
+		otpService.generateResetOtp(email);
+	}
+
+	public void resetPassword(String email, String otp, String newPassword) {
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User Not Found"));
+		
+		if (customer.getVerificationOtp() == null || !customer.getVerificationOtp().equals(otp)) {
+			throw new RuntimeException("Invalid OTP");
+		}
+		
+		if (customer.getOtpExpiry() == null || customer.getOtpExpiry().isBefore(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
+			throw new RuntimeException("OTP Expired");
+		}
+		
+		customer.setPassword(passwordEncoder.encode(newPassword));
+		// Clear OTP after successful reset
+		customer.setVerificationOtp(null);
+		customer.setOtpExpiry(null);
+		
 		customerRepository.save(customer);
 	}
 

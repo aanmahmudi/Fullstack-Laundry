@@ -31,7 +31,7 @@ public class OTPService {
 		sendOtpToCustomer(customer);
 	}
 	
-	public void generate (String email) {
+	public String generate (String email) {
 		Customer c = customerRepository.findByEmail(email)
 				.orElseThrow(()-> new RuntimeException("User not found"));
 		
@@ -45,7 +45,7 @@ public class OTPService {
 		if (c.getVerificationOtp() != null &&
 				c.getOtpExpiry() != null &&
 				c.getOtpExpiry().isAfter(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
-				throw new IllegalStateException("OTP masih aktif, silahkan cek kembali");
+				return c.getVerificationOtp();
 		}
 		
 		//Generate OTP baru
@@ -57,8 +57,24 @@ public class OTPService {
 		customerRepository.save(c);
 		
 		emailService.sendOTPEmail(email, otp);
+		return otp;
 	}
 	
+	public boolean checkOtp(String email, String otp) {
+		Customer c = customerRepository.findByEmail(email)
+				.orElseThrow(()-> new RuntimeException("User not found"));
+		
+		if (c.getVerificationOtp() == null || !c.getVerificationOtp().equals(otp)) {
+			throw new IllegalArgumentException("OTP Salah");
+		}
+		
+		if (c.getOtpExpiry() != null && c.getOtpExpiry().isBefore(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
+			throw new IllegalArgumentException("OTP Kadaluarsa");
+		}
+		
+		return true;
+	}
+
 	public void verify (String email, String otp) {
 		Customer c = customerRepository.findUnverifiedByEmailAndOtp(email, otp)
 				.orElseThrow(()-> new RuntimeException("User not found"));
@@ -92,6 +108,22 @@ public class OTPService {
 			throw new RuntimeException("User Already verified, no need to resend OTP");
 		}
 		generate(email);
+	}
+	
+	public String generateResetOtp(String email) {
+		Customer c = customerRepository.findByEmail(email)
+				.orElseThrow(()-> new RuntimeException("User not found"));
+		
+		//Generate OTP baru untuk reset password (tidak peduli status verified)
+		String otp = GenerateOTP.generateOTP();
+		OffsetDateTime expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5));
+		
+		c.setVerificationOtp(otp);
+		c.setOtpExpiry(expiry);
+		customerRepository.save(c);
+		
+		emailService.sendOTPEmail(email, otp);
+		return otp;
 	}
 	
 
