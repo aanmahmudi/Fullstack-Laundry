@@ -38,8 +38,14 @@ export const State = {
   getUser() {
     try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch { return null; }
   },
-  setUser(user) { localStorage.setItem(AUTH_KEY, JSON.stringify(user)); },
-  clearUser() { localStorage.removeItem(AUTH_KEY); },
+  setUser(user) {
+    localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+    window.dispatchEvent(new CustomEvent('user:updated', { detail: { user } }));
+  },
+  clearUser() {
+    localStorage.removeItem(AUTH_KEY);
+    window.dispatchEvent(new CustomEvent('user:updated', { detail: { user: null } }));
+  },
 
   setPendingEmail(email) {
     if (email) localStorage.setItem(PENDING_EMAIL_KEY, String(email));

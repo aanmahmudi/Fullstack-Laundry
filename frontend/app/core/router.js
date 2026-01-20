@@ -6,12 +6,14 @@ import { CheckoutPage } from '../pages/checkout.js';
 import { OrdersPage } from '../pages/orders.js';
 import { OrderDetailPage } from '../pages/order-detail.js';
 // Cache-busting import untuk memastikan perubahan AuthPage terbaca di browser
-import { AuthPage } from '../pages/auth.js?v=20251228';
+import { AuthPage } from '../pages/auth.js?v=20260120';
+import { State } from './state.js';
 
 let outletEl = null;
 
 const routes = [
   { pattern: '#/', render: HomePage },
+  { pattern: '#/dashboard', render: HomePage },
   { pattern: '#/products', render: ProductsPage },
   { pattern: '#/product/:id', render: ProductDetailPage },
   { pattern: '#/cart', render: CartPage },
@@ -19,6 +21,10 @@ const routes = [
   { pattern: '#/orders', render: OrdersPage },
   { pattern: '#/orders/:id', render: OrderDetailPage },
   { pattern: '#/auth', render: AuthPage },
+  { pattern: '#/login', render: AuthPage },
+  { pattern: '#/register', render: AuthPage },
+  { pattern: '#/forgot-password', render: AuthPage },
+  { pattern: '#/verify', render: AuthPage },
 ];
 
 function matchRoute(hash) {
@@ -53,7 +59,20 @@ export function initRouter({ outlet }) {
 }
 
 function render() {
-  const hash = location.hash || '#/';
+  let hash = location.hash || '#/';
+  
+  // Root redirect logic
+  if (hash === '#/' || hash === '') {
+    const user = State.getUser();
+    if (user) {
+      navigate('#/dashboard');
+      return;
+    } else {
+      navigate('#/login');
+      return;
+    }
+  }
+
   const match = matchRoute(hash);
   if (!match) {
     outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${hash}</p></section>`;

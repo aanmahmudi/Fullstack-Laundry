@@ -3,22 +3,21 @@ import { showModal } from '../components/modal.js';
 
 export function AuthPage() {
   const user = State.getUser();
-  const html = `
-    <section>
-      <h2>Akun</h2>
-      ${user ? loggedIn(user) : authForms()}
-    </section>
-  `;
+  const hash = window.location.hash;
+  let view = 'login';
+  if (hash.includes('register')) view = 'register';
+  else if (hash.includes('verify')) view = 'verify';
+  else if (hash.includes('forgot-password')) view = 'forgot-password';
+
+  const html = user ? loggedIn(user) : authForms(view);
 
   window.__bindPage = () => {
     const login = document.getElementById('form-login');
     const register = document.getElementById('form-register');
     const verify = document.getElementById('form-verify');
-    const switchToRegister = document.getElementById('switch-register');
-    const switchToLogin = document.getElementById('switch-login');
-    const switchToVerify = document.getElementById('switch-verify');
+    const forgotForm = document.getElementById('form-forgot');
+    
     const msg = document.getElementById('auth-msg');
-    const forgot = document.getElementById('forgot-password');
     const verifyEmailDisplay = document.getElementById('verify-email-display');
 
     function setFieldError(input, message) {
@@ -35,8 +34,12 @@ export function AuthPage() {
       const val = (input.value || '').trim();
       let message = '';
       if (name === 'email') {
-        const ok = /.+@.+\..+/.test(val);
-        if (!ok) message = 'Format email tidak valid';
+        if (context === 'register') {
+             const ok = /.+@.+\..+/.test(val);
+             if (!ok) message = 'Format email tidak valid';
+        } else {
+             if (!val) message = 'Email/Username wajib diisi';
+        }
       } else if (name === 'password') {
         if ((val || '').length < 8) message = 'Password minimal 8 karakter';
       } else if (name === 'phoneNumber') {
@@ -58,37 +61,10 @@ export function AuthPage() {
       });
     }
 
-    if (switchToRegister && switchToLogin) {
-      switchToRegister.addEventListener('click', (e) => { e.preventDefault(); toggleForms('register'); });
-      switchToLogin.addEventListener('click', (e) => { e.preventDefault(); toggleForms('login'); });
-    }
-    if (switchToVerify) {
-      switchToVerify.addEventListener('click', (e) => { e.preventDefault(); toggleForms('verify'); });
-    }
-
-  function toggleForms(which) {
-    document.getElementById('form-login').style.display = which === 'login' ? 'block' : 'none';
-    document.getElementById('form-register').style.display = which === 'register' ? 'block' : 'none';
-    if (document.getElementById('form-verify')) {
-      document.getElementById('form-verify').style.display = which === 'verify' ? 'block' : 'none';
-    }
-      const tLogin = document.getElementById('switch-login');
-      const tRegister = document.getElementById('switch-register');
-      const tVerify = document.getElementById('switch-verify');
-      if (tLogin && tRegister) {
-        tLogin.classList.toggle('active', which === 'login');
-        tRegister.classList.toggle('active', which === 'register');
-      }
-    if (tVerify) {
-      tVerify.classList.toggle('active', which === 'verify');
-    }
-    if (which === 'verify' && verifyEmailDisplay) {
+    if (view === 'verify' && verifyEmailDisplay) {
       const pe = State.getPendingEmail();
       verifyEmailDisplay.textContent = pe || '-';
     }
-    msg.textContent = '';
-    msg.classList.remove('error');
-  }
 
     if (login) {
       attachValidation(login, 'login');
@@ -103,18 +79,20 @@ export function AuthPage() {
           const token = res.token || res.accessToken || null;
           const id = res.customerId || res.id || null;
           State.setUser({ email: payload.email, id, token });
-          window.location.hash = '#/auth';
+          window.location.hash = '#/dashboard';
         } catch (e) {
           msg.textContent = e.message; msg.classList.add('error');
         }
       });
     }
-    if (forgot) {
-      forgot.addEventListener('click', (e) => {
+
+    if (forgotForm) {
+      forgotForm.addEventListener('submit', (e) => {
         e.preventDefault();
         showModal('Jika lupa password, silakan hubungi admin atau gunakan fitur reset jika tersedia.');
       });
     }
+
     if (verify) {
       const resend = document.getElementById('resend-otp');
       verify.addEventListener('submit', async (ev) => {
@@ -130,7 +108,7 @@ export function AuthPage() {
           await API.apiPost('/api/otp/verify', { email, otp: otpInput.value });
           showModal('Verifikasi berhasil. Silakan masuk.');
           State.clearPendingEmail();
-          toggleForms('login');
+          window.location.hash = '#/login';
         } catch (e) {
           msg.textContent = e.message; msg.classList.add('error');
         }
@@ -150,6 +128,7 @@ export function AuthPage() {
         });
       }
     }
+
     if (register) {
       attachValidation(register, 'register');
       register.addEventListener('submit', async (ev) => {
@@ -162,12 +141,13 @@ export function AuthPage() {
           const res = await API.apiPost('/api/customers/register', payload);
           State.setPendingEmail(payload.email);
           msg.textContent = `Registrasi sukses. Silakan verifikasi OTP yang dikirim ke ${payload.email}.`;
-          toggleForms('verify');
+          window.location.hash = '#/verify';
         } catch (e) {
           msg.textContent = e.message; msg.classList.add('error');
         }
       });
     }
+
     const logout = document.getElementById('btn-logout');
     if (logout) {
       logout.addEventListener('click', async () => {
@@ -176,9 +156,10 @@ export function AuthPage() {
           if (u?.email) { await API.apiPost('/api/customers/logout', { email: u.email }); }
         } catch (_) { /* abaikan error logout server */ }
         State.clearUser();
-        window.location.hash = '#/auth';
+        window.location.hash = '#/login';
       });
     }
+
     const formUpdate = document.getElementById('form-update-password');
     const btnUpdate = document.getElementById('btn-update-password');
     const updMsg = document.getElementById('upd-msg');
@@ -210,21 +191,29 @@ export function AuthPage() {
   return html;
 }
 
-function authForms() {
+function authForms(view) {
+  const isLogin = view === 'login';
+  const isRegister = view === 'register';
+  const isVerify = view === 'verify';
+  const isForgot = view === 'forgot-password';
+
+  let title = 'Login';
+  let subtitle = 'Masukkan email/username dan password';
+  if (isRegister) { title = 'Sign Up'; subtitle = 'Lengkapi data untuk membuat akun baru'; }
+  else if (isVerify) { title = 'Verifikasi OTP'; subtitle = 'Masukkan kode OTP yang dikirim ke email Anda'; }
+  else if (isForgot) { title = 'Lupa Password'; subtitle = 'Masukkan email untuk reset password'; }
+
   return `
     <div class="panel auth-card">
-      <div class="tabs">
-        <a href="#" id="switch-login" class="tab active">Masuk</a>
-        <a href="#" id="switch-register" class="tab">Daftar</a>
-        <a href="#" id="switch-verify" class="tab">Verifikasi</a>
-      </div>
+      <h2 id="auth-title">${title}</h2>
+      <p id="auth-subtitle" class="muted" style="margin-bottom: 24px;">${subtitle}</p>
       <p id="auth-msg" class="muted"></p>
 
-      <form id="form-login" class="form-vertical" style="display:block">
-        <label>Email
+      <form id="form-login" class="form-vertical" style="display:${isLogin ? 'block' : 'none'}">
+        <label>Email atau Username
           <div class="input-with-icon">
             <span class="icon">@</span>
-            <input name="email" type="email" required placeholder="email@contoh.com" />
+            <input name="email" type="text" required placeholder="email@contoh.com" />
           </div>
           <small class="field-error"></small>
         </label>
@@ -235,11 +224,14 @@ function authForms() {
           </div>
           <small class="field-error"></small>
         </label>
-        <button class="btn primary" type="submit">Masuk</button>
-        <a href="#" id="forgot-password" class="muted">Lupa Password?</a>
+        <button class="btn purple full-width" type="submit">Login</button>
+        <div class="auth-footer">
+           <span>Belum punya akun? <a href="#/register">Create Account</a></span>
+           <a href="#/forgot-password">Forgot password?</a>
+        </div>
       </form>
 
-      <form id="form-register" class="form-vertical" style="display:none">
+      <form id="form-register" class="form-vertical" style="display:${isRegister ? 'block' : 'none'}">
         <label>Nama
           <div class="input-with-icon">
             <span class="icon">👤</span>
@@ -286,10 +278,13 @@ function authForms() {
           </div>
           <small class="field-error"></small>
         </label>
-        <button class="btn primary" type="submit">Daftar</button>
+        <button class="btn purple full-width" type="submit">Sign Up</button>
+        <div class="auth-footer">
+           <span>Sudah punya akun? <a href="#/login">Login</a></span>
+        </div>
       </form>
 
-      <form id="form-verify" class="form-vertical" style="display:none">
+      <form id="form-verify" class="form-vertical" style="display:${isVerify ? 'block' : 'none'}">
         <p class="muted">OTP telah dikirim ke <strong id="verify-email-display">-</strong></p>
         <label>OTP
           <div class="input-with-icon">
@@ -298,8 +293,25 @@ function authForms() {
           </div>
           <small class="field-error"></small>
         </label>
-        <button class="btn primary" type="submit">Verifikasi</button>
-        <a href="#" id="resend-otp" class="muted">Kirim ulang OTP</a>
+        <button class="btn purple full-width" type="submit">Verifikasi</button>
+        <div class="auth-footer">
+            <a href="#" id="resend-otp">Kirim ulang OTP</a>
+            <a href="#/login">Kembali ke Login</a>
+        </div>
+      </form>
+
+      <form id="form-forgot" class="form-vertical" style="display:${isForgot ? 'block' : 'none'}">
+        <label>Email
+          <div class="input-with-icon">
+            <span class="icon">@</span>
+            <input name="email" type="email" required placeholder="email@contoh.com" />
+          </div>
+          <small class="field-error"></small>
+        </label>
+        <button class="btn purple full-width" type="submit">Reset Password</button>
+        <div class="auth-footer">
+           <a href="#/login">Kembali ke Login</a>
+        </div>
       </form>
     </div>
   `;

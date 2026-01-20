@@ -15,7 +15,7 @@ services:
     image: nginx:alpine
     restart: always
     ports:
-      - "8080:80"
+      - "3000:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     environment:
@@ -30,3 +30,6 @@ services:
       - db
     environment:
       TZ: Asia/Jakarta
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db-laundry
+      SPRING_DATASOURCE_USERNAME: subrutin
+      SPRING_DATASOURCE_PASSWORD: subrutin
