@@ -1,55 +1,170 @@
-# BE-Laundry Monorepo
+# 🧺 Fullstack Laundry Application
 
-Struktur proyek telah ditata ulang menjadi dua folder: `backend/` untuk aplikasi Spring Boot dan `frontend/` untuk UI sederhana HTML/CSS/JS yang terhubung ke API.
+Aplikasi manajemen laundry berbasis web dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (Vanilla JS SPA).
 
-## Struktur
-- `backend/` — Aplikasi Spring Boot (Dockerfile, Maven, src, uploads)
-- `frontend/` — Halaman HTML statis dengan form untuk Produk, Customer, Transaksi, dan Login
-- `docker-compose.yml` — Menjalankan Postgres dan backend dalam container
+---
 
-## Menjalankan Backend (Docker)
-Prasyarat: Docker & Docker Compose.
+## 🏗️ Arsitektur Sistem
 
-1. Dari root proyek, jalankan:
-   - `docker compose up -d --build`
-2. Layanan yang aktif:
-   - API backend: `http://localhost:8080`
-   - Postgres: `localhost:5432` (user: `subrutin`, password: `subrutin`, db: `db-laundry`)
+Aplikasi ini terdiri dari dua bagian utama yang berkomunikasi melalui REST API.
 
-Catatan: Dockerfile backend melakukan build Maven di tahap builder, lalu menjalankan jar dengan profile `docker`.
+```mermaid
+graph TD
+    User((User)) -->|Akses Browser| FE[Frontend SPA]
+    FE -->|REST API Request| BE[Backend Spring Boot]
+    BE -->|Query/Save| DB[(PostgreSQL Database)]
+    BE -->|Email Service| SMTP[SMTP Server]
+```
 
-## Menjalankan Frontend (SPA Terstruktur)
-Prasyarat: Node.js (v18+). Frontend sekarang Single Page Application (SPA) dengan router hash-based.
+---
 
-Struktur utama:
-- `frontend/index.html` — Shell aplikasi (header, main, footer)
-- `frontend/js/api.js` — Helper panggilan API (global `window.API`)
-- `frontend/app/core/router.js` — Router sederhana untuk `#/route`
-- `frontend/app/core/state.js` — State ringan (keranjang, user) via `localStorage`
-- `frontend/app/components/header.js` — Header reusable dengan navigasi & badge keranjang
-- `frontend/app/pages/*` — Halaman modular: `home.js`, `products.js`, `product-detail.js`, `cart.js`, `checkout.js`, `orders.js`, `auth.js`
-- `frontend/assets/styles.css` — Style modern (dark, grid, cards)
+## 📂 Struktur Folder Terbaru
 
-Menjalankan server statis:
-1. Dari root proyek jalankan:
-   - `npx http-server ./frontend -p 5500 -c-1`
-2. Buka `http://127.0.0.1:5500/`
-   - Navigasi via hash: `#/products`, `#/product/ID`, `#/cart`, `#/checkout`, `#/orders`, `#/auth`
+Untuk memudahkan pengembangan dan pemeliharaan, struktur folder frontend telah dikelompokkan berdasarkan **Fitur**. Developer tidak perlu lagi bingung mencari file; cukup buka folder sesuai fitur yang ingin diedit.
 
-Frontend menggunakan `API_BASE = http://localhost:8080` dan memanggil endpoint berikut:
-- `GET /api/products`, `POST /api/products`
-- `GET /api/customers`, `POST /api/customers/register`, `POST /api/customers/login`
-- `GET /api/transactions`, `POST /api/transactions`, `POST /api/transactions/payment`
+### 1. Frontend (`/frontend`)
 
-## Catatan Vite/React
-Jika ingin frontend React+Vite, gunakan Node.js `>=20.19.0` agar kompatibel dengan `create-vite@8.x`, lalu:
-- `npm create vite@latest frontend -- --template react`
-- `cd frontend && npm install && npm run dev`
+```text
+frontend/
+├── app/
+│   ├── core/               # Logika Inti Aplikasi
+│   │   ├── router.js       # Pengatur navigasi halaman
+│   │   └── state.js        # Penyimpan data sementara (User, Cart)
+│   │
+│   ├── pages/              # Halaman-halaman (Dikelompokkan per Fitur)
+│   │   ├── auth/           # Fitur Autentikasi
+│   │   │   ├── login.js
+│   │   │   ├── register.js
+│   │   │   └── ...
+│   │   │
+│   │   ├── home/           # Halaman Utama
+│   │   │   └── index.js
+│   │   │
+│   │   ├── products/       # Fitur Produk
+│   │   │   ├── list.js     # Daftar produk
+│   │   │   └── detail.js   # Detail produk
+│   │   │
+│   │   ├── cart/           # Fitur Keranjang
+│   │   │   └── index.js
+│   │   │
+│   │   ├── checkout/       # Fitur Pembayaran
+│   │   │   └── index.js
+│   │   │
+│   │   └── orders/         # Fitur Riwayat Pesanan
+│   │       ├── list.js
+│   │       └── detail.js
+│   │
+│   └── utils/              # Fungsi bantuan (Validasi, Format uang, dll)
+│       └── validator.js
+│
+├── js/
+│   └── api.js              # Penghubung ke Backend (Fetch API Wrapper)
+│
+└── index.html              # File utama yang memuat aplikasi
+```
 
-## Pengembangan
-- Perubahan API di backend langsung berdampak ke frontend (lihat file di `frontend/js/pages/*`).
-- Ubah `API_BASE` di `frontend/js/api.js` jika backend berjalan di host/port berbeda.
+### 2. Backend (`/backend`)
 
-## Troubleshooting
-- Port `5173` sering dipakai; gunakan `-p 5500` untuk http-server.
-- Jika `http-server` belum terpasang, `npx` akan memasang otomatis saat dijalankan pertama kali.
+Backend dibangun menggunakan Java Spring Boot dengan struktur Layered Architecture:
+
+```text
+backend/src/main/java/com/laundry/BE_Laundry/
+├── Controller/             # Menangani request HTTP dari Frontend
+│   ├── AuthController.java
+│   ├── CustomerController.java
+│   ├── ProductController.java
+│   └── TransactionController.java
+│
+├── Service/                # Logika bisnis
+├── Repository/             # Akses ke Database
+└── Model/                  # Definisi struktur data (Entity)
+```
+
+---
+
+## 🔄 Alur Pengguna (User Flow)
+
+Berikut adalah diagram alur bagaimana pengguna berinteraksi dengan aplikasi:
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend
+    
+    Note over U, F: Proses Belanja
+    U->>F: Buka Halaman Produk
+    F->>B: GET /api/products
+    B-->>F: List Produk
+    U->>F: Tambah ke Keranjang
+    F->>F: Simpan di State (Local Storage)
+    
+    Note over U, F: Proses Checkout
+    U->>F: Klik Checkout
+    alt Belum Login
+        F->>U: Redirect ke Login Page
+        U->>F: Input Email & Password
+        F->>B: POST /login
+        B-->>F: Token Valid
+    end
+    
+    U->>F: Konfirmasi Pembayaran
+    F->>B: POST /api/transactions
+    B-->>F: Transaksi Berhasil
+    F->>U: Tampilkan Halaman Sukses
+```
+
+---
+
+## 📸 Galeri Tampilan (Screenshot)
+
+> **Untuk Developer/User:** Silakan ganti gambar placeholder di bawah ini dengan screenshot aplikasi yang sebenarnya. Simpan gambar Anda di folder `docs/images/` atau upload ke image host.
+
+### 1. Halaman Login
+*(Tempel screenshot halaman login di sini)*
+![Login Page](https://placehold.co/600x400?text=Screenshot+Halaman+Login)
+
+### 2. Daftar Produk
+*(Tempel screenshot halaman daftar produk di sini)*
+![Products Page](https://placehold.co/600x400?text=Screenshot+Daftar+Produk)
+
+### 3. Keranjang & Checkout
+*(Tempel screenshot halaman keranjang di sini)*
+![Cart Page](https://placehold.co/600x400?text=Screenshot+Keranjang)
+
+---
+
+## 💡 Penjelasan Teknis Khusus
+
+### Apa itu `?v=fix8` pada tag Script?
+
+Anda mungkin melihat kode seperti ini di `index.html`:
+```html
+<script src="./js/api.js?v=fix8"></script>
+```
+
+**Fungsinya:**
+Ini adalah teknik **Cache Busting**. Browser biasanya menyimpan file JavaScript di "cache" (memori sementara) agar website loading lebih cepat. Namun, saat kita mengupdate kode, browser kadang masih memuat file lama yang tersimpan di cache.
+
+Dengan menambahkan parameter unik seperti `?v=fix8` (Version Fix 8), kita "menipu" browser agar menganggap ini adalah file baru yang berbeda, sehingga browser dipaksa mendownload versi terbaru dari server. Ini memastikan user selalu mendapatkan perbaikan bug terbaru tanpa harus menghapus cache browser mereka secara manual.
+
+---
+
+## 🚀 Cara Menjalankan Aplikasi
+
+### 1. Menjalankan Backend (Server)
+Pastikan Docker Desktop sudah menyala.
+```bash
+cd backend
+docker compose up -d --build
+```
+Backend akan berjalan di: `http://localhost:8080`
+
+### 2. Menjalankan Frontend (UI)
+Gunakan `http-server` atau Live Server apa saja.
+```bash
+# Dari folder root proyek
+npx http-server ./frontend -p 5500 -c-1
+```
+Buka browser di: `http://localhost:5500`
+

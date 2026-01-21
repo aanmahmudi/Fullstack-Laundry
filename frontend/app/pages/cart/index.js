@@ -1,4 +1,4 @@
-import { State } from '../core/state.js';
+import { State } from '../../core/state.js';
 
 export function CartPage() {
   const html = `
@@ -26,7 +26,7 @@ export function CartPage() {
               [${x.id}] ${x.name} — Rp ${x.price}
               <div class="actions">
                 <button data-i="${i}" class="btn small btn-dec">-</button>
-                <span style="margin:0 8px">${x.qty || 1}</span>
+                <span class="cart-qty">${x.qty || 1}</span>
                 <button data-i="${i}" class="btn small btn-inc">+</button>
                 <button data-i="${i}" class="btn small danger btn-del">Hapus</button>
               </div>

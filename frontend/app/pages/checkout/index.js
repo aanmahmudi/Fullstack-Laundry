@@ -1,4 +1,4 @@
-import { State } from '../core/state.js';
+import { State } from '../../core/state.js';
 
 export function CheckoutPage() {
   const items = State.getCart();

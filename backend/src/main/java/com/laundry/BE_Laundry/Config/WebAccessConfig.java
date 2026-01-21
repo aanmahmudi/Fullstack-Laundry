@@ -37,6 +37,14 @@ public class WebAccessConfig {
 				"/api/customers/upload/pdf",
 				"/api/customers/upload-pdf",
 				
+				// Auth Controller (New)
+				"/api/auth/**",
+				"/api/auth/login",
+				"/api/auth/register",
+				"/api/auth/forgot-password",
+				"/api/auth/reset-password",
+				"/api/auth/logout",
+
 				//OTP & TOKEN
 				"/api/otp/send",
 				"/spi/otp/otp",

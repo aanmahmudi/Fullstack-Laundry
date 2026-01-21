@@ -1,4 +1,4 @@
-import { State } from '../core/state.js';
+import { State } from '../../core/state.js';
 
 export function OrdersPage() {
   const user = State.getUser();
@@ -16,7 +16,7 @@ export function OrdersPage() {
           <h3>Akun</h3>
           ${user ? `<p>Masuk sebagai <strong>${user.email || 'customer'}</strong></p>` : `
             <p class="muted">Anda belum login.</p>
-            <a class="btn" href="#/auth">Login / Register</a>
+            <a class="btn" href="#/login">Login / Register</a>
           `}
         </div>
       </aside>
@@ -28,7 +28,7 @@ export function OrdersPage() {
     const user = State.getUser();
     try {
       if (!user) {
-        list.innerHTML = '<p>Silakan <a href="#/auth">login</a> untuk melihat pesanan.</p>';
+        list.innerHTML = '<p>Silakan <a href="#/login">login</a> untuk melihat pesanan.</p>';
         return;
       }
       let items = await API.apiGet('/api/transactions');

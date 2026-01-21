@@ -1,13 +1,20 @@
-import { HomePage } from '../pages/home.js';
-import { ProductsPage } from '../pages/products.js';
-import { ProductDetailPage } from '../pages/product-detail.js';
-import { CartPage } from '../pages/cart.js';
-import { CheckoutPage } from '../pages/checkout.js';
-import { OrdersPage } from '../pages/orders.js';
-import { OrderDetailPage } from '../pages/order-detail.js';
-// Cache-busting import untuk memastikan perubahan AuthPage terbaca di browser
-import { AuthPage } from '../pages/auth.js?v=fix3';
-import { State } from './state.js?v=fix3';
+import { HomePage } from '../pages/home/index.js';
+import { ProductsPage } from '../pages/products/list.js';
+import { ProductDetailPage } from '../pages/products/detail.js';
+import { CartPage } from '../pages/cart/index.js';
+import { CheckoutPage } from '../pages/checkout/index.js';
+import { OrdersPage } from '../pages/orders/list.js';
+import { OrderDetailPage } from '../pages/orders/detail.js';
+
+// Auth Pages
+import { LoginPage } from '../pages/auth/login.js';
+import { RegisterPage } from '../pages/auth/register.js';
+import { VerifyAccountPage } from '../pages/auth/verify-account.js';
+import { ForgotPasswordPage } from '../pages/auth/forgot-password.js';
+import { VerifyResetPage } from '../pages/auth/verify-reset.js';
+import { NewPasswordPage } from '../pages/auth/new-password.js';
+
+import { State } from './state.js?v=fix8';
 
 let outletEl = null;
 
@@ -20,13 +27,13 @@ const routes = [
   { pattern: '#/checkout', render: CheckoutPage },
   { pattern: '#/orders', render: OrdersPage },
   { pattern: '#/orders/:id', render: OrderDetailPage },
-  { pattern: '#/auth', render: AuthPage },
-  { pattern: '#/login', render: AuthPage },
-  { pattern: '#/register', render: AuthPage },
-  { pattern: '#/forgot-password', render: AuthPage },
-  { pattern: '#/verify-reset-otp', render: AuthPage },
-  { pattern: '#/new-password', render: AuthPage },
-  { pattern: '#/verify', render: AuthPage },
+  { pattern: '#/auth', render: LoginPage }, // Deprecated, use /login
+  { pattern: '#/login', render: LoginPage },
+  { pattern: '#/register', render: RegisterPage },
+  { pattern: '#/forgot-password', render: ForgotPasswordPage },
+  { pattern: '#/verify-reset-otp', render: VerifyResetPage },
+  { pattern: '#/new-password', render: NewPasswordPage },
+  { pattern: '#/verify', render: VerifyAccountPage },
 ];
 
 function matchRoute(hash) {
