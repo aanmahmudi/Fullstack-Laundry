@@ -39,6 +39,20 @@ function bindEvents() {
   const msg = document.getElementById('auth-msg');
 
   if (newPasswordForm) {
+    // Setup password toggles
+    newPasswordForm.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = '🙈';
+        } else {
+          input.type = 'password';
+          btn.textContent = '👁️';
+        }
+      });
+    });
+
     newPasswordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newPwd = newPasswordForm.querySelector('input[name="newPassword"]').value;

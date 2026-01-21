@@ -9,10 +9,22 @@ function getAuthHeaders() {
   return {};
 }
 
+async function handleResponse(res) {
+  if (!res.ok) {
+    const text = await res.text();
+    let msg = text;
+    try {
+      const json = JSON.parse(text);
+      if (json.message) msg = json.message;
+    } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
 async function apiGet(path) {
   const res = await fetch(`${API_BASE}${path}`, { headers: { ...getAuthHeaders() } });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 async function apiPost(path, body) {
@@ -21,8 +33,7 @@ async function apiPost(path, body) {
     headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 async function apiPut(path, body) {
@@ -31,8 +42,7 @@ async function apiPut(path, body) {
     headers: { "Content-Type": "application/json", ...getAuthHeaders() },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  return handleResponse(res);
 }
 
 window.API = { apiGet, apiPost, apiPut };

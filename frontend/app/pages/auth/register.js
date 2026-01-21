@@ -38,6 +38,7 @@ export function RegisterPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="password" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
+            <button type="button" class="password-toggle" title="Lihat Password">👁️</button>
           </div>
           <small class="field-error"></small>
         </label>
@@ -73,6 +74,20 @@ function bindEvents() {
   const msg = document.getElementById('auth-msg');
 
   if (register) {
+    // Setup password toggles
+    register.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = '🙈';
+        } else {
+          input.type = 'password';
+          btn.textContent = '👁️';
+        }
+      });
+    });
+
     attachValidation(register, 'register');
     register.addEventListener('submit', async (ev) => {
       ev.preventDefault();

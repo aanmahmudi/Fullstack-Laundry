@@ -13,6 +13,7 @@ import { VerifyAccountPage } from '../pages/auth/verify-account.js';
 import { ForgotPasswordPage } from '../pages/auth/forgot-password.js';
 import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
+import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
 import { State } from './state.js?v=fix8';
 
@@ -33,6 +34,7 @@ const routes = [
   { pattern: '#/forgot-password', render: ForgotPasswordPage },
   { pattern: '#/verify-reset-otp', render: VerifyResetPage },
   { pattern: '#/new-password', render: NewPasswordPage },
+  { pattern: '#/change-password', render: ChangePasswordPage },
   { pattern: '#/verify', render: VerifyAccountPage },
 ];
 

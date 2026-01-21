@@ -42,6 +42,20 @@ function bindEvents() {
   const msg = document.getElementById('auth-msg');
 
   if (login) {
+    // Setup password toggles
+    login.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = '🙈';
+        } else {
+          input.type = 'password';
+          btn.textContent = '👁️';
+        }
+      });
+    });
+
     attachValidation(login, 'login');
     login.addEventListener('submit', async (ev) => {
       ev.preventDefault();
@@ -52,12 +66,50 @@ function bindEvents() {
       msg.textContent = 'Mengirim...'; msg.classList.remove('error');
       try {
         const res = await API.apiPost('/api/auth/login', payload);
-        const token = res.token || res.accessToken || null;
+        const token = res.token || res.accessToken || null; 
         const id = res.customerId || res.id || null;
-        State.setUser({ email: payload.email, id, token });
+        const username = res.username || null;
+        const role = res.role || null;
+        
+        State.setUser({ 
+          email: res.email || payload.email, 
+          id, 
+          username, 
+          role,
+          token 
+        });
+        
         window.location.hash = '#/dashboard';
       } catch (e) {
-        msg.textContent = e.message; msg.classList.add('error');
+        let errorMsg = e.message;
+        // Parsing JSON string if api.js fails to parse it
+        try {
+          if (errorMsg.startsWith('{')) {
+             const parsed = JSON.parse(errorMsg);
+             if (parsed.message) errorMsg = parsed.message;
+          }
+        } catch {}
+
+        // User friendly messages
+        if (errorMsg.includes('Login failed: ')) {
+           errorMsg = errorMsg.replace('Login failed: ', '');
+        }
+
+        if (errorMsg.toLowerCase().includes('customer not found') || errorMsg.toLowerCase().includes('user not found')) {
+           errorMsg = 'Username atau Email tidak terdaftar.';
+        } else if (errorMsg.toLowerCase().includes('invalid email or password') || errorMsg.toLowerCase().includes('password mismatch')) {
+           errorMsg = 'Password yang Anda masukkan salah.';
+        } else if (errorMsg.toLowerCase().includes('account not verified')) {
+           errorMsg = 'Akun belum diverifikasi. Silakan cek email Anda.';
+        }
+
+        msg.innerHTML = `
+          <div class="alert-content">
+             <span class="icon">⚠️</span>
+             <span>${errorMsg}</span>
+          </div>
+        `;
+        msg.className = 'msg error visible';
       }
     });
   }

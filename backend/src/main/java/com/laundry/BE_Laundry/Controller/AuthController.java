@@ -60,35 +60,39 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@Valid @RequestBody CustomerLoginDTO customerLoginDTO,
-            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(ObjectError::getDefaultMessage)
-                    .collect(Collectors.joining(", "));
-            logger.warn("Validation failed: {}", errorMessage);
-            return ResponseEntity.badRequest().body(new ApiResponse("Invalid input: " + errorMessage, false));
-        }
+	public ResponseEntity<?> login(@Valid @RequestBody CustomerLoginDTO customerLoginDTO,
+			BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			String errorMessage = bindingResult.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+					.collect(Collectors.joining(", "));
+			logger.warn("Validation failed: {}", errorMessage);
+			return ResponseEntity.badRequest().body(new ApiResponse("Invalid input: " + errorMessage, false));
+		}
 
-        logger.info("Login attempt for email: {}", customerLoginDTO.getEmail());
-        try {
-            boolean isLoginSuccessful = customerService.login(customerLoginDTO);
-            if (isLoginSuccessful) {
-                logger.info("Login successful for email: {}", customerLoginDTO.getEmail());
-                return ResponseEntity.ok(new ApiResponse("Login Successfuly", true));
-            } else {
-                logger.warn("Login failed for email: {} due to {}", customerLoginDTO.getEmail());
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Login Failed", false));
-            }
-        } catch (RuntimeException ex) {
-            logger.error("Login failed for email: {} due to {}", customerLoginDTO.getEmail(), ex.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse("Login failed: " + ex.getMessage(), false));
-        } catch (Exception ex) {
-            logger.error("Unexpected error occurred during login: {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("An error occurred: " + ex.getMessage(), false));
-        }
-    }
+		logger.info("Login attempt for email: {}", customerLoginDTO.getEmail());
+		try {
+			Customer customer = customerService.login(customerLoginDTO);
+			logger.info("Login successful for email: {}", customerLoginDTO.getEmail());
+			
+			Map<String, Object> response = new HashMap<>();
+			response.put("message", "Login Successfuly");
+			response.put("success", true);
+			response.put("customerId", customer.getId());
+			response.put("username", customer.getUsername());
+			response.put("email", customer.getEmail());
+			response.put("role", customer.getRole());
+			
+			return ResponseEntity.ok(response);
+		} catch (RuntimeException ex) {
+			logger.error("Login failed for email: {} due to {}", customerLoginDTO.getEmail(), ex.getMessage());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(new ApiResponse("Login failed: " + ex.getMessage(), false));
+		} catch (Exception ex) {
+			logger.error("Unexpected error occurred during login: {}", ex.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ApiResponse("An error occurred: " + ex.getMessage(), false));
+		}
+	}
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody Map<String, String> payload) {

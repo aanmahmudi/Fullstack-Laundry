@@ -83,8 +83,10 @@ public class CustomerService {
 
 	}
 
-	public boolean login(CustomerLoginDTO customerLoginDTO) {
-		Customer customer = customerRepository.findByEmail(customerLoginDTO.getEmail())
+	public Customer login(CustomerLoginDTO customerLoginDTO) {
+		String identifier = customerLoginDTO.getEmail();
+		Customer customer = customerRepository.findByEmail(identifier)
+				.or(() -> customerRepository.findByUsername(identifier))
 				.orElseThrow(() -> new RuntimeException("Customer not found"));
 
 		System.out.println("Verifying passowrd for user: " + customer.getEmail());
@@ -99,11 +101,13 @@ public class CustomerService {
 			throw new RuntimeException("Account not verified. Please Verify using OTP");
 		}
 
-		return true;
+		return customer;
 	}
 
 	public void updatePassword(UpdatePasswordRequestDTO updatePasswordDTO) {
-		Customer customer = customerRepository.findByEmail(updatePasswordDTO.getEmail())
+		String identifier = updatePasswordDTO.getEmail();
+		Customer customer = customerRepository.findByEmail(identifier)
+				.or(() -> customerRepository.findByUsername(identifier))
 				.orElseThrow(() -> new RuntimeException("User Not Found"));
 
 		if (!passwordEncoder.matches(updatePasswordDTO.getOldPassword(), customer.getPassword())) {

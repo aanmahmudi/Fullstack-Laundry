@@ -3,28 +3,49 @@
 /* Hero Section */
 .hero {
   text-align: center;
-  padding: 80px 24px;
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0) 0%, rgba(30, 41, 59, 0.5) 100%);
+  padding: 100px 24px;
+  background: 
+    linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)),
+    url('https://images.unsplash.com/photo-1545173168-9f1947eebb8f?q=80&w=2071&auto=format&fit=crop'); /* Laundry/Clean background */
+  background-size: cover;
+  background-position: center;
   border-radius: 24px;
   margin-bottom: 48px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-.hero h2 {
-  font-size: 48px;
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.hero h1 {
+  font-size: 56px;
   font-weight: 800;
-  margin-bottom: 16px;
+  margin: 0 0 24px;
   background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .hero p {
-  font-size: 18px;
-  color: var(--text-muted);
+  font-size: 20px;
+  color: #e2e8f0;
   max-width: 600px;
-  margin: 0 auto 32px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .hero .actions {
@@ -34,7 +55,36 @@
 }
 
 .hero .btn {
-  padding: 12px 32px;
+  padding: 16px 40px;
   font-size: 16px;
   border-radius: 999px; /* Pill shape */
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.hero .btn.primary {
+  background: #f97316; /* Orange accent for CTA */
+  box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.4);
+}
+
+.hero .btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.5);
+  filter: brightness(1.1);
+}
+
+.hero .btn.ghost {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 36px; }
+  .hero p { font-size: 16px; }
+  .hero { padding: 60px 20px; }
 }

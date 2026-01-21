@@ -1,6 +1,7 @@
 package com.laundry.BE_Laundry.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +27,14 @@ public class CustomerController {
 	private final CustomerService customerService;
 
 	@PutMapping("/update-password")
-	public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordRequestDTO updatePasswordDTO) {
+	public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequestDTO updatePasswordDTO) {
 		try {
 			customerService.updatePassword(updatePasswordDTO);
-			return ResponseEntity.ok("Update password successfuly");
+			return ResponseEntity.ok(Map.of("message", "Update password successfuly"));
 		} catch (IllegalArgumentException ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update password failed:" + ex.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Update password failed: " + ex.getMessage()));
 		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured:" + ex.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occured: " + ex.getMessage()));
 		}
 	}
 	
