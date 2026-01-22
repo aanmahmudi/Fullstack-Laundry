@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: subrutin
-      POSTGRES_PASSWORD: subrutin
-      POSTGRES_DB: db-laundry
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
       TZ: Asia/Jakarta
       PGTZ: Asia/Jakarta
 
@@ -32,9 +32,9 @@ services:
       - db
     environment:
       TZ: Asia/Jakarta
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db-laundry
-      SPRING_DATASOURCE_USERNAME: subrutin
-      SPRING_DATASOURCE_PASSWORD: subrutin
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
     dns:
       - 8.8.8.8
 
