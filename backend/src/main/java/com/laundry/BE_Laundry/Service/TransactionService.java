@@ -130,13 +130,24 @@ public class TransactionService {
 	// Mapping transaction ke DTO
 	private TransactionResponseDTO mapToResponseDTO(Transaction transaction) {
 		return TransactionResponseDTO.builder().id(transaction.getId())
+				.customerId(transaction.getCustomer().getId())
 				.customerName(transaction.getCustomer().getUsername())
 				.productName(transaction.getProduct().getName())
 				.quantity(transaction.getQuantity())
 				.totalPrice(transaction.getTotalPrice())
 				.transactionDate(transaction.getTransactionDate())
 				.paymentStatus(transaction.getPaymentStatus())
-				.paymentAmount(transaction.getPaymentAmount()).build();
+				.paymentAmount(transaction.getPaymentAmount())
+				.orderStatus(transaction.getOrderStatus())
+				.build();
 
+	}
+	
+	public TransactionResponseDTO updateStatus(Long id, String status) {
+		Transaction transaction = transactionRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Transaction not found"));
+		transaction.setOrderStatus(status);
+		transactionRepository.save(transaction);
+		return mapToResponseDTO(transaction);
 	}
 }

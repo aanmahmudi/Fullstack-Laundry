@@ -1,4 +1,5 @@
 import { State } from '../../core/state.js';
+import { ICONS } from '../../utils/icons.js';
 import { validateInput, attachValidation } from '../../utils/validator.js';
 
 export function ChangePasswordPage() {
@@ -17,7 +18,7 @@ export function ChangePasswordPage() {
           <div class="input-with-icon">
             <span class="icon">🔑</span>
             <input name="oldPassword" type="password" required placeholder="Password saat ini" />
-            <button type="button" class="password-toggle" title="Lihat Password">👁️</button>
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
         </label>
         
@@ -25,7 +26,7 @@ export function ChangePasswordPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="newPassword" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
-            <button type="button" class="password-toggle" title="Lihat Password">👁️</button>
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
         </label>
 
@@ -33,7 +34,7 @@ export function ChangePasswordPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="confirmNewPassword" type="password" required minlength="8" placeholder="Ulangi password baru" />
-            <button type="button" class="password-toggle" title="Lihat Password">👁️</button>
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
         </label>
 
@@ -57,10 +58,10 @@ function bindEvents() {
         const input = btn.previousElementSibling;
         if (input.type === 'password') {
           input.type = 'text';
-          btn.textContent = '🙈';
+          btn.innerHTML = ICONS.eyeOff;
         } else {
           input.type = 'password';
-          btn.textContent = '👁️';
+          btn.innerHTML = ICONS.eye;
         }
       });
     });

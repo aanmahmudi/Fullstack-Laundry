@@ -43,4 +43,7 @@ public class Transaction {
 	private String paymentStatus;
 	
 	private BigDecimal paymentAmount;
+
+	@Column(name = "order_status")
+	private String orderStatus;
 }

@@ -5,10 +5,12 @@ import { CartPage } from '../pages/cart/index.js';
 import { CheckoutPage } from '../pages/checkout/index.js';
 import { OrdersPage } from '../pages/orders/list.js';
 import { OrderDetailPage } from '../pages/orders/detail.js';
+import { AddProductPage } from '../pages/products/add.js';
+import { AdminOrdersPage } from '../pages/admin/orders.js';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
-import { RegisterPage } from '../pages/auth/register.js';
+import { RegisterPage } from '../pages/auth/register.js?v=ui_fix_final_v2';
 import { VerifyAccountPage } from '../pages/auth/verify-account.js';
 import { ForgotPasswordPage } from '../pages/auth/forgot-password.js';
 import { VerifyResetPage } from '../pages/auth/verify-reset.js';
@@ -28,6 +30,8 @@ const routes = [
   { pattern: '#/checkout', render: CheckoutPage },
   { pattern: '#/orders', render: OrdersPage },
   { pattern: '#/orders/:id', render: OrderDetailPage },
+  { pattern: '#/products/add', render: AddProductPage },
+  { pattern: '#/admin/orders', render: AdminOrdersPage },
   { pattern: '#/auth', render: LoginPage }, // Deprecated, use /login
   { pattern: '#/login', render: LoginPage },
   { pattern: '#/register', render: RegisterPage },
@@ -81,6 +85,16 @@ function render() {
     } else {
       navigate('#/login');
       return;
+    }
+  }
+
+  // Prevent accessing new-password if no OTP verified
+  if (hash === '#/new-password') {
+    const otp = State.getPendingOTP();
+    const email = State.getPendingEmail();
+    if (!otp || !email) {
+       navigate('#/login');
+       return;
     }
   }
 

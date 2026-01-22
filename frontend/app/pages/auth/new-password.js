@@ -1,5 +1,6 @@
 import { State } from '../../core/state.js';
 import { showModal } from '../../components/modal.js';
+import { ICONS } from '../../utils/icons.js';
 
 export function NewPasswordPage() {
   setTimeout(() => {
@@ -17,12 +18,14 @@ export function NewPasswordPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="newPassword" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
         </label>
         <label class="form-group-confirm">Konfirmasi Password Baru
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="confirmNewPassword" type="password" required minlength="8" placeholder="Ulangi password baru" />
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
         </label>
         <button class="btn purple full-width btn-submit" type="submit">Simpan Password</button>
@@ -45,10 +48,10 @@ function bindEvents() {
         const input = btn.previousElementSibling;
         if (input.type === 'password') {
           input.type = 'text';
-          btn.textContent = '🙈';
+          btn.innerHTML = ICONS.eyeOff;
         } else {
           input.type = 'password';
-          btn.textContent = '👁️';
+          btn.innerHTML = ICONS.eye;
         }
       });
     });

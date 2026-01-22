@@ -38,20 +38,27 @@ export function renderHeader(el) {
         <!-- Actions -->
         <div class="header-actions">
           ${user ? `
-            <a href="#/orders" class="nav-link">Pesanan</a>
+            ${user.role === 'ADMIN' ? `
+              <a href="#/products/add" class="nav-link" style="color:var(--primary); font-weight:600;">+ Produk</a>
+              <a href="#/admin/orders" class="nav-link">Kelola Pesanan</a>
+            ` : `
+              <a href="#/orders" class="nav-link">Pesanan Saya</a>
+            `}
           ` : ''}
           
+          ${!user || user.role !== 'ADMIN' ? `
           <a href="#/cart" class="icon-btn" title="Keranjang">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             ${count > 0 ? `<span class="badge">${count}</span>` : ''}
           </a>
+          ` : ''}
 
           ${user ? `
             <div class="user-menu-container">
               <div class="user-menu-trigger">
                 <div class="user-info">
                   <span class="user-name">${user.username || user.email.split('@')[0]}</span>
-                  <span class="user-role">Customer</span>
+                  <span class="user-role">${user.role === 'ADMIN' ? 'Admin' : 'Customer'}</span>
                 </div>
                 <div class="avatar-placeholder">
                   ${(user.username || user.email || 'U').charAt(0).toUpperCase()}
@@ -62,9 +69,18 @@ export function renderHeader(el) {
                  <div class="dropdown-header">
                     <strong>${user.username || user.email.split('@')[0]}</strong>
                  </div>
-                 <a href="#/orders" class="dropdown-item">
-                   <span class="icon">📦</span> Pesanan Saya
-                 </a>
+                 ${user.role === 'ADMIN' ? `
+                   <a href="#/products/add" class="dropdown-item">
+                     <span class="icon">➕</span> Tambah Produk
+                   </a>
+                   <a href="#/admin/orders" class="dropdown-item">
+                     <span class="icon">📋</span> Kelola Pesanan
+                   </a>
+                 ` : `
+                   <a href="#/orders" class="dropdown-item">
+                     <span class="icon">📦</span> Pesanan Saya
+                   </a>
+                 `}
                  <a href="#/change-password" class="dropdown-item">
                    <span class="icon">🔒</span> Ganti Password
                  </a>

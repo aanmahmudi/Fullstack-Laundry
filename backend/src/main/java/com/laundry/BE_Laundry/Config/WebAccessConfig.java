@@ -61,7 +61,10 @@ public class WebAccessConfig {
 				"/api/transactions",
 				"/api/transactions/**",
 				"/api/transactions/payment",
-				"/api/transactions/paid"
+				"/api/transactions/paid",
+				
+				// Uploads
+				"/uploads/**"
 		};
 	}
 

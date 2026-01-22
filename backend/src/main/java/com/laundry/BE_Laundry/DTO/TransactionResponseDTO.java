@@ -11,6 +11,7 @@ import lombok.Data;
 public class TransactionResponseDTO {
 
 	private Long id;
+	private Long customerId;
 	private String customerName;
 	private String productName;
 	private int quantity;
@@ -18,5 +19,6 @@ public class TransactionResponseDTO {
 	private LocalDateTime transactionDate;
 	private String paymentStatus;
 	private BigDecimal paymentAmount;
+	private String orderStatus;
 
 }

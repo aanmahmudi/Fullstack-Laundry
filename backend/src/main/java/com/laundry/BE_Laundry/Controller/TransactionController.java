@@ -70,4 +70,9 @@ public class TransactionController {
 		
 	}
 
+	@PutMapping("/{id}/status")
+	public ResponseEntity<TransactionResponseDTO> updateStatus(@PathVariable Long id, @RequestParam String status) {
+		return ResponseEntity.ok(transactionService.updateStatus(id, status));
+	}
+
 }

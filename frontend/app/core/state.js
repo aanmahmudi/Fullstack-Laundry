@@ -56,9 +56,16 @@ export const State = {
   clearPendingEmail() { localStorage.removeItem(PENDING_EMAIL_KEY); },
 
   setPendingOTP(otp) {
-    if (otp) localStorage.setItem(PENDING_OTP_KEY, String(otp));
-    else localStorage.removeItem(PENDING_OTP_KEY);
+    this.pendingOTP = otp;
+    localStorage.setItem('laundry_pending_otp', otp);
   },
-  getPendingOTP() { return localStorage.getItem(PENDING_OTP_KEY) || null; },
-  clearPendingOTP() { localStorage.removeItem(PENDING_OTP_KEY); },
+  
+  getPendingOTP() {
+    return this.pendingOTP || localStorage.getItem('laundry_pending_otp');
+  },
+  
+  clearPendingOTP() {
+    this.pendingOTP = null;
+    localStorage.removeItem('laundry_pending_otp');
+  },
 };

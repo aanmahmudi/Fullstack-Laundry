@@ -1,5 +1,6 @@
 import { State } from '../../core/state.js';
 import { validateInput, attachValidation } from '../../utils/validator.js';
+import { ICONS } from '../../utils/icons.js';
 
 export function RegisterPage() {
   setTimeout(() => {
@@ -38,9 +39,19 @@ export function RegisterPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="password" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
-            <button type="button" class="password-toggle" title="Lihat Password">👁️</button>
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
           <small class="field-error"></small>
+        </label>
+        <label>Daftar Sebagai
+          <div class="input-with-icon">
+            <span class="icon">🎭</span>
+            <select name="role" required>
+              <option value="USER">Customer</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+            <span class="arrow-icon">▼</span>
+          </div>
         </label>
         <label>Tempat Lahir
           <div class="input-with-icon">
@@ -50,7 +61,10 @@ export function RegisterPage() {
           <small class="field-error"></small>
         </label>
         <label>Tanggal Lahir
-          <input name="dateOfBirth" type="date" required />
+          <div class="input-with-icon">
+            <span class="icon">📅</span>
+            <input name="dateOfBirth" type="date" required />
+          </div>
           <small class="field-error"></small>
         </label>
         <label>Alamat
@@ -80,11 +94,26 @@ function bindEvents() {
         const input = btn.previousElementSibling;
         if (input.type === 'password') {
           input.type = 'text';
-          btn.textContent = '🙈';
+          btn.innerHTML = ICONS.eyeOff;
         } else {
           input.type = 'password';
-          btn.textContent = '👁️';
+          btn.innerHTML = ICONS.eye;
         }
+      });
+    });
+
+    // Setup Role Toggle
+    const roleInput = document.getElementById('role-input');
+    const roleBtns = register.querySelectorAll('.role-btn');
+    
+    roleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active from all
+        roleBtns.forEach(b => b.classList.remove('active'));
+        // Add active to clicked
+        btn.classList.add('active');
+        // Update hidden input
+        roleInput.value = btn.dataset.value;
       });
     });
 

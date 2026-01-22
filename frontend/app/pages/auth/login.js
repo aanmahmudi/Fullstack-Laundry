@@ -1,5 +1,6 @@
 import { State } from '../../core/state.js';
 import { validateInput, attachValidation } from '../../utils/validator.js';
+import { ICONS } from '../../utils/icons.js';
 
 export function LoginPage() {
   setTimeout(() => {
@@ -24,6 +25,7 @@ export function LoginPage() {
           <div class="input-with-icon">
             <span class="icon">🔒</span>
             <input name="password" type="password" required placeholder="••••••••" minlength="8" />
+            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
           </div>
           <small class="field-error"></small>
         </label>
@@ -48,10 +50,10 @@ function bindEvents() {
         const input = btn.previousElementSibling;
         if (input.type === 'password') {
           input.type = 'text';
-          btn.textContent = '🙈';
+          btn.innerHTML = ICONS.eyeOff;
         } else {
           input.type = 'password';
-          btn.textContent = '👁️';
+          btn.innerHTML = ICONS.eye;
         }
       });
     });

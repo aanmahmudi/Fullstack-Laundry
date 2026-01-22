@@ -1,5 +1,44 @@
 /* Auth Pages Specific Styles */
 
+/* Role Selector */
+.role-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.role-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.role-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.role-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
 /* Auth Card */
 .auth-card {
   max-width: 440px; /* Slightly narrower for modern look */
@@ -92,6 +131,7 @@
 
 /* Input with icon */
 .input-with-icon {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -113,9 +153,21 @@
   font-size: 16px;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
-.input-with-icon input {
+.input-with-icon .arrow-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.input-with-icon input,
+.input-with-icon select {
   flex: 1;
   border: none;
   outline: none;
@@ -124,6 +176,41 @@
   font-size: 15px;
   padding: 0;
   min-width: 0; /* Fix flex issue */
+  font-family: inherit;
+  width: 100%;
+}
+
+.input-with-icon select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  padding-right: 20px; /* Space for arrow */
+}
+
+.input-with-icon select option {
+  background: #1e293b; /* Dark slate */
+  color: white;
+  padding: 10px;
+}
+
+/* Date input specific */
+.input-with-icon input[type="date"] {
+  color-scheme: dark;
+  background: transparent;
+}
+
+.input-with-icon input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* White icon for dark mode */
+  cursor: pointer;
+  opacity: 0; /* Hide default icon if we use custom one, or keep it */
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .password-toggle {

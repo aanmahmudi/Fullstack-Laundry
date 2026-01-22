@@ -38,11 +38,36 @@ export function OrdersPage() {
         list.innerHTML = '<p>Tidak ada pesanan.</p>';
         return;
       }
+
+      const getStatusLabel = (s) => {
+        if (s === 'ON_PROCESS') return 'On Process';
+        if (s === 'PROCESSING') return 'Proses';
+        if (s === 'DONE') return 'Selesai';
+        return s || 'Menunggu';
+      };
+
       list.innerHTML = `
-        <ul class="list">
-          ${items.map((t) => `<li>[${t.id}] cust:${t.customerId} prod:${t.productId} qty:${t.quantity} total:${t.totalAmount || '-'} status:${t.status || '-'}  
-          <a class="btn small" href="#/orders/${t.id}">Detail</a></li>`).join('')}
-        </ul>
+        <div class="list-group">
+          ${items.map((t) => `
+            <div class="panel" style="margin-bottom: 12px; padding: 16px; border-left: 4px solid var(--primary);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div style="font-weight:bold; font-size:1.1em;">Order #${t.id}</div>
+                  <div style="color:var(--text-muted); margin-bottom:8px;">${t.productName || 'Layanan Laundry'}</div>
+                  <div>Qty: ${t.quantity} • Total: <strong>Rp ${t.totalPrice}</strong></div>
+                </div>
+                <div style="text-align:right;">
+                  <span class="badge ${t.orderStatus === 'DONE' ? 'success' : (t.orderStatus === 'PROCESSING' ? 'warning' : 'info')}">
+                    ${getStatusLabel(t.orderStatus)}
+                  </span>
+                  <div style="margin-top:8px;">
+                     <a class="btn small outline" href="#/orders/${t.id}">Detail</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
       `;
     } catch (e) {
       list.innerHTML = `<p class="error">${e.message}</p>`;

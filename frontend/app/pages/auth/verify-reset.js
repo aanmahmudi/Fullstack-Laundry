@@ -50,7 +50,11 @@ function bindEvents() {
          await API.apiPost('/api/otp/verify-reset', { email, otp });
          State.setPendingOTP(otp);
          msg.textContent = '';
-         window.location.hash = '#/new-password';
+         
+         // Fix navigation issue
+         setTimeout(() => {
+            window.location.hash = '#/new-password';
+         }, 100);
       } catch (err) {
          msg.textContent = err.message || 'OTP Salah atau Kadaluarsa'; msg.classList.add('error');
       }
