@@ -42,6 +42,7 @@ build/
 
 # Ignore sensitive config files
 application.yml
+application-secret.yml
 application-docker.yml
 application-railway.yml
 .env
