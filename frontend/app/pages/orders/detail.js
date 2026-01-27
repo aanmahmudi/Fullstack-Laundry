@@ -31,7 +31,7 @@ export function OrderDetailPage(params) {
         <p><strong>Customer:</strong> ${t.customerId}</p>
         <p><strong>Produk:</strong> ${t.productId}</p>
         <p><strong>Qty:</strong> ${t.quantity}</p>
-        <p><strong>Total:</strong> ${t.totalAmount ?? '-'}</p>
+        <p><strong>Total:</strong> ${t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</p>
         <p><strong>Status:</strong> ${t.status ?? '-'}</p>
       `;
     } catch (e) {
@@ -56,7 +56,7 @@ export function OrderDetailPage(params) {
           <p><strong>Customer:</strong> ${t.customerId}</p>
           <p><strong>Produk:</strong> ${t.productId}</p>
           <p><strong>Qty:</strong> ${t.quantity}</p>
-          <p><strong>Total:</strong> ${t.totalAmount ?? '-'}</p>
+          <p><strong>Total:</strong> ${t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</p>
           <p><strong>Status:</strong> ${t.status ?? '-'}</p>
         `;
       } catch (e) {

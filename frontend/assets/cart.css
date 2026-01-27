@@ -1,55 +1,169 @@
-/* Cart Page Styles */
+/* Cart Page Styles - Astra Honda Inspired */
 
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.cart-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
 }
 
-.list li {
-  padding: 16px;
-  border-bottom: 1px solid var(--panel-border);
+@media (max-width: 768px) {
+  .cart-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cart Items List */
+.cart-items-list {
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.cart-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  background: rgba(15, 23, 42, 0.3);
-  margin-bottom: 8px;
-  border-radius: var(--radius-md);
+  padding: 20px;
+  border-bottom: 1px solid var(--panel-border);
+  transition: background 0.2s;
 }
 
-.list li:last-child {
-  margin-bottom: 0;
+.cart-item:last-child {
+  border-bottom: none;
 }
 
-.list li .actions {
+.cart-item:hover {
+  background-color: #f8fafc;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-title {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cart-item-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cart-item-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
 }
 
-.cart-qty {
-  margin: 0 12px;
+/* Quantity Control */
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.qty-control button {
+  background: #f8fafc;
+  border: none;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
   font-weight: 600;
-  min-width: 24px;
-  text-align: center;
-  display: inline-block;
-  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  transition: background 0.2s;
 }
 
-.cart-total {
-  margin-top: 24px;
-  font-size: 1.25em;
-  border-top: 1px solid var(--panel-border);
-  padding-top: 20px;
-  text-align: right;
-  font-weight: 700;
-  color: var(--accent);
+.qty-control button:hover {
+  background: #e2e8f0;
 }
 
-/* Empty cart state */
-#cart-items p {
+.qty-control span {
+  width: 40px;
   text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  background: white;
+  line-height: 32px;
+}
+
+/* Small variant for cart list */
+.qty-control.small button {
+  width: 28px;
+  height: 28px;
+}
+.qty-control.small span {
+  width: 32px;
+  line-height: 28px;
+  font-size: 13px;
+}
+
+.btn-del-icon {
+  background: none;
+  border: none;
   color: var(--text-muted);
-  padding: 40px 0;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.btn-del-icon:hover {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+/* Cart Summary */
+.cart-summary {
+  background: var(--panel);
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 100px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.summary-row.total {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--panel-border);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.summary-row.total span:last-child {
+  color: var(--primary);
+}
+
+.summary-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-block {
+  width: 100%;
+  display: block;
+  text-align: center;
 }

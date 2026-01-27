@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/products")
 public class ProductImageController {
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
 
     @PostMapping("/upload-image")
     public ResponseEntity<Map<String, String>> uploadProductImage(@RequestParam("file") MultipartFile file) {
@@ -31,15 +31,23 @@ public class ProductImageController {
                 return ResponseEntity.badRequest().body(Map.of("error", "File kosong"));
             }
 
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(UPLOAD_DIR + filename);
+            // Sanitize filename
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null) originalFilename = "image.jpg";
+            String safeFilename = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String filename = UUID.randomUUID() + "_" + safeFilename;
+            
+            Path filePath = uploadPath.resolve(filename);
             Files.write(filePath, file.getBytes());
 
-            String fileUrl = "http://localhost:8080/uploads/" + filename;
+            String fileUrl = "http://localhost:8081/uploads/" + filename;
             
-            log.info("Product image uploaded: {}", fileUrl);
+            log.info("Product image uploaded successfully: {}", fileUrl);
 
             return ResponseEntity.ok(Map.of("url", fileUrl));
 

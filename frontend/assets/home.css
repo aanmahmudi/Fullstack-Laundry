@@ -4,9 +4,7 @@
 .hero {
   text-align: center;
   padding: 100px 24px;
-  background: 
-    linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.9)),
-    url('https://images.unsplash.com/photo-1545173168-9f1947eebb8f?q=80&w=2071&auto=format&fit=crop'); /* Laundry/Clean background */
+  background: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
   background-size: cover;
   background-position: center;
   border-radius: 24px;
@@ -31,9 +29,7 @@
   font-size: 56px;
   font-weight: 800;
   margin: 0 0 24px;
-  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: white;
   letter-spacing: -2px;
   line-height: 1.1;
   text-shadow: 0 10px 30px rgba(0,0,0,0.5);

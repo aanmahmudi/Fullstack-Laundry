@@ -152,16 +152,16 @@ Dengan menambahkan parameter unik seperti `?v=fix8` (Version Fix 8), kita "menip
 
 ## 🚀 Cara Menjalankan Aplikasi
 
-### 1. Menjalankan Backend (Server)
+### 1. Menjalankan Backend & Frontend (Docker)
 Pastikan Docker Desktop sudah menyala.
 ```bash
-cd backend
 docker compose up -d --build
 ```
-Backend akan berjalan di: `http://localhost:8080`
+- Backend akan berjalan di: `http://localhost:8081`
+- Frontend akan berjalan di: `http://localhost:3000`
 
-### 2. Menjalankan Frontend (UI)
-Gunakan `http-server` atau Live Server apa saja.
+### 2. Menjalankan Frontend Manual (Opsional)
+Jika tidak menggunakan container frontend:
 ```bash
 # Dari folder root proyek
 npx http-server ./frontend -p 5500 -c-1

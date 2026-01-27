@@ -1,7 +1,7 @@
-const CART_KEY = 'laundry_cart';
-const AUTH_KEY = 'laundry_user';
-const PENDING_EMAIL_KEY = 'laundry_pending_email';
-const PENDING_OTP_KEY = 'laundry_pending_otp';
+const CART_KEY = 'remon_cart';
+const AUTH_KEY = 'remon_user';
+const PENDING_EMAIL_KEY = 'remon_pending_email';
+const PENDING_OTP_KEY = 'remon_pending_otp';
 
 export const State = {
   getCart() {
@@ -57,15 +57,15 @@ export const State = {
 
   setPendingOTP(otp) {
     this.pendingOTP = otp;
-    localStorage.setItem('laundry_pending_otp', otp);
+    localStorage.setItem(PENDING_OTP_KEY, otp);
   },
   
   getPendingOTP() {
-    return this.pendingOTP || localStorage.getItem('laundry_pending_otp');
+    return this.pendingOTP || localStorage.getItem(PENDING_OTP_KEY);
   },
   
   clearPendingOTP() {
     this.pendingOTP = null;
-    localStorage.removeItem('laundry_pending_otp');
+    localStorage.removeItem(PENDING_OTP_KEY);
   },
 };

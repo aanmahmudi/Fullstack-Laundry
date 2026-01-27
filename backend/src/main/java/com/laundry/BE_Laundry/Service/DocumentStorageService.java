@@ -40,7 +40,7 @@ public class DocumentStorageService {
 		Path filePath = Paths.get(UPLOAD_DIR, filename);
 		Files.write(filePath, file.getBytes());
 		
-		String fileUrl = "http://localhost:8080/uploads/pdf/" + filename;
+		String fileUrl = "http://localhost:8081/uploads/pdf/" + filename;
 		
 		Optional<Customer> customerOptional = customerRepository.findById(customerId);
 		

@@ -12,7 +12,7 @@ async function loadTransactions() {
       list.innerHTML = `<li>Belum ada transaksi.</li>`;
     } else {
       list.innerHTML = items
-        .map((t) => `<li>[${t.id}] cust:${t.customerId} prod:${t.productId} qty:${t.quantity} total:${t.totalAmount ?? '-'}</li>`)
+        .map((t) => `<li>[${t.id}] cust:${t.customerId} prod:${t.productId} qty:${t.quantity} total:${t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</li>`)
         .join("");
     }
   } catch (e) {

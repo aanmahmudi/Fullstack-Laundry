@@ -1,14 +1,24 @@
-import { navigate } from '../core/router.js?v=20260119';
-import { State } from '../core/state.js?v=fix3';
+import { navigate } from '../core/router.js';
+import { State } from '../core/state.js';
 
 export function renderHeader(el) {
   function render() {
-    // Sembunyikan header jika di halaman auth
+    // Sembunyikan header full di halaman auth, tampilkan logo saja
     const hash = window.location.hash;
     const isAuthPage = hash.includes('login') || hash.includes('register') || hash.includes('forgot-password') || hash.includes('verify') || hash.includes('reset-password') || hash.includes('verify-reset-otp') || hash.includes('new-password');
     
     if (isAuthPage) {
-      el.style.display = 'none';
+      el.style.display = 'block';
+      el.innerHTML = `
+        <div class="header-container">
+          <div class="header-left">
+            <a class="brand" href="#/">
+              <span style="color: var(--primary); font-weight: 800; font-size: 26px; letter-spacing: -0.5px;">Remon</span>
+              <span style="font-weight: 600; font-size: 26px; color: var(--primary); margin-left: 4px;">Eccom</span>
+            </a>
+          </div>
+        </div>
+      `;
       return;
     } else {
       el.style.display = 'block';
@@ -23,15 +33,18 @@ export function renderHeader(el) {
         <!-- Logo -->
         <div class="header-left">
           <a class="brand" href="#/">
-            <span style="font-size:24px">🧺</span> Laundry<span>App</span>
+            <span style="color: var(--primary); font-weight: 800; font-size: 26px; letter-spacing: -0.5px;">Remon</span>
+            <span style="font-weight: 600; font-size: 26px; color: var(--primary); margin-left: 4px;">Eccom</span>
           </a>
         </div>
 
         <!-- Search Bar -->
         <div class="header-search">
           <form id="global-search" class="search-form">
-            <input id="global-search-input" type="text" placeholder="Cari layanan atau produk..." aria-label="Cari produk" />
-            <button type="submit">Cari</button>
+            <input id="global-search-input" type="text" placeholder="Cari produk di Remon Eccom..." aria-label="Cari produk" />
+            <button type="submit" style="background: #f1f5f9; border: 1px solid #e2e8f0; border-left: none; border-radius: 0 99px 99px 0; width: 60px; display: flex; align-items: center; justify-content: center;">
+                <span class="icon" style="color: #64748b;">🔍</span>
+            </button>
           </form>
         </div>
 
@@ -39,16 +52,16 @@ export function renderHeader(el) {
         <div class="header-actions">
           ${user ? `
             ${user.role === 'ADMIN' ? `
-              <a href="#/products/add" class="nav-link" style="color:var(--primary); font-weight:600;">+ Produk</a>
-              <a href="#/admin/orders" class="nav-link">Kelola Pesanan</a>
+              <a href="#/products/add" class="nav-link" style="color:var(--primary); font-weight:700;">+ Produk</a>
+              <a href="#/admin/orders" class="nav-link">Admin</a>
             ` : `
-              <a href="#/orders" class="nav-link">Pesanan Saya</a>
+              <a href="#/orders" class="nav-link">Transaksi</a>
             `}
           ` : ''}
           
           ${!user || user.role !== 'ADMIN' ? `
-          <a href="#/cart" class="icon-btn" title="Keranjang">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          <a href="#/cart" class="icon-btn cart-btn" title="Keranjang">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             ${count > 0 ? `<span class="badge">${count}</span>` : ''}
           </a>
           ` : ''}
@@ -56,44 +69,35 @@ export function renderHeader(el) {
           ${user ? `
             <div class="user-menu-container">
               <div class="user-menu-trigger">
-                <div class="user-info">
-                  <span class="user-name">${user.username || user.email.split('@')[0]}</span>
-                  <span class="user-role">${user.role === 'ADMIN' ? 'Admin' : 'Customer'}</span>
-                </div>
-                <div class="avatar-placeholder">
+                <div class="avatar-placeholder" style="background: var(--primary);">
                   ${(user.username || user.email || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div class="user-info-mini">
+                   <span class="user-name">${user.username || 'User'}</span>
                 </div>
               </div>
               
               <div class="user-dropdown">
                  <div class="dropdown-header">
                     <strong>${user.username || user.email.split('@')[0]}</strong>
+                    <span class="role-badge">${user.role}</span>
                  </div>
                  ${user.role === 'ADMIN' ? `
-                   <a href="#/products/add" class="dropdown-item">
-                     <span class="icon">➕</span> Tambah Produk
-                   </a>
-                   <a href="#/admin/orders" class="dropdown-item">
-                     <span class="icon">📋</span> Kelola Pesanan
-                   </a>
+                   <a href="#/products/add" class="dropdown-item">Tambah Produk</a>
+                   <a href="#/admin/orders" class="dropdown-item">Kelola Pesanan</a>
                  ` : `
-                   <a href="#/orders" class="dropdown-item">
-                     <span class="icon">📦</span> Pesanan Saya
-                   </a>
+                   <a href="#/orders" class="dropdown-item">Pesanan Saya</a>
                  `}
-                 <a href="#/change-password" class="dropdown-item">
-                   <span class="icon">🔒</span> Ganti Password
-                 </a>
+                 <a href="#/change-password" class="dropdown-item">Ganti Password</a>
                  <div class="dropdown-divider"></div>
-                 <a href="#" id="header-logout" class="dropdown-item danger">
-                   <span class="icon">🚪</span> Logout
-                 </a>
+                 <a href="#" id="header-logout" class="dropdown-item danger">Logout</a>
               </div>
             </div>
           ` : `
-            <div style="display:flex; gap:12px">
-              <a href="#/login" class="nav-link">Masuk</a>
-              <a href="#/register" class="btn primary small">Daftar</a>
+            <div class="auth-buttons">
+              <a href="#/register" class="btn-text" style="font-weight: 600;">Daftar</a>
+              <div style="width: 1px; height: 16px; background: #ddd;"></div>
+              <a href="#/login" class="btn-text" style="font-weight: 600;">Login</a>
             </div>
           `}
         </div>
@@ -147,7 +151,6 @@ export function renderHeader(el) {
 
   // Listen for cart updates to update badge
   window.addEventListener('cart:updated', (e) => {
-    const badge = el.querySelector('.badge');
-    if (badge) badge.textContent = e.detail.count;
+    render();
   });
 }

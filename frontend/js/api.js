@@ -1,9 +1,9 @@
-// Gunakan API_BASE dari window jika tersedia, default ke port 8081 (Docker BE)
+// Gunakan API_BASE dari window jika tersedia, default ke port 8080 (Local BE)
 const API_BASE = window.API_BASE || "http://localhost:8081";
 
 function getAuthHeaders() {
   try {
-    const u = JSON.parse(localStorage.getItem('laundry_user') || 'null');
+    const u = JSON.parse(localStorage.getItem('remon_user') || 'null');
     if (u && u.token) return { Authorization: `Bearer ${u.token}` };
   } catch {}
   return {};
@@ -45,4 +45,4 @@ async function apiPut(path, body) {
   return handleResponse(res);
 }
 
-window.API = { apiGet, apiPost, apiPut };
+window.API = { apiGet, apiPost, apiPut, BASE_URL: API_BASE };

@@ -10,20 +10,20 @@ import { AdminOrdersPage } from '../pages/admin/orders.js';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
-import { RegisterPage } from '../pages/auth/register.js?v=ui_fix_final_v2';
+import { RegisterPage } from '../pages/auth/register.js';
 import { VerifyAccountPage } from '../pages/auth/verify-account.js';
 import { ForgotPasswordPage } from '../pages/auth/forgot-password.js';
 import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
 import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
-import { State } from './state.js?v=fix8';
+import { State } from './state.js';
 
 let outletEl = null;
 
 const routes = [
   { pattern: '#/', render: HomePage },
-  { pattern: '#/dashboard', render: HomePage },
+  { pattern: '#/dashboard', render: ProductsPage },
   { pattern: '#/products', render: ProductsPage },
   { pattern: '#/product/:id', render: ProductDetailPage },
   { pattern: '#/cart', render: CartPage },
@@ -76,16 +76,20 @@ export function initRouter({ outlet }) {
 function render() {
   let hash = location.hash || '#/';
   
-  // Root redirect logic
+  // Public Access: Allow Home/Dashboard without login
   if (hash === '#/' || hash === '') {
-    const user = State.getUser();
-    if (user) {
-      navigate('#/dashboard');
-      return;
-    } else {
-      navigate('#/login');
-      return;
-    }
+    navigate('#/dashboard');
+    return;
+  }
+
+  // Protected Routes - Redirect to login if not authenticated
+  // Allow Cart for guests, but protect Checkout
+  const protectedRoutes = ['#/checkout', '#/orders', '#/admin'];
+  const user = State.getUser();
+  
+  if (!user && protectedRoutes.some(route => hash.startsWith(route))) {
+     navigate('#/login');
+     return;
   }
 
   // Prevent accessing new-password if no OTP verified
@@ -103,11 +107,20 @@ function render() {
     outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${hash}</p></section>`;
     return;
   }
-  const html = match.render(match.params || {});
-  outletEl.innerHTML = html;
-  // Jalankan binder halaman jika tersedia
-  if (window.__bindPage) {
-    try { window.__bindPage(); } catch { /* noop */ }
-    window.__bindPage = null;
+
+  try {
+    const html = match.render(match.params || {});
+    outletEl.innerHTML = html;
+    // Jalankan binder halaman jika tersedia
+    if (window.__bindPage) {
+      window.__bindPage();
+      window.__bindPage = null;
+    }
+  } catch (err) {
+    console.error(err);
+    outletEl.innerHTML = `<div style="padding: 20px; color: red;">
+      <h3>Terjadi Kesalahan Aplikasi</h3>
+      <pre>${err.message}\n${err.stack}</pre>
+    </div>`;
   }
 }

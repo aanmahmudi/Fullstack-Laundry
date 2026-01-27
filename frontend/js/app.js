@@ -13,7 +13,7 @@ async function loadProducts() {
   try {
     const items = await API.apiGet("/api/products");
     list.innerHTML = items
-      .map((p) => `<li>[${p.id}] ${p.name} - Rp ${p.price} ${p.description ? "- " + p.description : ""}</li>`)
+      .map((p) => `<li>[${p.id}] ${p.name} - Rp ${Number(p.price).toLocaleString('id-ID')} ${p.description ? "- " + p.description : ""}</li>`)
       .join("");
   } catch (e) {
     list.innerHTML = `<li class="error">${e.message}</li>`;
@@ -85,7 +85,7 @@ async function loadTransactions() {
   try {
     const items = await API.apiGet("/api/transactions");
     list.innerHTML = items
-      .map((t) => `<li>[${t.id}] cust:${t.customerId} prod:${t.productId} qty:${t.quantity} total:${t.totalAmount}</li>`)
+      .map((t) => `<li>[${t.id}] cust:${t.customerId} prod:${t.productId} qty:${t.quantity} total:${t.totalAmount ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</li>`)
       .join("");
   } catch (e) {
     list.innerHTML = `<li class="error">${e.message}</li>`;

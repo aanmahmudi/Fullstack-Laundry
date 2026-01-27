@@ -8,33 +8,35 @@ export function LoginPage() {
   }, 0);
 
   return `
-    <div class="panel auth-card">
-      <h2 id="auth-title">Login</h2>
-      <p id="auth-subtitle" class="muted" style="margin-bottom: 20px;">Masukkan email/username dan password</p>
-      <p id="auth-msg" class="muted"></p>
+    <div class="auth-wrapper">
+      <div class="panel auth-card">
+        <h2 id="auth-title">Login</h2>
+        <p id="auth-subtitle" class="auth-subtitle">Masuk ke akun Remon Eccom Anda</p>
+        <p id="auth-msg" class="msg"></p>
 
-      <form id="form-login" class="form-vertical">
-        <label>Email atau Username
-          <div class="input-with-icon">
-            <span class="icon">@</span>
-            <input name="email" type="text" required placeholder="email@contoh.com" />
+        <form id="form-login" class="form-vertical">
+          <label>Email atau Username
+            <div class="input-with-icon">
+              <span class="icon">@</span>
+              <input name="email" type="text" required placeholder="email@contoh.com" />
+            </div>
+            <small class="field-error"></small>
+          </label>
+          <label>Password
+            <div class="input-with-icon">
+              <span class="icon">🔒</span>
+              <input name="password" type="password" required placeholder="••••••••" minlength="8" />
+              <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
+            </div>
+            <small class="field-error"></small>
+          </label>
+          <button class="btn primary full-width" type="submit">Masuk Sekarang</button>
+          <div class="auth-footer">
+             <span>Belum punya akun? <a href="#/register">Daftar Sekarang</a></span>
+             <a href="#/forgot-password">Lupa Password?</a>
           </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Password
-          <div class="input-with-icon">
-            <span class="icon">🔒</span>
-            <input name="password" type="password" required placeholder="••••••••" minlength="8" />
-            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
-          </div>
-          <small class="field-error"></small>
-        </label>
-        <button class="btn purple full-width" type="submit">Login</button>
-        <div class="auth-footer">
-           <span>Belum punya akun? <a href="#/register">Create Account</a></span>
-           <a href="#/forgot-password">Forgot password?</a>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   `;
 }

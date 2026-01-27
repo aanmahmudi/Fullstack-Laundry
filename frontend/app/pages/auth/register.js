@@ -8,77 +8,87 @@ export function RegisterPage() {
   }, 0);
 
   return `
-    <div class="panel auth-card">
-      <h2 id="auth-title">Sign Up</h2>
-      <p id="auth-subtitle" class="muted" style="margin-bottom: 24px;">Lengkapi data untuk membuat akun baru</p>
-      <p id="auth-msg" class="muted"></p>
+    <div class="auth-wrapper">
+      <div class="panel auth-card" style="max-width: 520px;">
+        <h2 id="auth-title">Buat Akun Baru</h2>
+        <p id="auth-subtitle" class="auth-subtitle">Bergabunglah dan mulai belanja di Remon Eccom</p>
+        <p id="auth-msg" class="msg"></p>
 
-      <form id="form-register" class="form-vertical">
-        <label>Nama
-          <div class="input-with-icon">
-            <span class="icon">👤</span>
-            <input name="username" type="text" required placeholder="Nama lengkap" />
+        <form id="form-register" class="form-vertical">
+          <label>Nama Lengkap
+            <div class="input-with-icon">
+              <span class="icon">👤</span>
+              <input name="username" type="text" required placeholder="Nama Anda" />
+            </div>
+            <small class="field-error"></small>
+          </label>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+             <label>Email
+               <div class="input-with-icon">
+                 <span class="icon">@</span>
+                 <input name="email" type="email" required placeholder="email@contoh.com" />
+               </div>
+               <small class="field-error"></small>
+             </label>
+             <label>No. HP
+               <div class="input-with-icon">
+                 <span class="icon">📱</span>
+                 <input name="phoneNumber" type="text" required pattern="[0-9]{12,13}" inputmode="numeric" placeholder="08..." />
+               </div>
+               <small class="field-error"></small>
+             </label>
           </div>
-          <small class="field-error"></small>
-        </label>
-        <label>No. HP (12–13 digit)
-          <div class="input-with-icon">
-            <span class="icon">📱</span>
-            <input name="phoneNumber" type="text" required pattern="[0-9]{12,13}" inputmode="numeric" title="Harus 12–13 digit angka" placeholder="081234567890" />
+
+          <label>Password
+            <div class="input-with-icon">
+              <span class="icon">🔒</span>
+              <input name="password" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
+              <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
+            </div>
+            <small class="field-error"></small>
+          </label>
+
+          <label>Daftar Sebagai</label>
+          <div class="role-selector">
+             <button type="button" class="role-btn active" data-value="USER">
+               <span>👤</span> Customer
+             </button>
+             <button type="button" class="role-btn" data-value="ADMIN">
+               <span>🛠️</span> Admin
+             </button>
           </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Email
-          <div class="input-with-icon">
-            <span class="icon">@</span>
-            <input name="email" type="email" required placeholder="email@contoh.com" />
+          <input type="hidden" name="role" id="role-input" value="USER" />
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <label>Tempat Lahir
+              <div class="input-with-icon">
+                <span class="icon">📍</span>
+                <input name="placeOfBirth" type="text" placeholder="Kota" />
+              </div>
+            </label>
+            <label>Tanggal Lahir
+              <div class="input-with-icon">
+                <span class="icon">📅</span>
+                <input name="dateOfBirth" type="date" required />
+              </div>
+            </label>
           </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Password (min 8)
-          <div class="input-with-icon">
-            <span class="icon">🔒</span>
-            <input name="password" type="password" required minlength="8" placeholder="Minimal 8 karakter" />
-            <button type="button" class="password-toggle" title="Lihat Password">${ICONS.eye}</button>
+
+          <label>Alamat Lengkap
+            <div class="input-with-icon">
+              <span class="icon">🏠</span>
+              <input name="address" type="text" placeholder="Jalan, No. Rumah, Kota" />
+            </div>
+            <small class="field-error"></small>
+          </label>
+
+          <button class="btn primary full-width" type="submit">Daftar Sekarang</button>
+          <div class="auth-footer">
+             <span>Sudah punya akun? <a href="#/login">Login disini</a></span>
           </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Daftar Sebagai
-          <div class="input-with-icon">
-            <span class="icon">🎭</span>
-            <select name="role" required>
-              <option value="USER">Customer</option>
-              <option value="ADMIN">Admin</option>
-            </select>
-            <span class="arrow-icon">▼</span>
-          </div>
-        </label>
-        <label>Tempat Lahir
-          <div class="input-with-icon">
-            <span class="icon">📍</span>
-            <input name="placeOfBirth" type="text" placeholder="Kota/Kabupaten" />
-          </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Tanggal Lahir
-          <div class="input-with-icon">
-            <span class="icon">📅</span>
-            <input name="dateOfBirth" type="date" required />
-          </div>
-          <small class="field-error"></small>
-        </label>
-        <label>Alamat
-          <div class="input-with-icon">
-            <span class="icon">🏠</span>
-            <input name="address" type="text" placeholder="Alamat lengkap" />
-          </div>
-          <small class="field-error"></small>
-        </label>
-        <button class="btn purple full-width" type="submit">Sign Up</button>
-        <div class="auth-footer">
-           <span>Sudah punya akun? <a href="#/login">Login</a></span>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   `;
 }

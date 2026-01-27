@@ -3,14 +3,29 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Laundry App</title>
-    <link rel="stylesheet" href="./assets/styles.css?v=fix12" />
-    <link rel="stylesheet" href="./assets/auth.css?v=ui_fix_final_v2" />
-    <link rel="stylesheet" href="./assets/home.css?v=fix1" />
-    <link rel="stylesheet" href="./assets/products.css?v=fix2" />
-    <link rel="stylesheet" href="./assets/cart.css?v=fix1" />
+    <title>Remon Eccom - Belanja Online Terpercaya</title>
+    <link rel="stylesheet" href="./assets/styles.css?v=remon4" />
+    <link rel="stylesheet" href="./assets/auth.css?v=remon4" />
+    <link rel="stylesheet" href="./assets/home.css?v=remon4" />
+    <link rel="stylesheet" href="./assets/products.css?v=remon4" />
+    <link rel="stylesheet" href="./assets/cart.css?v=remon4" />
   </head>
   <body>
+    <div id="global-error-display" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; padding:20px; z-index:9999; font-family:monospace; white-space:pre-wrap;"></div>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        var display = document.getElementById('global-error-display');
+        display.style.display = 'block';
+        display.innerHTML += 'Global Error: ' + msg + '\nLocation: ' + url + ':' + line + ':' + col + '\nStack: ' + (error ? error.stack : 'no stack') + '\n\n';
+        console.error('Global Error:', msg, url, line, col, error);
+        return false;
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        var display = document.getElementById('global-error-display');
+        display.style.display = 'block';
+        display.innerHTML += 'Unhandled Promise Rejection: ' + event.reason + '\n\n';
+      });
+    </script>
     <header id="app-header"></header>
 
     <main id="app-main"></main>
@@ -24,34 +39,48 @@
             <li><a href="#">Metode Pembayaran</a></li>
             <li><a href="#">Lacak Pesanan</a></li>
             <li><a href="#">Hubungi Kami</a></li>
+            <li><a href="#">Garansi Shopee</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h3>Tentang Kami</h3>
+          <h3>Tentang Remon Eccom</h3>
           <ul>
-            <li><a href="#">Tentang LaundryApp</a></li>
+            <li><a href="#">Tentang Kami</a></li>
             <li><a href="#">Karir</a></li>
             <li><a href="#">Kebijakan Privasi</a></li>
             <li><a href="#">Blog</a></li>
+            <li><a href="#">Media Kontak</a></li>
           </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Pembayaran</h3>
+          <div style="display:flex; gap:10px; flex-wrap: wrap;">
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BCA</span>
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">Mandiri</span>
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BNI</span>
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BRI</span>
+          </div>
+          <h3 style="margin-top: 20px;">Pengiriman</h3>
+          <div style="display:flex; gap:10px; flex-wrap: wrap;">
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">JNE</span>
+             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">J&T</span>
+          </div>
         </div>
         <div class="footer-col">
           <h3>Ikuti Kami</h3>
           <div style="display:flex; gap:10px;">
-             <a href="#">FB</a> | <a href="#">IG</a> | <a href="#">TW</a>
+            <a href="#">FB</a> | <a href="#">IG</a> | <a href="#">TW</a>
           </div>
-        </div>
-        <div class="footer-col">
-          <h3>Download Aplikasi</h3>
-          <p class="muted">Segera hadir di App Store dan Google Play.</p>
+          <h3 style="margin-top: 20px;">Download Aplikasi</h3>
+          <p class="muted">Scan QR Code untuk download aplikasi Remon Eccom</p>
         </div>
       </div>
       <div class="footer-bottom">
-        &copy; 2026 Laundry App. Hak Cipta Dilindungi.
+        &copy; 2026 Remon Eccom. Hak Cipta Dilindungi.
       </div>
     </footer>
 
-    <script src="./js/api.js?v=fix16"></script>
-    <script type="module" src="./app/main.js?v=fix16"></script>
+    <script src="./js/api.js?v=remon3"></script>
+    <script type="module" src="./app/main.js?v=remon3"></script>
   </body>
-  </html>
+</html>

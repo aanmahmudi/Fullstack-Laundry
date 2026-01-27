@@ -92,7 +92,7 @@ function renderRow(t) {
       <td>${t.customerName}</td>
       <td>${t.productName}</td>
       <td>${t.quantity}</td>
-      <td>Rp ${t.totalPrice}</td>
+      <td>Rp ${Number(t.totalAmount || t.totalPrice || 0).toLocaleString('id-ID')}</td>
       <td>
         <span class="badge ${t.paymentStatus === 'PAID' ? 'success' : 'warning'}">
           ${t.paymentStatus}

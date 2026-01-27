@@ -53,8 +53,8 @@ export function OrdersPage() {
               <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
                   <div style="font-weight:bold; font-size:1.1em;">Order #${t.id}</div>
-                  <div style="color:var(--text-muted); margin-bottom:8px;">${t.productName || 'Layanan Laundry'}</div>
-                  <div>Qty: ${t.quantity} • Total: <strong>Rp ${t.totalPrice}</strong></div>
+                  <div style="color:var(--text-muted); margin-bottom:8px;">${t.productName || 'Produk Remon Eccom'}</div>
+                  <div>Qty: ${t.quantity} • Total: <strong>Rp ${Number(t.totalAmount || 0).toLocaleString('id-ID')}</strong></div>
                 </div>
                 <div style="text-align:right;">
                   <span class="badge ${t.orderStatus === 'DONE' ? 'success' : (t.orderStatus === 'PROCESSING' ? 'warning' : 'info')}">

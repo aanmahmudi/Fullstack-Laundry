@@ -38,7 +38,7 @@ public class PhotoStorageService {
 		Files.write(filePath, file.getBytes());
 
 		// generate URL file
-		String fileUrl = "http://localhost:8080/uploads/" + filename;
+		String fileUrl = "http://localhost:8081/uploads/" + filename;
 
 		// simpan ke database
 		Optional<Customer> customerOptional = customerRepository.findById(customerId);

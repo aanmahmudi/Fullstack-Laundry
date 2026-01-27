@@ -12,7 +12,7 @@ async function loadProducts() {
       list.innerHTML = `<li>Belum ada produk.</li>`;
     } else {
       list.innerHTML = items
-        .map((p) => `<li>[${p.id}] ${p.name} - Rp ${p.price} ${p.description ? "- " + p.description : ""}</li>`)
+        .map((p) => `<li>[${p.id}] ${p.name} - Rp ${Number(p.price).toLocaleString('id-ID')} ${p.description ? "- " + p.description : ""}</li>`)
         .join("");
     }
   } catch (e) {

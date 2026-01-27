@@ -1,262 +1,195 @@
-/* Auth Pages Specific Styles */
+/* Auth Pages Specific Styles - Modern Elegant Theme */
 
-/* Role Selector */
-.role-selector {
-  display: flex;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 4px;
-  border-radius: 12px;
-  border: 1px solid var(--panel-border);
-  gap: 4px;
-  margin-top: 4px;
-}
+/* Page Background */
+/* We'll use the body background from styles.css, but we can add a specific background for auth pages if needed. 
+   For now, we'll rely on the global background but make the card pop. */
 
-.role-btn {
-  flex: 1;
+/* Auth Container - Shopee Style */
+.auth-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.role-btn.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
-}
-
-.role-btn:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  padding: 20px;
+  background: var(--primary); /* Shopee Orange Background */
+  background-image: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
 }
 
 /* Auth Card */
 .auth-card {
-  max-width: 440px; /* Slightly narrower for modern look */
-  margin: 60px auto;
-  padding: 40px;
-  background: rgba(30, 41, 59, 0.7); /* Glass-ish effect */
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border-radius: 24px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 30px; /* Reduced padding for tighter feel */
+  background: #ffffff;
+  border: none;
+  border-radius: 4px; /* Sharper corners like Shopee */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative top bar - Removed for Shopee style, or keep minimal */
+.auth-card::before {
+  display: none;
 }
 
 .auth-card h2 {
-  font-size: 28px;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-align: center;
-}
-
-.auth-subtitle {
-  margin-bottom: 32px;
-  text-align: center;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.auth-hidden {
-  display: none;
-}
-
-/* Message Box */
-.msg {
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  margin-bottom: 24px;
-  font-size: 14px;
-  display: none;
-  line-height: 1.5;
-}
-
-.msg.visible {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-.msg.error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-}
-
-.msg.success {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #6ee7b7;
-}
-
-.alert-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.alert-content .icon {
-  font-size: 16px;
-  margin-top: 1px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Auth Form Layout */
-.form-vertical {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.form-vertical label {
-  display: grid;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text-muted);
+  font-size: 24px;
+  margin: 0 0 8px 0;
+  color: #1a1a1a;
+  text-align: left; /* Shopee titles are often left aligned or center */
   font-weight: 500;
 }
 
-/* Input with icon */
+.auth-subtitle {
+  margin-bottom: 30px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Form Elements */
+.form-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Adjusted gap to be not too far, not too close */
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px; /* Slightly reduced */
+  color: #333;
+}
+
+/* Input Fields */
 .input-with-icon {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.6);
-  transition: all 0.2s ease;
-}
-
-.input-with-icon:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-  background: rgba(15, 23, 42, 0.8);
 }
 
 .input-with-icon .icon {
-  color: var(--text-muted);
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.input-with-icon .arrow-icon {
   position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 12px;
+  color: #bfbfbf;
+  font-size: 16px;
   pointer-events: none;
-  color: var(--text-muted);
-  font-size: 12px;
+  z-index: 1;
 }
 
 .input-with-icon input,
 .input-with-icon select {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--text);
-  font-size: 15px;
-  padding: 0;
-  min-width: 0; /* Fix flex issue */
-  font-family: inherit;
   width: 100%;
+  padding: 12px 12px 12px 40px;
+  font-size: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px; /* Shopee style */
+  background: #fff;
+  color: #333;
+  transition: all 0.2s;
 }
 
-.input-with-icon select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  padding-right: 20px; /* Space for arrow */
+.input-with-icon input:focus,
+.input-with-icon select:focus {
+  border-color: #333;
+  box-shadow: none;
 }
 
-.input-with-icon select option {
-  background: #1e293b; /* Dark slate */
-  color: white;
-  padding: 10px;
+.input-with-icon input::placeholder {
+  color: #cbd5e1;
 }
 
-/* Date input specific */
-.input-with-icon input[type="date"] {
-  color-scheme: dark;
-  background: transparent;
+.input-with-icon:focus-within .icon {
+  color: var(--primary);
 }
 
-.input-with-icon input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* White icon for dark mode */
-  cursor: pointer;
-  opacity: 0; /* Hide default icon if we use custom one, or keep it */
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
+/* Password Toggle */
 .password-toggle {
+  position: absolute;
+  right: 12px;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
-  color: var(--text-muted);
-  font-size: 18px;
+  color: #bfbfbf;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color 0.2s;
-  margin-right: -8px; /* Pull slightly right */
-  -webkit-appearance: none;
-  -moz-appearance: none;
 }
 
 .password-toggle:hover {
   color: var(--text);
 }
 
-.input-with-icon.input-error {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
-}
-
-.field-error {
-  color: #fca5a5;
-  font-size: 13px;
-  display: none;
-  margin-top: 4px;
-}
-
-label.has-error .field-error {
-  display: block;
-}
-
-/* Footer Links */
-.auth-footer {
+/* Role Selector (Segmented Control) */
+.role-selector {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
   align-items: center;
-  margin-top: 24px;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.role-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #fff5f5; /* Light orange tint */
+  font-weight: 600;
+}
+
+.role-btn:hover:not(.active) {
+  background: #f9f9f9;
+}
+
+/* Buttons */
+.btn.full-width {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 2px; /* Shopee style */
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.btn.full-width:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transform: none;
+}
+
+/* Auth Footer */
+.auth-footer {
+  margin-top: 32px;
+  text-align: center;
   font-size: 14px;
   color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .auth-footer a {
@@ -271,13 +204,88 @@ label.has-error .field-error {
   text-decoration: underline;
 }
 
-/* New Password Form Specifics */
-.auth-form-new-password .form-group-confirm {
-  margin-bottom: 8px;
+/* Message Box */
+.msg {
+  padding: 16px;
+  border-radius: 2px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  display: none;
+  line-height: 1.5;
+  animation: slideDown 0.3s ease;
 }
 
-.auth-form-new-password .btn-submit {
-  margin-top: 16px;
-  height: 48px;
-  font-size: 16px;
+.msg.visible {
+  display: block;
+}
+
+.msg.error {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  color: #b91c1c;
+}
+
+.msg.success {
+  background: #f0fdf4;
+  border-left: 4px solid #16a34a;
+  color: #15803d;
+}
+
+.alert-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alert-content .icon {
+  font-size: 18px;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Field Errors */
+.field-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 6px;
+  display: block;
+  font-weight: 500;
+  min-height: 18px; /* reserve space */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.field-error:not(:empty) {
+  opacity: 1;
+}
+
+/* Auth Brand link on login/register */
+.auth-brand {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.auth-brand a {
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Custom Select styling */
+.input-with-icon .arrow-icon {
+  position: absolute;
+  right: 16px;
+  pointer-events: none;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
 }

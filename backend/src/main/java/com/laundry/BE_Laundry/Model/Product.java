@@ -31,4 +31,7 @@ public class Product {
 	
 	private String description;
 
+	@Column(name = "owner_id")
+	private Long ownerId;
+
 }

@@ -14,7 +14,7 @@ export function AddProductPage() {
   return `
     <div class="panel auth-card add-product-card">
       <h2 class="form-header">Tambah Produk Baru</h2>
-      <p class="muted form-subtitle">Isi detail produk laundry</p>
+      <p class="muted form-subtitle">Isi detail produk Remon Eccom</p>
       
       <form id="form-add-product" class="form-vertical">
         <label>Nama Produk
@@ -24,26 +24,27 @@ export function AddProductPage() {
           </div>
         </label>
         
-        <label>Deskripsi
-          <div class="input-with-icon" style="align-items: flex-start;">
-            <span class="icon" style="margin-top: 10px;">📝</span>
+        <label style="display: block; margin-bottom: 8px;">Deskripsi
+          <div style="position: relative;">
+            <span style="position: absolute; left: 12px; top: 12px; font-size: 16px; z-index: 10; pointer-events: none;">📝</span>
             <textarea name="description" rows="3" placeholder="Deskripsi singkat produk..." 
-              style="flex: 1; background: transparent; border: none; color: var(--text); outline: none; padding: 8px 0; font-family: inherit; resize: vertical; min-height: 80px;"></textarea>
+              style="width: 100%; box-sizing: border-box; background: #fff; border: 1px solid #e0e0e0; border-radius: 2px; color: #333; outline: none; padding: 12px 12px 12px 40px; font-family: inherit; resize: vertical; min-height: 100px; display: block;"></textarea>
           </div>
         </label>
         
         <label>Harga (Rp)
           <div class="input-with-icon">
             <span class="icon">💰</span>
-            <input name="price" type="number" required min="0" placeholder="0" />
+            <input name="price" type="text" inputmode="numeric" required placeholder="0" id="price-input" />
           </div>
         </label>
         
-        <label>Foto Produk
+        <div class="form-group">
+          <label class="form-label">Foto Produk</label>
           <div class="file-upload-container">
             <input type="file" id="file-input" accept="image/*" style="display: none;" />
             <div id="drop-zone" class="drop-zone">
-              <div id="preview-container" class="preview-container">
+              <div id="preview-container" class="preview-container" style="display: none;">
                 <img id="preview-img" class="preview-img" src="" alt="Preview" />
               </div>
               <div id="upload-prompt">
@@ -54,7 +55,7 @@ export function AddProductPage() {
             </div>
             <input type="hidden" name="photoUrl" id="photo-url-input" />
           </div>
-        </label>
+        </div>
         
         <div class="actions form-actions">
           <a href="#/products" class="btn btn-full">Batal</a>
@@ -76,8 +77,25 @@ function bindEvents() {
 
   if (!form) return;
 
+  // Format price input
+  const priceInput = document.getElementById('price-input');
+  if (priceInput) {
+    priceInput.addEventListener('input', (e) => {
+      // Remove non-numeric characters
+      let value = e.target.value.replace(/\D/g, '');
+      // Format with thousand separator
+      if (value) {
+        value = parseInt(value, 10).toLocaleString('id-ID');
+      }
+      e.target.value = value;
+    });
+  }
+
   // File Upload Handling
-  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', () => {
+    fileInput.value = ''; // Clear value to allow re-selecting same file
+    fileInput.click();
+  });
 
   dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -114,11 +132,60 @@ function bindEvents() {
     reader.onload = (e) => {
       previewImg.src = e.target.result;
       previewContainer.style.display = 'flex';
-      uploadPrompt.querySelector('.upload-text').textContent = 'Ganti Foto';
+      uploadPrompt.querySelector('.upload-text').textContent = 'Mengupload...';
       uploadPrompt.querySelector('.upload-hint').style.display = 'none';
       uploadPrompt.querySelector('.upload-icon').style.display = 'none';
     };
     reader.readAsDataURL(file);
+
+    // Auto Upload
+    uploadImage(file);
+  }
+
+  async function uploadImage(file) {
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+    
+    try {
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+      console.log('Uploading to:', `${baseUrl}/api/products/upload-image`);
+      
+      const res = await fetch(`${baseUrl}/api/products/upload-image`, {
+        method: 'POST',
+        body: uploadData
+      });
+      
+      if (!res.ok) {
+        const text = await res.text();
+        let errorDetail = text;
+        try {
+            const json = JSON.parse(text);
+            if (json.error) errorDetail = json.error;
+            if (json.message) errorDetail = json.message;
+        } catch(e) {}
+        throw new Error(`Server error: ${res.status} - ${errorDetail}`);
+      }
+      
+      const data = await res.json();
+      photoUrlInput.value = data.url;
+      
+      uploadPrompt.querySelector('.upload-text').textContent = 'Foto Terupload';
+      uploadPrompt.querySelector('.upload-text').style.color = 'var(--success)';
+      console.log('Upload success:', data.url);
+      
+    } catch (err) {
+      console.error('Upload failed details:', err);
+      uploadPrompt.querySelector('.upload-text').textContent = 'Gagal Upload';
+      uploadPrompt.querySelector('.upload-text').style.color = 'var(--error)';
+      
+      // Show more detailed error to user
+      alert(`Gagal upload foto: ${err.message}. \n\nPastikan backend berjalan di port 8081.`);
+      
+      // Reset input to allow immediate retry without clicking twice if possible
+      // But we already clear value on click. 
+      // Maybe we can auto-clear here?
+      // fileInput.value = ''; 
+    }
   }
 
   // Form Submit
@@ -129,39 +196,22 @@ function bindEvents() {
     
     try {
       btn.disabled = true;
-      btn.textContent = 'Menyimpan...';
-
-      // 1. Upload Photo if selected
-      let finalPhotoUrl = null;
-      if (fileInput.files.length > 0) {
-        btn.textContent = 'Mengupload foto...';
-        const uploadData = new FormData();
-        uploadData.append('file', fileInput.files[0]);
-        
-        try {
-          // Note: We need to use fetch directly or ensure API wrapper handles FormData correctly without setting Content-Type to json
-          const res = await fetch('http://localhost:8080/api/products/upload-image', {
-            method: 'POST',
-            body: uploadData
-            // Do NOT set Content-Type header, browser does it for FormData
-          });
-          
-          if (!res.ok) throw new Error('Gagal upload foto');
-          const data = await res.json();
-          finalPhotoUrl = data.url;
-        } catch (uploadErr) {
-          throw new Error('Gagal upload foto: ' + uploadErr.message);
-        }
-      }
-
       btn.textContent = 'Menyimpan data...';
       
       const formData = new FormData(form);
+      const user = State.getUser();
+      const photoUrl = photoUrlInput.value; // Get from hidden input
+
+      if (fileInput.files.length > 0 && !photoUrl) {
+         throw new Error('Tunggu proses upload foto selesai.');
+      }
+
       const payload = {
         name: formData.get('name'),
         description: formData.get('description'),
-        price: Number(formData.get('price')),
-        photoUrl: finalPhotoUrl // Use the uploaded URL
+        price: Number(formData.get('price').replace(/\./g, '')),
+        photoUrl: photoUrl || null,
+        ownerId: user && user.id ? user.id : null
       };
       
       await API.apiPost('/api/products', payload);
