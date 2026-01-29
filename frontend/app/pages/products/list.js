@@ -29,10 +29,21 @@ export function ProductsPage() {
     grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk...</div>';
     
     try {
-      let items = await API.apiGet('/api/products');
+      // API Call wrapper with search support
+      const fetchProducts = async (query = '') => {
+        let url = '/api/products';
+        if (query) {
+            url += `?search=${encodeURIComponent(query)}`;
+        }
+        return await API.apiGet(url);
+      };
+
+      // Initial load (no search)
+      let items = await fetchProducts();
+      
       const render = (list) => {
-        if (list.length === 0) {
-            grid.innerHTML = '<div class="panel" style="grid-column: 1/-1; text-align: center; background: white; color: #333;">Tidak ada produk ditemukan.</div>';
+        if (!list || list.length === 0) {
+            grid.innerHTML = '<div class="panel" style="grid-column: 1/-1; text-align: center; background: white; color: #333; padding: 40px;">Tidak ada produk ditemukan.</div>';
             return;
         }
         grid.innerHTML = list.map((p) => productCard(p, user)).join('');
@@ -41,7 +52,8 @@ export function ProductsPage() {
         grid.querySelectorAll('.btn-add').forEach((btn) => {
           btn.addEventListener('click', () => {
             const id = Number(btn.dataset.id);
-            const prod = list.find((x) => x.id === id) || items.find((x) => x.id === id);
+            // Look up in current displayed list first
+            const prod = list.find((x) => x.id === id);
             if (prod) {
                 State.addToCart({ id: prod.id, name: prod.name, price: prod.price, qty: 1, photoUrl: prod.photoUrl });
                 // Visual feedback
@@ -83,8 +95,8 @@ export function ProductsPage() {
                 } catch {}
                 throw new Error(msg);
               }
-              items = items.filter((x) => x.id !== id);
-              render(items);
+              // Refresh data from server to ensure sync
+              refresh.click();
             } catch (err) {
               alert('Gagal menghapus produk: ' + err.message);
             }
@@ -94,31 +106,50 @@ export function ProductsPage() {
       
       render(items);
       
-      // renderCartSummary removed as sidebar is gone, rely on header or toast
-      
-      const doFilter = (q) => {
-        const query = String(q || '').toLowerCase();
-        const filtered = items.filter((p) =>
-          String(p.name || '').toLowerCase().includes(query) || String(p.description || '').toLowerCase().includes(query)
-        );
-        render(filtered);
+      // Debounce utility
+      const debounce = (func, wait) => {
+        let timeout;
+        return function(...args) {
+          const context = this;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+      };
+
+      // Server-side search handler
+      const handleSearch = async (q) => {
+        const query = String(q || '').trim();
+        grid.innerHTML = '<div class="loading" style="color: #333;">Mencari produk...</div>';
+        try {
+           const filtered = await fetchProducts(query);
+           render(filtered);
+        } catch (e) {
+           grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+        }
       };
       
+      const debouncedSearch = debounce(handleSearch, 500);
+
       search.addEventListener('input', () => {
-        doFilter(search.value);
+        debouncedSearch(search.value);
       });
       
       window.addEventListener('global:search', (e) => {
         const q = e.detail && e.detail.q ? e.detail.q : '';
         if (search) search.value = q;
-        doFilter(q);
+        // Immediate search for explicit submit
+        handleSearch(q);
       });
       
       refresh.addEventListener('click', async () => {
         grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk...</div>';
-        items = await API.apiGet('/api/products');
         search.value = '';
-        render(items);
+        try {
+            items = await fetchProducts();
+            render(items);
+        } catch (e) {
+             grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+        }
       });
       
     } catch (e) {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.laundry.BE_Laundry.Model.Product;
@@ -32,7 +33,10 @@ public class ProductController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Product>> getAllProducts() {
+	public ResponseEntity<List<Product>> getAllProducts(@RequestParam(required = false) String search) {
+		if (search != null && !search.trim().isEmpty()) {
+			return ResponseEntity.ok(productService.searchProducts(search));
+		}
 		return ResponseEntity.ok(productService.getAllProducts());
 	}
 
