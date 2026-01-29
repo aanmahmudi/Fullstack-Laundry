@@ -28,10 +28,13 @@ services:
     restart: always
     ports:
       - "8081:8080"
+    volumes:
+      - ./uploads:/uploads
     depends_on:
       - db
     environment:
       TZ: Asia/Jakarta
+      FILE_UPLOAD_DIR: /uploads/
       SPRING_DATASOURCE_URL: ${DB_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}

@@ -50,10 +50,13 @@ public class ProductController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deleteProduct(@PathVariable Long id, @org.springframework.web.bind.annotation.RequestParam("requesterId") Long requesterId) {
 		Product product = productService.getProductById(id);
-		if (product.getOwnerId() != null && !product.getOwnerId().equals(requesterId)) {
+		
+		// Strict check: Owner must exist and must match requester
+		if (product.getOwnerId() == null || !product.getOwnerId().equals(requesterId)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN)
-					.body(Map.of("message", "Anda tidak dapat menghapus produk milik admin lain."));
+					.body(Map.of("message", "Anda hanya dapat menghapus produk milik Anda sendiri."));
 		}
+		
 		productService.deleteProduct(id);
 		return ResponseEntity.noContent().build();
 	}

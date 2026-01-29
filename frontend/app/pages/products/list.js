@@ -130,10 +130,17 @@ export function ProductsPage() {
 }
 
 function productCard(p, user) {
-  const hasPhoto = !!p.photoUrl;
+  let photoUrl = p.photoUrl;
+  if (photoUrl && photoUrl.startsWith('/')) {
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+      photoUrl = baseUrl + photoUrl;
+  }
+  
+  const hasPhoto = !!photoUrl;
+  const placeholder = "https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image";
   const photoHtml = hasPhoto
-    ? `<img src="${p.photoUrl}" alt="${p.name}"/>`
-    : `<img src="https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image" alt="No Image"/>`;
+    ? `<img src="${photoUrl}" alt="${p.name}" onerror="this.onerror=null;this.src='${placeholder}';this.alt='No Image';"/>`
+    : `<img src="${placeholder}" alt="No Image"/>`;
   const description = p.description || 'Produk berkualitas pilihan dari Remon Eccom.';
   const price = (Number(p.price) || 0).toLocaleString('id-ID');
   const isOwnerAdmin = user && user.role === 'ADMIN' && String(p.ownerId || '') === String(user.id || '');
@@ -141,7 +148,9 @@ function productCard(p, user) {
     ? `<span class="owner-badge">Produk saya</span>`
     : '';
   const deleteButton = isOwnerAdmin
-    ? `<button class="btn btn-delete-product" data-id="${p.id}">Hapus</button>`
+    ? `<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee;">
+         <button class="btn btn-delete-product" data-id="${p.id}" style="width: 100%;">Hapus Produk</button>
+       </div>`
     : '';
 
   return `
@@ -155,11 +164,14 @@ function productCard(p, user) {
         <p>${description}</p>
         <div class="price">Rp ${price}</div>
       </div>
-      <div class="card-actions">
+      <div class="card-actions" style="flex-wrap: wrap;">
         <a class="btn btn-detail" href="#/product/${p.id}">Detail</a>
-        <button class="btn btn-buy btn-add" data-id="${p.id}">Beli</button>
-        ${deleteButton}
+        ${isOwnerAdmin 
+          ? `<button class="btn btn-buy" disabled style="opacity: 0.5; cursor: not-allowed; background: #94a3b8; border-color: #94a3b8;">Milik Anda</button>`
+          : `<button class="btn btn-buy btn-add" data-id="${p.id}">Beli</button>`
+        }
       </div>
+      ${deleteButton ? `<div style="padding: 0 24px 24px;">${deleteButton}</div>` : ''}
     </article>
   `;
 }

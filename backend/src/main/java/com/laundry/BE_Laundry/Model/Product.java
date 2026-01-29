@@ -23,7 +23,7 @@ public class Product {
 	private Long id;
 	
 	private String name;
-	@Column(precision = 10, scale = 5)
+	@Column(precision = 15, scale = 2)
 	private BigDecimal price;
 	
 	@Column(name = "photo_url")

@@ -94,7 +94,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  text-align: center;
+  text-align: left;
 }
 
 .card-body h3 {
@@ -365,8 +365,9 @@ input[type=number] {
 .pd-description {
   font-size: 15px;
   line-height: 1.6;
-  white-space: pre-wrap;
+  white-space: pre-line;
   color: var(--text);
+  text-align: left;
 }
 
 .pd-actions {

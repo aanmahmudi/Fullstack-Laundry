@@ -77,6 +77,10 @@ function bindEvents() {
 
   if (!form) return;
 
+  // Prevent double binding
+  if (form.dataset.bound) return;
+  form.dataset.bound = 'true';
+
   // Format price input
   const priceInput = document.getElementById('price-input');
   if (priceInput) {
@@ -167,7 +171,11 @@ function bindEvents() {
       }
       
       const data = await res.json();
-      photoUrlInput.value = data.url;
+      
+      // Construct full URL using the current API base URL
+      // data.url from backend is relative path like "/uploads/filename.jpg"
+      const fullUrl = `${baseUrl}${data.url}`;
+      photoUrlInput.value = fullUrl;
       
       uploadPrompt.querySelector('.upload-text').textContent = 'Foto Terupload';
       uploadPrompt.querySelector('.upload-text').style.color = 'var(--success)';
@@ -191,10 +199,15 @@ function bindEvents() {
   // Form Submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // Prevent double submission if already processing
+    if (form.dataset.submitting === 'true') return;
+    
     const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
     
     try {
+      form.dataset.submitting = 'true';
       btn.disabled = true;
       btn.textContent = 'Menyimpan data...';
       
@@ -220,10 +233,12 @@ function bindEvents() {
       btn.textContent = 'Berhasil!';
       btn.style.background = 'var(--success)';
       setTimeout(() => {
+        delete form.dataset.submitting;
         window.location.hash = '#/products';
       }, 500);
       
     } catch (err) {
+      delete form.dataset.submitting;
       alert('Error: ' + err.message);
       btn.disabled = false;
       btn.textContent = originalText;

@@ -1,14 +1,26 @@
-const CART_KEY = 'remon_cart';
 const AUTH_KEY = 'remon_user';
 const PENDING_EMAIL_KEY = 'remon_pending_email';
 const PENDING_OTP_KEY = 'remon_pending_otp';
+const CART_KEY_PREFIX = 'remon_cart_';
 
 export const State = {
+  _getCartKey() {
+    try {
+        const user = this.getUser();
+        if (user && user.id) {
+            return `${CART_KEY_PREFIX}${user.id}`;
+        }
+    } catch (e) { console.error(e); }
+    return 'remon_cart_guest';
+  },
+
   getCart() {
-    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; }
+    const key = this._getCartKey();
+    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
   },
   setCart(items) {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
+    const key = this._getCartKey();
+    localStorage.setItem(key, JSON.stringify(items));
     const count = items.reduce((sum, x) => sum + (Number(x.qty) || 1), 0);
     window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count } }));
   },

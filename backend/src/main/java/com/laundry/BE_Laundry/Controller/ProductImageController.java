@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/products")
 public class ProductImageController {
 
-    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     @PostMapping("/upload-image")
     public ResponseEntity<Map<String, String>> uploadProductImage(@RequestParam("file") MultipartFile file) {
@@ -31,7 +33,7 @@ public class ProductImageController {
                 return ResponseEntity.badRequest().body(Map.of("error", "File kosong"));
             }
 
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -45,11 +47,12 @@ public class ProductImageController {
             Path filePath = uploadPath.resolve(filename);
             Files.write(filePath, file.getBytes());
 
-            String fileUrl = "http://localhost:8081/uploads/" + filename;
+            // Return relative path for frontend compatibility (Frontend prepends base URL)
+            String relativePath = "/uploads/" + filename;
             
-            log.info("Product image uploaded successfully: {}", fileUrl);
+            log.info("Product image uploaded successfully: {}", relativePath);
 
-            return ResponseEntity.ok(Map.of("url", fileUrl));
+            return ResponseEntity.ok(Map.of("url", relativePath));
 
         } catch (IOException e) {
             log.error("Failed to upload product image", e);

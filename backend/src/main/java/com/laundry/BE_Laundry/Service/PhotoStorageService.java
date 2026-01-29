@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,18 +24,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PhotoStorageService {
 
-	private static final String UPLOAD_DIR = "uploads/";
+	@Value("${file.upload-dir}")
+	private String uploadDir;
 
 	private final CustomerRepository customerRepository;
 	private final CustomerPhotoRepository customerPhotoRepository;
 
 	public String uploadPhoto(MultipartFile file, Long customerId) throws IOException {
 		// buat folder
-		Files.createDirectories(Paths.get(UPLOAD_DIR));
+		Files.createDirectories(Paths.get(uploadDir));
 
 		// generate name file unik
 		String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-		Path filePath = Paths.get(UPLOAD_DIR + filename);
+		Path filePath = Paths.get(uploadDir, filename);
 		Files.write(filePath, file.getBytes());
 
 		// generate URL file

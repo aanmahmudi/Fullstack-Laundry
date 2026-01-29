@@ -7,6 +7,7 @@ import { OrdersPage } from '../pages/orders/list.js';
 import { OrderDetailPage } from '../pages/orders/detail.js';
 import { AddProductPage } from '../pages/products/add.js';
 import { AdminOrdersPage } from '../pages/admin/orders.js';
+import { MyProductsPage } from '../pages/admin/my-products.js';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -32,6 +33,7 @@ const routes = [
   { pattern: '#/orders/:id', render: OrderDetailPage },
   { pattern: '#/products/add', render: AddProductPage },
   { pattern: '#/admin/orders', render: AdminOrdersPage },
+  { pattern: '#/admin/my-products', render: MyProductsPage },
   { pattern: '#/auth', render: LoginPage }, // Deprecated, use /login
   { pattern: '#/login', render: LoginPage },
   { pattern: '#/register', render: RegisterPage },

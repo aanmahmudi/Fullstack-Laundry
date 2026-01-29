@@ -13,15 +13,24 @@ export function ProductDetailPage(params) {
     try {
       const p = await API.apiGet(`/api/products/${id}`);
       
+      let photoUrl = p.photoUrl;
+      if (photoUrl && photoUrl.startsWith('/')) {
+          const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+          photoUrl = baseUrl + photoUrl;
+      }
+
+      const user = State.getUser();
+      const isOwner = user && String(user.id) === String(p.ownerId);
+
       container.innerHTML = `
         <div class="pd-container">
           <!-- Left Column: Image -->
           <div class="pd-gallery">
             <div class="pd-main-image">
-               ${p.photoUrl 
-                 ? `<img src="${p.photoUrl}" alt="${p.name}" />` 
-                 : `<div class="skeleton-image">No Image</div>`
-               }
+              ${photoUrl 
+                ? `<img src="${photoUrl}" alt="${p.name}" onerror="this.onerror=null;this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=No+Image';this.alt='No Image';" />` 
+                : `<div class="skeleton-image">No Image</div>`
+              }
             </div>
           </div>
 
@@ -52,12 +61,19 @@ export function ProductDetailPage(params) {
               </div>
 
               <div class="pd-buttons">
-                <button id="btn-add-cart" class="btn btn-outline-primary btn-lg">
-                  <span class="icon">🛒</span> Masukkan Keranjang
-                </button>
-                <button id="btn-buy-now" class="btn btn-primary btn-lg">
-                  Beli Sekarang
-                </button>
+                ${isOwner 
+                  ? `<div style="width: 100%; text-align: center; padding: 15px; background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; border-radius: 4px; font-weight: 500;">
+                       Anda adalah pemilik produk ini
+                     </div>`
+                  : `
+                    <button id="btn-add-cart" class="btn btn-outline-primary btn-lg">
+                      <span class="icon">🛒</span> Masukkan Keranjang
+                    </button>
+                    <button id="btn-buy-now" class="btn btn-primary btn-lg">
+                      Beli Sekarang
+                    </button>
+                  `
+                }
               </div>
             </div>
           </div>
@@ -79,33 +95,35 @@ export function ProductDetailPage(params) {
         qtyInput.value = val + 1;
       });
 
-      document.getElementById('btn-add-cart').addEventListener('click', () => {
-        const qty = parseInt(qtyInput.value) || 1;
-        State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
-        
-        // Visual feedback
-        const btn = document.getElementById('btn-add-cart');
-        const originalContent = btn.innerHTML;
-        btn.innerHTML = `<span class="icon">✓</span> Masuk Keranjang`;
-        btn.classList.add('btn-success');
-        btn.style.backgroundColor = '#22c55e';
-        btn.style.color = 'white';
-        btn.style.borderColor = '#22c55e';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.classList.remove('btn-success');
-            btn.style.backgroundColor = '';
-            btn.style.color = '';
-            btn.style.borderColor = '';
-        }, 1500);
-      });
+      if (!isOwner) {
+        document.getElementById('btn-add-cart').addEventListener('click', () => {
+          const qty = parseInt(qtyInput.value) || 1;
+          State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
+          
+          // Visual feedback
+          const btn = document.getElementById('btn-add-cart');
+          const originalContent = btn.innerHTML;
+          btn.innerHTML = `<span class="icon">✓</span> Masuk Keranjang`;
+          btn.classList.add('btn-success');
+          btn.style.backgroundColor = '#22c55e';
+          btn.style.color = 'white';
+          btn.style.borderColor = '#22c55e';
+          
+          setTimeout(() => {
+              btn.innerHTML = originalContent;
+              btn.classList.remove('btn-success');
+              btn.style.backgroundColor = '';
+              btn.style.color = '';
+              btn.style.borderColor = '';
+          }, 1500);
+        });
 
-      document.getElementById('btn-buy-now').addEventListener('click', () => {
-        const qty = parseInt(qtyInput.value) || 1;
-        State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
-        window.location.hash = '#/checkout'; // Go to checkout directly
-      });
+        document.getElementById('btn-buy-now').addEventListener('click', () => {
+          const qty = parseInt(qtyInput.value) || 1;
+          State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
+          window.location.hash = '#/checkout'; // Go to checkout directly
+        });
+      }
 
     } catch (e) {
       container.innerHTML = `<div class="panel error">Gagal memuat produk: ${e.message}</div>`;

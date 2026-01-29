@@ -25,10 +25,16 @@ export function CartPage() {
             container.innerHTML = `
             <div class="cart-container">
                 <div class="cart-items-list">
-                ${items.map((x, i) => `
+                ${items.map((x, i) => {
+                    let photoUrl = x.photoUrl;
+                    if (photoUrl && photoUrl.startsWith('/')) {
+                        const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+                        photoUrl = baseUrl + photoUrl;
+                    }
+                    return `
                     <div class="cart-item">
                     <div class="cart-item-thumb" style="margin-right:12px;">
-                        <img src="${x.photoUrl || 'https://placehold.co/80x80/f1f5f9/94a3b8?text=No+Image'}" alt="${x.name}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;background:#fff;" />
+                        <img src="${photoUrl || 'https://placehold.co/80x80/f1f5f9/94a3b8?text=No+Image'}" alt="${x.name}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;background:#fff;" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=No+Image';this.alt='No Image';" />
                     </div>
                     <div class="cart-item-info">
                         <h3 class="cart-item-title">${x.name}</h3>
@@ -43,7 +49,7 @@ export function CartPage() {
                         <button data-i="${i}" class="btn-del-icon" title="Hapus">✕</button>
                     </div>
                     </div>
-                `).join('')}
+                `}).join('')}
                 </div>
                 
                 <div class="cart-summary">

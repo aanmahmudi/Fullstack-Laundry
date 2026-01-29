@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DocumentStorageService {
 	
-	private static final String UPLOAD_DIR = "uploads/pdf/";
+	@Value("${file.upload-dir}")
+	private String uploadDir;
 	
 	private final CustomerRepository customerRepository;
 	private final CustomerDocumentRepository documentRepository;
@@ -33,11 +35,12 @@ public class DocumentStorageService {
 		}
 		
 		//create folder
-		Files.createDirectories(Paths.get(UPLOAD_DIR));
+		Path pdfDir = Paths.get(uploadDir, "pdf");
+		Files.createDirectories(pdfDir);
 		
 		//generate name file unik
 		String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-		Path filePath = Paths.get(UPLOAD_DIR, filename);
+		Path filePath = pdfDir.resolve(filename);
 		Files.write(filePath, file.getBytes());
 		
 		String fileUrl = "http://localhost:8081/uploads/pdf/" + filename;
