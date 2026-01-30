@@ -1,5 +1,7 @@
-import { initRouter, navigate } from './core/router.js';
-import { renderHeader } from './components/header.js';
+import { initRouter, navigate } from './core/router.js?v=remon13';
+import { renderHeader } from './components/header.js?v=remon13';
+
+console.log('Main App v13 Loaded');
 
 function bootstrap() {
   renderHeader(document.getElementById('app-header'));

@@ -24,9 +24,11 @@ export function AdminOrdersPage() {
     
     const loadOrders = async () => {
       try {
-        list.innerHTML = '<div class="loading">Memuat data...</div>';
+        if (list) list.innerHTML = '<div class="loading">Memuat data...</div>';
         const items = await API.apiGet('/api/transactions');
         
+        if (!document.getElementById('admin-orders-list')) return;
+
         if (!items.length) {
           list.innerHTML = '<p>Belum ada transaksi.</p>';
           return;
@@ -59,7 +61,9 @@ export function AdminOrdersPage() {
         
         bindStatusChange();
       } catch (e) {
-        list.innerHTML = `<p class="error">${e.message}</p>`;
+        if (document.getElementById('admin-orders-list')) {
+           list.innerHTML = `<p class="error">${e.message}</p>`;
+        }
       }
     };
 

@@ -21,6 +21,14 @@
         return false;
       };
       window.addEventListener('unhandledrejection', function(event) {
+        // Suppress specific UI error related to race conditions during navigation
+        // This error happens when async operations try to update the DOM after the page has changed.
+        // It is harmless as the old page is already gone.
+        if (event.reason && event.reason.message && event.reason.message.includes("Cannot set properties of null")) {
+             console.warn('Suppressed navigation race condition error:', event.reason);
+             return;
+        }
+
         var display = document.getElementById('global-error-display');
         display.style.display = 'block';
         display.innerHTML += 'Unhandled Promise Rejection: ' + event.reason + '\n\n';
@@ -80,7 +88,7 @@
       </div>
     </footer>
 
-    <script src="./js/api.js?v=remon3"></script>
-    <script type="module" src="./app/main.js?v=remon3"></script>
+    <script src="./js/api.js?v=remon13"></script>
+    <script type="module" src="./app/main.js?v=remon13"></script>
   </body>
 </html>

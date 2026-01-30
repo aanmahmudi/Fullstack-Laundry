@@ -1,4 +1,4 @@
-import { State } from '../../core/state.js';
+import { State } from '../../core/state.js?v=remon13';
 
 export function ProductDetailPage(params) {
   const id = Number(params.id);
@@ -10,9 +10,13 @@ export function ProductDetailPage(params) {
 
   window.__bindPage = async () => {
     const container = document.getElementById('product-detail');
+    if (!container) return;
+
     try {
       const p = await API.apiGet(`/api/products/${id}`);
       
+      if (!document.getElementById('product-detail')) return;
+
       let photoUrl = p.photoUrl;
       if (photoUrl && photoUrl.startsWith('/')) {
           const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
@@ -21,6 +25,9 @@ export function ProductDetailPage(params) {
 
       const user = State.getUser();
       const isOwner = user && String(user.id) === String(p.ownerId);
+
+      // Prevent setting innerHTML on null if navigated away
+      if (!document.getElementById('product-detail')) return;
 
       container.innerHTML = `
         <div class="pd-container">
@@ -85,15 +92,17 @@ export function ProductDetailPage(params) {
       const btnMinus = document.getElementById('qty-minus');
       const btnPlus = document.getElementById('qty-plus');
 
-      btnMinus.addEventListener('click', () => {
-        let val = parseInt(qtyInput.value) || 1;
-        if (val > 1) qtyInput.value = val - 1;
-      });
+      if (qtyInput && btnMinus && btnPlus) {
+        btnMinus.addEventListener('click', () => {
+            let val = parseInt(qtyInput.value) || 1;
+            if (val > 1) qtyInput.value = val - 1;
+        });
 
-      btnPlus.addEventListener('click', () => {
-        let val = parseInt(qtyInput.value) || 1;
-        qtyInput.value = val + 1;
-      });
+        btnPlus.addEventListener('click', () => {
+            let val = parseInt(qtyInput.value) || 1;
+            qtyInput.value = val + 1;
+        });
+      }
 
       if (!isOwner) {
         document.getElementById('btn-add-cart').addEventListener('click', () => {

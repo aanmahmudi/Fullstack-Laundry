@@ -1,4 +1,4 @@
-import { State } from '../../core/state.js';
+import { State } from '../../core/state.js?v=remon13';
 
 export function ProductsPage() {
   const html = `
@@ -26,9 +26,15 @@ export function ProductsPage() {
     const refresh = document.getElementById('btn-refresh');
     const user = State.getUser();
     
+    if (!grid) {
+        console.error('Grid element not found!');
+        return;
+    }
+
     grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk...</div>';
     
     try {
+      console.log('Products Page v8 Loaded');
       // API Call wrapper with search support
       const fetchProducts = async (query = '') => {
         let url = '/api/products';
@@ -41,6 +47,9 @@ export function ProductsPage() {
       // Initial load (no search)
       let items = await fetchProducts();
       
+      // Safety check if navigated away
+      if (!document.getElementById('products-grid')) return;
+
       const render = (list) => {
         if (!list || list.length === 0) {
             grid.innerHTML = '<div class="panel" style="grid-column: 1/-1; text-align: center; background: white; color: #333; padding: 40px;">Tidak ada produk ditemukan.</div>';
@@ -48,24 +57,42 @@ export function ProductsPage() {
         }
         grid.innerHTML = list.map((p) => productCard(p, user)).join('');
         
-        // Re-attach event listeners for "Beli" buttons
-        grid.querySelectorAll('.btn-add').forEach((btn) => {
+        // Re-attach event listeners for buttons
+        const addToCart = (id) => {
+             // Look up in current displayed list first
+             const prod = list.find((x) => x.id === id);
+             if (prod) {
+                 State.addToCart({ id: prod.id, name: prod.name, price: prod.price, qty: 1, photoUrl: prod.photoUrl });
+                 return true;
+             }
+             return false;
+        };
+
+        // Handle "Keranjang" (Add to Cart only)
+        grid.querySelectorAll('.btn-add-cart').forEach((btn) => {
           btn.addEventListener('click', () => {
             const id = Number(btn.dataset.id);
-            // Look up in current displayed list first
-            const prod = list.find((x) => x.id === id);
-            if (prod) {
-                State.addToCart({ id: prod.id, name: prod.name, price: prod.price, qty: 1, photoUrl: prod.photoUrl });
+            if (addToCart(id)) {
                 // Visual feedback
-                const originalText = btn.innerText;
-                btn.innerText = "Berhasil!";
-                btn.style.background = "#22c55e";
+                const originalText = btn.innerHTML;
+                btn.innerHTML = "Masuk Keranjang!";
+                btn.style.color = "#22c55e";
                 btn.style.borderColor = "#22c55e";
                 setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.background = "";
+                    btn.innerHTML = originalText;
+                    btn.style.color = "";
                     btn.style.borderColor = "";
                 }, 1500);
+            }
+          });
+        });
+
+        // Handle "Beli" (Add to Cart + Checkout)
+        grid.querySelectorAll('.btn-buy-now').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const id = Number(btn.dataset.id);
+            if (addToCart(id)) {
+                 window.location.hash = '#/checkout';
             }
           });
         });
@@ -119,12 +146,17 @@ export function ProductsPage() {
       // Server-side search handler
       const handleSearch = async (q) => {
         const query = String(q || '').trim();
-        grid.innerHTML = '<div class="loading" style="color: #333;">Mencari produk...</div>';
+        const currentGrid = document.getElementById('products-grid');
+        if (currentGrid) currentGrid.innerHTML = '<div class="loading" style="color: #333;">Mencari produk...</div>';
+        
         try {
            const filtered = await fetchProducts(query);
+           if (!document.getElementById('products-grid')) return;
            render(filtered);
         } catch (e) {
-           grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+           if (document.getElementById('products-grid')) {
+               document.getElementById('products-grid').innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+           }
         }
       };
       
@@ -142,18 +174,25 @@ export function ProductsPage() {
       });
       
       refresh.addEventListener('click', async () => {
-        grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk...</div>';
+        if (document.getElementById('products-grid')) {
+            document.getElementById('products-grid').innerHTML = '<div class="loading" style="color: #333;">Memuat produk...</div>';
+        }
         search.value = '';
         try {
             items = await fetchProducts();
+            if (!document.getElementById('products-grid')) return;
             render(items);
         } catch (e) {
-             grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+             if (document.getElementById('products-grid')) {
+                document.getElementById('products-grid').innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+             }
         }
       });
       
     } catch (e) {
-      grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+      if (document.getElementById('products-grid')) {
+         grid.innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
+      }
     }
   };
 
@@ -195,11 +234,18 @@ function productCard(p, user) {
         <p>${description}</p>
         <div class="price">Rp ${price}</div>
       </div>
-      <div class="card-actions" style="flex-wrap: wrap;">
-        <a class="btn btn-detail" href="#/product/${p.id}">Detail</a>
-        ${isOwnerAdmin 
-          ? `<button class="btn btn-buy" disabled style="opacity: 0.5; cursor: not-allowed; background: #94a3b8; border-color: #94a3b8;">Milik Anda</button>`
-          : `<button class="btn btn-buy btn-add" data-id="${p.id}">Beli</button>`
+      <div class="card-actions" style="flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <a class="btn btn-detail" href="#/product/${p.id}" style="flex: 1; text-align: center;">Detail</a>
+            ${isOwnerAdmin 
+              ? `<button class="btn btn-buy" disabled style="flex: 1; opacity: 0.5; cursor: not-allowed; background: #94a3b8; border-color: #94a3b8;">Milik Anda</button>`
+              : `<button class="btn btn-buy btn-buy-now" data-id="${p.id}" style="flex: 1; background: #ee4d2d; color: white; border: none;">Beli</button>`
+            }
+        </div>
+        ${!isOwnerAdmin ? 
+           `<button class="btn btn-add-cart" data-id="${p.id}" style="width: 100%; border: 1px solid #ee4d2d; color: #ee4d2d; background: white; margin-top: 5px;">
+              <span style="font-size: 1.2em; margin-right: 5px;">🛒</span> + Keranjang
+            </button>` : ''
         }
       </div>
       ${deleteButton ? `<div style="padding: 0 24px 24px;">${deleteButton}</div>` : ''}

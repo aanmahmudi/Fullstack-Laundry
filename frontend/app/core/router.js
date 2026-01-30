@@ -1,13 +1,13 @@
-import { HomePage } from '../pages/home/index.js';
-import { ProductsPage } from '../pages/products/list.js';
-import { ProductDetailPage } from '../pages/products/detail.js';
-import { CartPage } from '../pages/cart/index.js';
-import { CheckoutPage } from '../pages/checkout/index.js';
-import { OrdersPage } from '../pages/orders/list.js';
-import { OrderDetailPage } from '../pages/orders/detail.js';
-import { AddProductPage } from '../pages/products/add.js';
-import { AdminOrdersPage } from '../pages/admin/orders.js';
-import { MyProductsPage } from '../pages/admin/my-products.js';
+import { HomePage } from '../pages/home/index.js?v=remon13';
+import { ProductsPage } from '../pages/products/list.js?v=remon13';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon13';
+import { CartPage } from '../pages/cart/index.js?v=remon13';
+import { CheckoutPage } from '../pages/checkout/index.js?v=remon13';
+import { OrdersPage } from '../pages/orders/list.js?v=remon13';
+import { OrderDetailPage } from '../pages/orders/detail.js?v=remon13';
+import { AddProductPage } from '../pages/products/add.js?v=remon13';
+import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon13';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon13';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -18,7 +18,7 @@ import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
 import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
-import { State } from './state.js';
+import { State } from './state.js?v=remon13';
 
 let outletEl = null;
 
@@ -115,7 +115,8 @@ function render() {
     outletEl.innerHTML = html;
     // Jalankan binder halaman jika tersedia
     if (window.__bindPage) {
-      window.__bindPage();
+      // Execute async binder but catch errors to prevent global rejection
+      Promise.resolve(window.__bindPage()).catch(e => console.error('BindPage Error:', e));
       window.__bindPage = null;
     }
   } catch (err) {

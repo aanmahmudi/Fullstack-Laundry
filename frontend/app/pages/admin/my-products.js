@@ -26,11 +26,13 @@ export function MyProductsPage() {
 
   window.__bindPage = async () => {
     const grid = document.getElementById('my-products-grid');
-    grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk Anda...</div>';
+    if (grid) grid.innerHTML = '<div class="loading" style="color: #333;">Memuat produk Anda...</div>';
 
     try {
       const allItems = await API.apiGet('/api/products');
       
+      if (!document.getElementById('my-products-grid')) return;
+
       // Filter only products owned by this admin
       // Note: products with null ownerId are not owned by anyone
       const myItems = allItems.filter(p => String(p.ownerId || '') === String(user.id || ''));
@@ -97,7 +99,9 @@ export function MyProductsPage() {
       render(myItems);
       
     } catch (e) {
-      grid.innerHTML = `<div class="error" style="color: red; padding: 20px; text-align: center;">Gagal memuat data: ${e.message}</div>`;
+      if (document.getElementById('my-products-grid')) {
+         grid.innerHTML = `<div class="error" style="color: red; padding: 20px; text-align: center;">Gagal memuat data: ${e.message}</div>`;
+      }
     }
   };
 

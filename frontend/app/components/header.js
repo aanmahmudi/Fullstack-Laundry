@@ -1,7 +1,8 @@
 import { navigate } from '../core/router.js';
-import { State } from '../core/state.js';
+import { State } from '../core/state.js?v=remon13';
 
 export function renderHeader(el) {
+  if (!el) return;
   function render() {
     // Sembunyikan header full di halaman auth, tampilkan logo saja
     const hash = window.location.hash;

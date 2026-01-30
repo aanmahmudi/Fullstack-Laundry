@@ -30,9 +30,9 @@ export const State = {
     if (idx >= 0) {
       const current = items[idx];
       const nextQty = (Number(current.qty) || 1) + (Number(item.qty) || 1);
-      items[idx] = { ...current, qty: nextQty };
+      items[idx] = { ...current, qty: nextQty, selected: true }; // Re-select if updated
     } else {
-      items.push({ ...item, qty: Number(item.qty) || 1 });
+      items.push({ ...item, qty: Number(item.qty) || 1, selected: true });
     }
     State.setCart(items);
   },
@@ -45,6 +45,18 @@ export const State = {
     const q = Math.max(1, Number(qty) || 1);
     const items = State.getCart();
     if (items[index]) { items[index].qty = q; State.setCart(items); }
+  },
+  setItemSelection(index, selected) {
+    const items = State.getCart();
+    if (items[index]) {
+        items[index].selected = !!selected;
+        State.setCart(items);
+    }
+  },
+  setAllSelection(selected) {
+    const items = State.getCart();
+    items.forEach(item => item.selected = !!selected);
+    State.setCart(items);
   },
   clearCart() { State.setCart([]); },
 

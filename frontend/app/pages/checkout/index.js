@@ -1,7 +1,7 @@
-import { State } from '../../core/state.js';
+import { State } from '../../core/state.js?v=remon13';
 
 export function CheckoutPage() {
-  const items = State.getCart();
+  const items = State.getCart().filter(item => item.selected !== false);
   const user = State.getUser();
   const total = items.reduce((sum, x) => sum + (x.price * (x.qty || 1)), 0);
   
@@ -9,6 +9,14 @@ export function CheckoutPage() {
   if (!user) {
     window.location.hash = '#/login';
     return '';
+  }
+
+  // If no items selected, redirect to cart
+  if (!items.length) {
+      // Delay alert slightly to avoid race conditions or use a more graceful UI
+      setTimeout(() => alert("Silakan pilih produk yang ingin dibayar terlebih dahulu."), 100);
+      window.location.hash = '#/cart';
+      return '';
   }
 
   const html = `

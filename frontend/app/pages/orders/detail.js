@@ -26,21 +26,27 @@ export function OrderDetailPage(params) {
     const box = document.getElementById('order-detail');
     try {
       const t = await API.apiGet(`/api/transactions/${id}`);
-      box.innerHTML = `
+      if (box) {
+        box.innerHTML = `
         <p><strong>ID:</strong> ${t.id}</p>
-        <p><strong>Customer:</strong> ${t.customerId}</p>
-        <p><strong>Produk:</strong> ${t.productId}</p>
+        <p><strong>Customer:</strong> ${t.customerName || t.customerId}</p>
+        <p><strong>Produk:</strong> ${t.productName || '-'}</p>
         <p><strong>Qty:</strong> ${t.quantity}</p>
-        <p><strong>Total:</strong> ${t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</p>
-        <p><strong>Status:</strong> ${t.status ?? '-'}</p>
-      `;
+        <p><strong>Total:</strong> ${t.totalPrice != null ? 'Rp ' + Number(t.totalPrice).toLocaleString('id-ID') : (t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-')}</p>
+        <p><strong>Status Pesanan:</strong> <span class="badge ${t.orderStatus === 'DONE' ? 'success' : 'info'}">${t.orderStatus || 'Pending'}</span></p>
+        <p><strong>Status Pembayaran:</strong> <span class="badge ${t.paymentStatus === 'PAID' ? 'success' : 'warning'}">${t.paymentStatus || 'Unpaid'}</span></p>
+        `;
+      }
     } catch (e) {
-      box.innerHTML = `<p class="error">${e.message}</p>`;
+      if (document.getElementById('order-detail')) {
+        box.innerHTML = `<p class="error">${e.message}</p>`;
+      }
     }
 
     const form = document.getElementById('form-payment');
-    const msg = document.getElementById('payment-msg');
-    form.addEventListener('submit', async (ev) => {
+    if (form) {
+      const msg = document.getElementById('payment-msg');
+      form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const payload = Object.fromEntries(new FormData(form));
       payload.transactionId = id;
@@ -53,16 +59,18 @@ export function OrderDetailPage(params) {
         const t = await API.apiGet(`/api/transactions/${id}`);
         box.innerHTML = `
           <p><strong>ID:</strong> ${t.id}</p>
-          <p><strong>Customer:</strong> ${t.customerId}</p>
-          <p><strong>Produk:</strong> ${t.productId}</p>
+          <p><strong>Customer:</strong> ${t.customerName || t.customerId}</p>
+          <p><strong>Produk:</strong> ${t.productName || '-'}</p>
           <p><strong>Qty:</strong> ${t.quantity}</p>
-          <p><strong>Total:</strong> ${t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-'}</p>
-          <p><strong>Status:</strong> ${t.status ?? '-'}</p>
+          <p><strong>Total:</strong> ${t.totalPrice != null ? 'Rp ' + Number(t.totalPrice).toLocaleString('id-ID') : (t.totalAmount != null ? 'Rp ' + Number(t.totalAmount).toLocaleString('id-ID') : '-')}</p>
+          <p><strong>Status Pesanan:</strong> <span class="badge ${t.orderStatus === 'DONE' ? 'success' : 'info'}">${t.orderStatus || 'Pending'}</span></p>
+          <p><strong>Status Pembayaran:</strong> <span class="badge ${t.paymentStatus === 'PAID' ? 'success' : 'warning'}">${t.paymentStatus || 'Unpaid'}</span></p>
         `;
       } catch (e) {
         msg.textContent = e.message; msg.classList.add('error');
       }
     });
+    }
   };
 
   return html;

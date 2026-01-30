@@ -1,4 +1,4 @@
-import { State } from '../../core/state.js';
+import { State } from '../../core/state.js?v=remon13';
 
 export function OrdersPage() {
   const user = State.getUser();
@@ -25,6 +25,8 @@ export function OrdersPage() {
 
   window.__bindPage = async () => {
     const list = document.getElementById('orders-list');
+    if (!list) return;
+
     const user = State.getUser();
     try {
       if (!user) {
@@ -34,6 +36,10 @@ export function OrdersPage() {
       let items = await API.apiGet('/api/transactions');
       // Tampilkan hanya pesanan milik user bila tersedia
       items = items.filter((t) => String(t.customerId) === String(user.id));
+      
+      // Re-check element existence after async operation
+      if (!document.getElementById('orders-list')) return;
+
       if (!items.length) {
         list.innerHTML = '<p>Tidak ada pesanan.</p>';
         return;
@@ -54,7 +60,7 @@ export function OrdersPage() {
                 <div>
                   <div style="font-weight:bold; font-size:1.1em;">Order #${t.id}</div>
                   <div style="color:var(--text-muted); margin-bottom:8px;">${t.productName || 'Produk Remon Eccom'}</div>
-                  <div>Qty: ${t.quantity} • Total: <strong>Rp ${Number(t.totalAmount || 0).toLocaleString('id-ID')}</strong></div>
+                  <div>Qty: ${t.quantity} • Total: <strong>Rp ${Number(t.totalPrice || t.totalAmount || 0).toLocaleString('id-ID')}</strong></div>
                 </div>
                 <div style="text-align:right;">
                   <span class="badge ${t.orderStatus === 'DONE' ? 'success' : (t.orderStatus === 'PROCESSING' ? 'warning' : 'info')}">
@@ -70,7 +76,9 @@ export function OrdersPage() {
         </div>
       `;
     } catch (e) {
-      list.innerHTML = `<p class="error">${e.message}</p>`;
+      if (document.getElementById('orders-list')) {
+         list.innerHTML = `<p class="error">${e.message}</p>`;
+      }
     }
   };
 
