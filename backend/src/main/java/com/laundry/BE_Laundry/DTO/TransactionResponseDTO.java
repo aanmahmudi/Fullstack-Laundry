@@ -20,5 +20,8 @@ public class TransactionResponseDTO {
 	private String paymentStatus;
 	private BigDecimal paymentAmount;
 	private String orderStatus;
+	private String shippingAddress;
+	private String paymentMethod;
+	private String productPhoto;
 
 }

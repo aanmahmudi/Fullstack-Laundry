@@ -97,8 +97,24 @@ public class TransactionService {
 			transaction.setQuantity(requestDTO.getQuantity());
 			transaction.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(requestDTO.getQuantity())));
 			transaction.setTransactionDate(LocalDateTime.now());
-			transaction.setPaymentStatus("UNPAID");
 			
+			// Set payment status based on payment method
+			if ("COD".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
+				transaction.setPaymentStatus("UNPAID");
+				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+			} else if ("TRANSFER".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
+				transaction.setPaymentStatus("UNPAID");
+				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+			} else if ("CC".equalsIgnoreCase(requestDTO.getPaymentMethod()) || "PAYPAL".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
+				transaction.setPaymentStatus("PAID");
+				transaction.setOrderStatus("DIKEMAS");
+			} else {
+				transaction.setPaymentStatus("UNPAID");
+				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+			}
+			
+			transaction.setPaymentMethod(requestDTO.getPaymentMethod());
+			transaction.setShippingAddress(requestDTO.getShippingAddress());
 			transactionRepository.save(transaction);
 			return mapToResponseDTO(transaction);	
 		} catch (Exception e) {
@@ -139,6 +155,9 @@ public class TransactionService {
 				.paymentStatus(transaction.getPaymentStatus())
 				.paymentAmount(transaction.getPaymentAmount())
 				.orderStatus(transaction.getOrderStatus())
+				.shippingAddress(transaction.getShippingAddress())
+				.paymentMethod(transaction.getPaymentMethod())
+				.productPhoto(transaction.getProduct().getPhotoUrl())
 				.build();
 
 	}

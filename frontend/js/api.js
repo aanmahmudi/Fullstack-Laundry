@@ -1,5 +1,5 @@
 // Gunakan API_BASE dari window jika tersedia, default ke port 8080 (Local BE)
-const API_BASE = window.API_BASE || "http://localhost:8081";
+const API_BASE = window.API_BASE || "http://localhost:8080";
 
 function getAuthHeaders() {
   try {
@@ -23,26 +23,73 @@ async function handleResponse(res) {
 }
 
 async function apiGet(path) {
-  const res = await fetch(`${API_BASE}${path}`, { headers: { ...getAuthHeaders() } });
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}${path}`, { headers: { ...getAuthHeaders() } });
+    const data = await handleResponse(res);
+    return data;
+  } catch (e) {
+    const alt = API_BASE.includes('8080') ? API_BASE.replace('8080', '8081') : API_BASE.replace('8081', '8080');
+    try {
+      const res2 = await fetch(`${alt}${path}`, { headers: { ...getAuthHeaders() } });
+      const data2 = await handleResponse(res2);
+      window.API.BASE_URL = alt;
+      return data2;
+    } catch (_) {
+      throw e;
+    }
+  }
 }
 
 async function apiPost(path, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify(body),
-  });
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      body: JSON.stringify(body),
+    });
+    const data = await handleResponse(res);
+    return data;
+  } catch (e) {
+    const alt = API_BASE.includes('8080') ? API_BASE.replace('8080', '8081') : API_BASE.replace('8081', '8080');
+    try {
+      const res2 = await fetch(`${alt}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        body: JSON.stringify(body),
+      });
+      const data2 = await handleResponse(res2);
+      window.API.BASE_URL = alt;
+      return data2;
+    } catch (_) {
+      throw e;
+    }
+  }
 }
 
 async function apiPut(path, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-    body: JSON.stringify(body),
-  });
-  return handleResponse(res);
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      body: JSON.stringify(body),
+    });
+    const data = await handleResponse(res);
+    return data;
+  } catch (e) {
+    const alt = API_BASE.includes('8080') ? API_BASE.replace('8080', '8081') : API_BASE.replace('8081', '8080');
+    try {
+      const res2 = await fetch(`${alt}${path}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+        body: JSON.stringify(body),
+      });
+      const data2 = await handleResponse(res2);
+      window.API.BASE_URL = alt;
+      return data2;
+    } catch (_) {
+      throw e;
+    }
+  }
 }
 
 window.API = { apiGet, apiPost, apiPut, BASE_URL: API_BASE };

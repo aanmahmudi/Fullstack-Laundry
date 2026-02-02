@@ -1,13 +1,13 @@
-import { HomePage } from '../pages/home/index.js?v=remon13';
-import { ProductsPage } from '../pages/products/list.js?v=remon13';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon13';
-import { CartPage } from '../pages/cart/index.js?v=remon13';
-import { CheckoutPage } from '../pages/checkout/index.js?v=remon13';
-import { OrdersPage } from '../pages/orders/list.js?v=remon13';
-import { OrderDetailPage } from '../pages/orders/detail.js?v=remon13';
-import { AddProductPage } from '../pages/products/add.js?v=remon13';
-import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon13';
-import { MyProductsPage } from '../pages/admin/my-products.js?v=remon13';
+import { HomePage } from '../pages/home/index.js?v=remon19';
+import { ProductsPage } from '../pages/products/list.js?v=remon19';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon19';
+import { CartPage } from '../pages/cart/index.js?v=remon19';
+import { CheckoutPage } from '../pages/checkout/index.js?v=remon19';
+import { OrdersPage } from '../pages/orders/list.js?v=remon19';
+import { OrderDetailPage } from '../pages/orders/detail.js?v=remon19';
+import { AddProductPage } from '../pages/products/add.js?v=remon19';
+import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon19';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon19';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -18,7 +18,7 @@ import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
 import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
-import { State } from './state.js?v=remon13';
+import { State } from './state.js?v=remon16';
 
 let outletEl = null;
 

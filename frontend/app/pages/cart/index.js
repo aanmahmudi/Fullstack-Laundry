@@ -1,4 +1,4 @@
-import { State } from '../../core/state.js?v=remon13';
+import { State } from '../../core/state.js?v=remon14';
 
 export function CartPage() {
   const html = `

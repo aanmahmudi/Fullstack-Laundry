@@ -1,4 +1,4 @@
-import { State } from '../../core/state.js?v=remon13';
+import { State } from '../../core/state.js?v=remon14';
 
 export function CheckoutPage() {
   const items = State.getCart().filter(item => item.selected !== false);
@@ -40,18 +40,35 @@ export function CheckoutPage() {
             `}
 
             <div class="form-group">
+              <label class="form-label">Alamat Pengiriman</label>
+              <textarea name="shippingAddress" class="input" rows="3" required placeholder="Masukkan alamat lengkap pengiriman..."></textarea>
+            </div>
+
+            <div class="form-group">
               <label class="form-label">Metode Pembayaran</label>
               <div class="payment-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <label class="radio-card">
-                  <input type="radio" name="paymentMethod" value="CASH" checked>
+                  <input type="radio" name="paymentMethod" value="COD" checked>
                   <div class="card-content">
-                    <span class="icon">💵</span> Tunai
+                    <span class="icon">📦</span> Bayar di Tempat (COD)
                   </div>
                 </label>
                 <label class="radio-card">
                   <input type="radio" name="paymentMethod" value="TRANSFER">
                   <div class="card-content">
                     <span class="icon">💳</span> Transfer Bank
+                  </div>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="paymentMethod" value="CC">
+                  <div class="card-content">
+                    <span class="icon">💳</span> Kartu Kredit
+                  </div>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="paymentMethod" value="PAYPAL">
+                  <div class="card-content">
+                    <span class="icon">🅿️</span> Paypal
                   </div>
                 </label>
               </div>
@@ -127,10 +144,13 @@ export function CheckoutPage() {
       ev.preventDefault();
       const payload = Object.fromEntries(new FormData(form));
       const msg = document.getElementById('checkout-msg');
-      const cart = State.getCart();
       
-      if (!cart.length) {
-        alert('Keranjang kosong!');
+      // Get only selected items for checkout
+      const allItems = State.getCart();
+      const checkoutItems = allItems.filter(item => item.selected !== false);
+      
+      if (!checkoutItems.length) {
+        alert('Tidak ada item yang dipilih untuk checkout!');
         return;
       }
       
@@ -147,13 +167,13 @@ export function CheckoutPage() {
         
         // Sequential transaction creation
         const results = [];
-        for (const item of cart) {
+        for (const item of checkoutItems) {
           const body = { 
             customerId, 
             productId: Number(item.id), 
             quantity: Number(item.qty) || 1, 
-            paymentMethod: payload.paymentMethod 
-            // Note: 'notes' might not be supported by backend yet, ignoring for now
+            paymentMethod: payload.paymentMethod,
+            shippingAddress: payload.shippingAddress
           };
           const res = await API.apiPost('/api/transactions', body);
           results.push(res);
@@ -163,7 +183,10 @@ export function CheckoutPage() {
         msg.className = 'msg success';
         
         setTimeout(() => {
-            State.clearCart();
+            // Remove only checked out items (selected ones)
+            const remainingItems = allItems.filter(item => item.selected === false);
+            State.setCart(remainingItems);
+            
             window.location.hash = '#/orders';
         }, 1500);
         

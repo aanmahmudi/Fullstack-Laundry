@@ -46,4 +46,10 @@ public class Transaction {
 
 	@Column(name = "order_status")
 	private String orderStatus;
+
+	@Column(name = "shipping_address")
+	private String shippingAddress;
+
+	@Column(name = "payment_method")
+	private String paymentMethod;
 }

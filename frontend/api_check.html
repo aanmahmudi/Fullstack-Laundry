@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Check</title>
+</head>
+<body>
+    <h1>API Connection Check</h1>
+    <div id="status">Testing...</div>
+    <div id="response"></div>
+    <button onclick="checkApi()">Check Again</button>
+
+    <script>
+  async function checkUrl(url, name) {
+    const statusEl = document.getElementById('status');
+    const responseEl = document.getElementById('response');
+    
+    const div = document.createElement('div');
+    div.style.marginBottom = '20px';
+    div.style.padding = '10px';
+    div.style.border = '1px solid #ccc';
+    
+    div.innerHTML = `<strong>Checking ${name} (${url})...</strong><br>`;
+    statusEl.appendChild(div);
+
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        div.innerHTML += `<span style="color:green">SUCCESS (200 OK)</span>`;
+        div.innerHTML += `<pre style="background:#f0f0f0; padding:5px; margin-top:5px;">${JSON.stringify(data, null, 2)}</pre>`;
+      } else {
+        div.innerHTML += `<span style="color:red">FAILED (${res.status} ${res.statusText})</span>`;
+        const text = await res.text();
+        div.innerHTML += `<pre style="color:red">${text}</pre>`;
+      }
+    } catch (e) {
+      div.innerHTML += `<span style="color:red">ERROR: ${e.message}</span>`;
+      div.innerHTML += `<br><small>Make sure the backend is running and CORS is enabled.</small>`;
+    }
+  }
+
+  async function checkApi() {
+    document.getElementById('status').innerHTML = '';
+    document.getElementById('response').innerHTML = '';
+    
+    // Check Port 8080 (Local Java)
+    await checkUrl('http://localhost:8080/api/products', 'Local Java (Port 8080)');
+    
+    // Check Port 8081 (Docker)
+    await checkUrl('http://localhost:8081/api/products', 'Docker (Port 8081)');
+  }
+  checkApi();
+</script>
+</body>
+</html>

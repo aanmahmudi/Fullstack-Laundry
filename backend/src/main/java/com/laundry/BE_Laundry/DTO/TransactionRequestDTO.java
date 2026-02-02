@@ -8,5 +8,7 @@ public class TransactionRequestDTO {
 	private Long customerId;
 	private Long productId;
 	private int quantity;
+	private String shippingAddress;
+	private String paymentMethod;
 
 }
