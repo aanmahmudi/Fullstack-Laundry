@@ -1,63 +1,76 @@
 package com.laundry.BE_Laundry.Controller;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.laundry.BE_Laundry.Model.ProductImage;
+import com.laundry.BE_Laundry.Repository.ProductImageRepository;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor
 public class ProductImageController {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final ProductImageRepository productImageRepository;
 
     @PostMapping("/upload-image")
-    public ResponseEntity<Map<String, String>> uploadProductImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadProductImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(name = "productId", required = false) Long productId) {
         try {
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "File kosong"));
             }
 
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            String originalFilename = file.getOriginalFilename() == null ? "image.jpg" : file.getOriginalFilename();
+            ProductImage image = new ProductImage();
+            image.setData(file.getBytes());
+            image.setContentType(file.getContentType() == null ? MediaType.APPLICATION_OCTET_STREAM_VALUE : file.getContentType());
+            image.setOriginalName(originalFilename);
+            image.setProductId(productId);
 
-            // Sanitize filename
-            String originalFilename = file.getOriginalFilename();
-            if (originalFilename == null) originalFilename = "image.jpg";
-            String safeFilename = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
-            String filename = UUID.randomUUID() + "_" + safeFilename;
-            
-            Path filePath = uploadPath.resolve(filename);
-            Files.write(filePath, file.getBytes());
+            ProductImage saved = productImageRepository.save(image);
 
-            // Return relative path for frontend compatibility (Frontend prepends base URL)
-            String relativePath = "/uploads/" + filename;
-            
-            log.info("Product image uploaded successfully: {}", relativePath);
-
-            return ResponseEntity.ok(Map.of("url", relativePath));
-
-        } catch (IOException e) {
+            String url = "/api/products/image/" + saved.getId();
+            log.info("Product image stored in DB: {}", url);
+            return ResponseEntity.ok(Map.of("url", url));
+        } catch (Exception e) {
             log.error("Failed to upload product image", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Gagal upload gambar: " + e.getMessage()));
         }
+    }
+
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
+        return productImageRepository.findById(id)
+                .map(img -> {
+                    MediaType mediaType;
+                    try {
+                        mediaType = MediaType.parseMediaType(img.getContentType());
+                    } catch (Exception e) {
+                        mediaType = MediaType.APPLICATION_OCTET_STREAM;
+                    }
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + img.getOriginalName() + "\"")
+                            .contentType(mediaType)
+                            .body(img.getData());
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 }

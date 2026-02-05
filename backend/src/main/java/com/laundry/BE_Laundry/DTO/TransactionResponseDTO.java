@@ -13,6 +13,7 @@ public class TransactionResponseDTO {
 	private Long id;
 	private Long customerId;
 	private String customerName;
+	private Long productId;
 	private String productName;
 	private int quantity;
 	private BigDecimal totalPrice;

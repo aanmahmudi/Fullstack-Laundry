@@ -32,7 +32,7 @@ async function apiGet(path) {
     try {
       const res2 = await fetch(`${alt}${path}`, { headers: { ...getAuthHeaders() } });
       const data2 = await handleResponse(res2);
-      window.API.BASE_URL = alt;
+      if (window.API) window.API.BASE_URL = alt;
       return data2;
     } catch (_) {
       throw e;
@@ -58,7 +58,7 @@ async function apiPost(path, body) {
         body: JSON.stringify(body),
       });
       const data2 = await handleResponse(res2);
-      window.API.BASE_URL = alt;
+      if (window.API) window.API.BASE_URL = alt;
       return data2;
     } catch (_) {
       throw e;
@@ -84,7 +84,7 @@ async function apiPut(path, body) {
         body: JSON.stringify(body),
       });
       const data2 = await handleResponse(res2);
-      window.API.BASE_URL = alt;
+      if (window.API) window.API.BASE_URL = alt;
       return data2;
     } catch (_) {
       throw e;

@@ -101,16 +101,16 @@ public class TransactionService {
 			// Set payment status based on payment method
 			if ("COD".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("UNPAID");
-				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+				transaction.setOrderStatus("DIKEMAS");
 			} else if ("TRANSFER".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("UNPAID");
-				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+				transaction.setOrderStatus("BELUM_BAYAR");
 			} else if ("CC".equalsIgnoreCase(requestDTO.getPaymentMethod()) || "PAYPAL".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("PAID");
 				transaction.setOrderStatus("DIKEMAS");
 			} else {
 				transaction.setPaymentStatus("UNPAID");
-				transaction.setOrderStatus("MENUNGGU PEMBAYARAN");
+				transaction.setOrderStatus("BELUM_BAYAR");
 			}
 			
 			transaction.setPaymentMethod(requestDTO.getPaymentMethod());
@@ -148,6 +148,7 @@ public class TransactionService {
 		return TransactionResponseDTO.builder().id(transaction.getId())
 				.customerId(transaction.getCustomer().getId())
 				.customerName(transaction.getCustomer().getUsername())
+				.productId(transaction.getProduct().getId())
 				.productName(transaction.getProduct().getName())
 				.quantity(transaction.getQuantity())
 				.totalPrice(transaction.getTotalPrice())

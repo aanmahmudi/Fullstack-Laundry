@@ -30,8 +30,7 @@ export function OrderDetailPage(params) {
       // Handle Photo URL
       let photoUrl = t.productPhoto;
       if (photoUrl && photoUrl.startsWith('/')) {
-         // Gunakan port 8080 sesuai log backend, atau fallback ke 8081 jika API_BASE diset lain
-         const baseUrl = (window.API_BASE) || 'http://localhost:8080';
+         const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
          photoUrl = baseUrl + photoUrl;
       }
       photoUrl = photoUrl || 'https://placehold.co/80x80/f1f5f9/94a3b8?text=No+Image';
@@ -63,7 +62,7 @@ export function OrderDetailPage(params) {
            </div>
            
            <div style="padding: 16px; display: flex; gap: 16px; border-bottom: 1px solid #f1f5f9;">
-              <img src="${photoUrl}" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 4px;">
+              <img src="${photoUrl}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=Error';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 4px;">
               <div style="flex: 1;">
                  <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 500; color: #333;">${t.productName || 'Produk'}</h4>
                  <div style="color: #64748b; font-size: 14px; margin-bottom: 4px;">Variasi: -</div>
