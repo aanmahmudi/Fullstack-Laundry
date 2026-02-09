@@ -98,6 +98,10 @@ public class TransactionService {
 			transaction.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(requestDTO.getQuantity())));
 			transaction.setTransactionDate(LocalDateTime.now());
 			
+			// Generate Random Order Number
+			String orderNum = "ORD-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+			transaction.setOrderNumber(orderNum);
+
 			// Set payment status based on payment method
 			if ("COD".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("UNPAID");
@@ -105,12 +109,14 @@ public class TransactionService {
 			} else if ("TRANSFER".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("UNPAID");
 				transaction.setOrderStatus("BELUM_BAYAR");
+				transaction.setPaymentCode(generateTestPaymentCode());
 			} else if ("CC".equalsIgnoreCase(requestDTO.getPaymentMethod()) || "PAYPAL".equalsIgnoreCase(requestDTO.getPaymentMethod())) {
 				transaction.setPaymentStatus("PAID");
 				transaction.setOrderStatus("DIKEMAS");
 			} else {
 				transaction.setPaymentStatus("UNPAID");
 				transaction.setOrderStatus("BELUM_BAYAR");
+				transaction.setPaymentCode(generateTestPaymentCode());
 			}
 			
 			transaction.setPaymentMethod(requestDTO.getPaymentMethod());
@@ -121,6 +127,15 @@ public class TransactionService {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+
+	private String generateTestPaymentCode() {
+		StringBuilder sb = new StringBuilder("888");
+		java.util.Random r = new java.util.Random();
+		for (int i = 0; i < 9; i++) {
+			sb.append(r.nextInt(10));
+		}
+		return sb.toString();
 	}
 
 	// Melakukan payment berdasarkan ID pada transaksi
@@ -159,10 +174,28 @@ public class TransactionService {
 				.shippingAddress(transaction.getShippingAddress())
 				.paymentMethod(transaction.getPaymentMethod())
 				.productPhoto(transaction.getProduct().getPhotoUrl())
+				.orderNumber(transaction.getOrderNumber() != null ? transaction.getOrderNumber() : String.valueOf(transaction.getId()))
+				.paymentCode(transaction.getPaymentCode())
 				.build();
 
 	}
-	
+
+	public TransactionResponseDTO payByCode(Long transactionId, String paymentCode) {
+		Transaction transaction = transactionRepository.findById(transactionId)
+				.orElseThrow(() -> new RuntimeException("Transaction not found"));
+		if ("PAID".equalsIgnoreCase(transaction.getPaymentStatus())) {
+			throw new RuntimeException("Transaction is already paid.");
+		}
+		if (transaction.getPaymentCode() == null || !transaction.getPaymentCode().equals(paymentCode)) {
+			throw new RuntimeException("Invalid payment code.");
+		}
+		transaction.setPaymentStatus("PAID");
+		transaction.setPaymentAmount(transaction.getTotalPrice());
+		transaction.setOrderStatus("DIKEMAS");
+		transactionRepository.save(transaction);
+		return mapToResponseDTO(transaction);
+	}
+
 	public TransactionResponseDTO updateStatus(Long id, String status) {
 		Transaction transaction = transactionRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Transaction not found"));

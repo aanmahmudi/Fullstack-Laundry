@@ -52,4 +52,10 @@ public class Transaction {
 
 	@Column(name = "payment_method")
 	private String paymentMethod;
+
+	@Column(name = "order_number")
+	private String orderNumber;
+	
+	@Column(name = "payment_code")
+	private String paymentCode;
 }

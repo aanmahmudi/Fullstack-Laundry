@@ -55,6 +55,11 @@ public class TransactionController {
 	public ResponseEntity<TransactionResponseDTO> makePayment(@RequestBody PaymentRequestDTO paymentRequest) {
 		return ResponseEntity.ok(transactionService.makePayment(paymentRequest));
 	}
+	
+	@PostMapping("/pay-by-code")
+	public ResponseEntity<TransactionResponseDTO> payByCode(@RequestParam Long transactionId, @RequestParam String paymentCode) {
+		return ResponseEntity.ok(transactionService.payByCode(transactionId, paymentCode));
+	}
 
 	// Transaksi yang sudah dibayar
 	@GetMapping("/paid")

@@ -1,13 +1,13 @@
-import { HomePage } from '../pages/home/index.js?v=remon19';
-import { ProductsPage } from '../pages/products/list.js?v=remon19';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon19';
-import { CartPage } from '../pages/cart/index.js?v=remon19';
-import { CheckoutPage } from '../pages/checkout/index.js?v=remon19';
-import { OrdersPage } from '../pages/orders/list.js?v=remon19';
-import { OrderDetailPage } from '../pages/orders/detail.js?v=remon19';
-import { AddProductPage } from '../pages/products/add.js?v=remon19';
-import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon19';
-import { MyProductsPage } from '../pages/admin/my-products.js?v=remon19';
+import { HomePage } from '../pages/home/index.js?v=remon100';
+import { ProductsPage } from '../pages/products/list.js?v=remon100';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon100';
+import { CartPage } from '../pages/cart/index.js?v=remon100';
+import { CheckoutPage } from '../pages/checkout/index.js?v=remon100';
+import { OrdersPage } from '../pages/orders/list.js?v=remon100';
+import { OrderDetailPage } from '../pages/orders/detail.js?v=remon100';
+import { AddProductPage } from '../pages/products/add.js?v=remon100';
+import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon100';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon100';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -113,6 +113,10 @@ function render() {
   try {
     const html = match.render(match.params || {});
     outletEl.innerHTML = html;
+
+    // Reset scroll to top
+    window.scrollTo(0, 0);
+
     // Jalankan binder halaman jika tersedia
     if (window.__bindPage) {
       // Execute async binder but catch errors to prevent global rejection
