@@ -101,19 +101,19 @@ export function OrderDetailPage(params) {
              Debug: Status=${t.paymentStatus}, OrderStatus=${t.orderStatus}, Code=${t.paymentCode}
            </div>
 
-           ${t.paymentCode ? `
-           <div style="margin-top: 12px; padding: 16px; border: 1px dashed #e2e8f0; border-radius: 6px; background: #f8fafc;">
-              <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
-                 <div style="font-weight:600; color:#334155;">Kode Pembayaran (VA Test)</div>
-                 <button id="copyVaBtn" style="background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe; padding:6px 10px; border-radius:4px; cursor:pointer;">Salin</button>
-              </div>
-              <div style="font-family: monospace; font-size: 18px; letter-spacing: 1px; color:#0f172a; user-select: all;">${t.paymentCode}</div>
-              <div style="margin-top:8px; font-size:12px; color:#64748b;">Gunakan kode ini untuk simulasi pembayaran. Ini hanya untuk keperluan test.</div>
-              <div style="margin-top:12px;">
-                 <button id="simulatePayBtn" style="background:#22c55e; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">Bayar (Simulasi)</button>
-              </div>
-           </div>
-           ` : ''}
+           ${t.paymentCode && t.paymentStatus === 'UNPAID' ? `
+          <div style="margin-top: 12px; padding: 16px; border: 1px dashed #e2e8f0; border-radius: 6px; background: #f8fafc;">
+             <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
+                <div style="font-weight:600; color:#334155;">Kode Pembayaran (VA Test)</div>
+                <button id="copyVaBtn" style="background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe; padding:6px 10px; border-radius:4px; cursor:pointer;">Salin</button>
+             </div>
+             <div style="font-family: monospace; font-size: 18px; letter-spacing: 1px; color:#0f172a; user-select: all;">${t.paymentCode}</div>
+             <div style="margin-top:8px; font-size:12px; color:#64748b;">Gunakan kode ini untuk simulasi pembayaran. Ini hanya untuk keperluan test.</div>
+             <div style="margin-top:12px;">
+                <button id="simulatePayBtn" style="background:#22c55e; color:#fff; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;">Bayar (Simulasi)</button>
+             </div>
+          </div>
+          ` : ''}
            
            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #64748b;">
               <span>Subtotal untuk Produk</span>
@@ -135,7 +135,7 @@ export function OrderDetailPage(params) {
         <div style="background: #fff; padding: 16px; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 24px; font-size: 12px; color: #94a3b8;">
            
            <!-- NEW LOCATION FOR VA CODE (As Requested) -->
-           ${t.paymentCode ? `
+           ${t.paymentCode && t.paymentStatus === 'UNPAID' ? `
            <div style="background: #eff6ff; border: 1px dashed #3b82f6; padding: 12px; margin-bottom: 12px; border-radius: 4px;">
               <div style="color: #1e40af; font-weight: bold; font-size: 14px; margin-bottom: 4px;">Kode Pembayaran (Virtual Account)</div>
               <div style="font-family: monospace; font-size: 20px; color: #1e3a8a; font-weight: 700; letter-spacing: 2px;">${t.paymentCode}</div>
