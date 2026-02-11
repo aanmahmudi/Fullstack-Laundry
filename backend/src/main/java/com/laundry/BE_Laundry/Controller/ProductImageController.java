@@ -57,9 +57,12 @@ public class ProductImageController {
     }
 
     @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> getProductImage(@PathVariable Long id) {
+    public ResponseEntity<?> getProductImage(@PathVariable Long id) {
         return productImageRepository.findById(id)
                 .map(img -> {
+                    if (img.getData() == null || img.getData().length == 0) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    }
                     MediaType mediaType;
                     try {
                         mediaType = MediaType.parseMediaType(img.getContentType());

@@ -149,7 +149,8 @@ export function OrdersPage() {
                  const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
                  photoUrl = baseUrl + photoUrl;
              }
-             photoUrl = photoUrl || 'https://placehold.co/80x80/f1f5f9/94a3b8?text=No+Image';
+             const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394a3b8'%3ENo Image%3C/text%3E%3C/svg%3E";
+             photoUrl = photoUrl || placeholder;
              
              return `
             <div class="order-card" style="background: #fff; border-radius: 2px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
@@ -169,7 +170,7 @@ export function OrdersPage() {
               <!-- Card Body (Product) -->
               <a href="#/orders/${t.id}" style="text-decoration: none; color: inherit; display: block;">
                 <div class="card-body" style="padding: 16px; display: flex; align-items: flex-start; gap: 16px;">
-                    <img src="${photoUrl}" onerror="this.onerror=null;this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=Error';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc;" alt="Product">
+                    <img src="${photoUrl}" onerror="this.onerror=null;this.src='${placeholder.replace(/'/g, "%27")}';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc;" alt="Product">
                     <div style="flex: 1;">
                         <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 500; line-height: 1.4;">${t.productName || 'Produk Tanpa Nama'}</h4>
                         <p style="margin: 0; color: #64748b; font-size: 14px;">Variasi: -</p>
