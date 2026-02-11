@@ -177,7 +177,6 @@ export function OrdersPage() {
                         <p style="margin: 4px 0 0 0; font-size: 14px;">x${t.quantity}</p>
                     </div>
                     <div style="text-align: right;">
-                        <span style="color: #94a3b8; text-decoration: line-through; font-size: 13px; margin-right: 4px;">Rp ${(Number(t.totalPrice) * 1.2).toLocaleString('id-ID')}</span>
                         <div style="color: var(--primary); font-weight: 600;">Rp ${Number(t.totalPrice || 0).toLocaleString('id-ID')}</div>
                     </div>
                 </div>

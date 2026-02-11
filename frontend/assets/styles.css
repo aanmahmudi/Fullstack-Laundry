@@ -30,10 +30,11 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  line-height: 1.6;
+  line-height: 1.5;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-size: 14px; /* Reduced base font size */
 }
 
 /* --- HEADER --- */
@@ -48,17 +49,17 @@ header {
 }
 
 .header-container {
-  max-width: 1200px;
+  max-width: 1080px; /* Reduced max-width */
   margin: 0 auto;
-  padding: 16px 24px;
+  padding: 10px 20px; /* Reduced padding */
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px; /* Reduced gap */
 }
 
 /* Brand */
 .brand {
-  font-size: 24px;
+  font-size: 20px; /* Reduced font size */
   font-weight: 800;
   color: #1a1a1a;
   text-decoration: none;
@@ -193,9 +194,9 @@ header {
 /* --- MAIN --- */
 main {
   flex: 1;
-  max-width: 1200px;
-  margin: 32px auto;
-  padding: 0 24px;
+  max-width: 1080px; /* Reduced max-width */
+  margin: 24px auto; /* Reduced margin */
+  padding: 0 20px; /* Reduced padding */
   width: 100%;
 }
 

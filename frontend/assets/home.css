@@ -3,12 +3,12 @@
 /* Hero Section */
 .hero {
   text-align: center;
-  padding: 100px 24px;
+  padding: 60px 20px; /* Reduced padding */
   background: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
   background-size: cover;
   background-position: center;
-  border-radius: 24px;
-  margin-bottom: 48px;
+  border-radius: 16px; /* Reduced radius */
+  margin-bottom: 32px; /* Reduced margin */
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -26,21 +26,21 @@
 }
 
 .hero h1 {
-  font-size: 56px;
+  font-size: 42px; /* Reduced font size */
   font-weight: 800;
-  margin: 0 0 24px;
+  margin: 0 0 16px; /* Reduced margin */
   color: white;
-  letter-spacing: -2px;
+  letter-spacing: -1px;
   line-height: 1.1;
   text-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .hero p {
-  font-size: 20px;
+  font-size: 16px; /* Reduced font size */
   color: #e2e8f0;
-  max-width: 600px;
-  margin: 0 auto 40px;
-  line-height: 1.6;
+  max-width: 500px; /* Reduced width */
+  margin: 0 auto 32px; /* Reduced margin */
+  line-height: 1.5;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
