@@ -26,5 +26,6 @@ public class TransactionResponseDTO {
 	private String productPhoto;
 	private String orderNumber;
 	private String paymentCode;
+	private String sellerPhone;
 
 } 

@@ -1,13 +1,13 @@
-import { HomePage } from '../pages/home/index.js?v=remon105';
-import { ProductsPage } from '../pages/products/list.js?v=remon105';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon105';
-import { CartPage } from '../pages/cart/index.js?v=remon105';
-import { CheckoutPage } from '../pages/checkout/index.js?v=remon105';
-import { OrdersPage } from '../pages/orders/list.js?v=remon105';
-import { OrderDetailPage } from '../pages/orders/detail.js?v=remon105';
-import { AddProductPage } from '../pages/products/add.js?v=remon105';
-import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon105';
-import { MyProductsPage } from '../pages/admin/my-products.js?v=remon105';
+import { HomePage } from '../pages/home/index.js?v=remon107';
+import { ProductsPage } from '../pages/products/list.js?v=remon107';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon107';
+import { CartPage } from '../pages/cart/index.js?v=remon107';
+import { CheckoutPage } from '../pages/checkout/index.js?v=remon107';
+import { OrdersPage } from '../pages/orders/list.js?v=remon107';
+import { OrderDetailPage } from '../pages/orders/detail.js?v=remon107';
+import { AddProductPage } from '../pages/products/add.js?v=remon107';
+import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon107';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon107';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';

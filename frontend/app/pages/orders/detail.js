@@ -161,7 +161,11 @@ export function OrderDetailPage(params) {
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
             <a href="#/orders" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Kembali</a>
             ${t.orderStatus === 'DONE' ? `<a href="#/products/${t.productId || ''}" class="btn primary" style="padding: 10px 24px; text-decoration: none; border-radius: 4px;">Beli Lagi</a>` : ''}
-            <button class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; cursor: pointer; border-radius: 4px;">Hubungi Penjual</button>
+            ${t.sellerPhone ? 
+               `<a href="https://wa.me/${t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '')}" target="_blank" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Hubungi Penjual</a>` 
+               : 
+               `<button class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; cursor: pointer; border-radius: 4px;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`
+            }
         </div>
       `;
       

@@ -160,6 +160,23 @@ public class TransactionService {
 
 	// Mapping transaction ke DTO
 	private TransactionResponseDTO mapToResponseDTO(Transaction transaction) {
+		String sellerPhone = null;
+		
+		// 1. Coba ambil dari owner produk
+		if (transaction.getProduct() != null && transaction.getProduct().getOwnerId() != null) {
+			sellerPhone = customerRepository.findById(transaction.getProduct().getOwnerId())
+					.map(Customer::getPhoneNumber)
+					.orElse(null);
+		}
+
+		// 2. Jika tidak ada, fallback (Dihapus sementara untuk stabilitas)
+		// Logic fallback ke Admin dihapus karena menyebabkan error startup
+
+		// 3. Jika masih null, biarkan null agar frontend menangani dengan alert
+		// if (sellerPhone == null) {
+		// 	sellerPhone = "081234567890"; 
+		// }
+
 		return TransactionResponseDTO.builder().id(transaction.getId())
 				.customerId(transaction.getCustomer().getId())
 				.customerName(transaction.getCustomer().getUsername())
@@ -176,6 +193,7 @@ public class TransactionService {
 				.productPhoto(transaction.getProduct().getPhotoUrl())
 				.orderNumber(transaction.getOrderNumber() != null ? transaction.getOrderNumber() : String.valueOf(transaction.getId()))
 				.paymentCode(transaction.getPaymentCode())
+				.sellerPhone(sellerPhone)
 				.build();
 
 	}

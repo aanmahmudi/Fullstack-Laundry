@@ -190,7 +190,11 @@ export function OrdersPage() {
                  <div style="display: flex; gap: 10px;">
                     <a href="#/orders/${t.id}" class="btn small" style="background: var(--primary); color: #fff; border: none; padding: 8px 24px; font-weight: 500;">Detail Pesanan</a>
                     ${status.text === 'Selesai' ? `<a href="#/products/${t.productId}" class="btn small outline" style="border: 1px solid var(--primary); color: var(--primary); padding: 8px 24px;">Beli Lagi</a>` : ''}
-                    <button class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px;">Hubungi Penjual</button>
+                    ${t.sellerPhone ? 
+                        `<a href="https://wa.me/${t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '')}" target="_blank" class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; text-decoration: none;">Hubungi Penjual</a>` 
+                        : 
+                        `<button class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; cursor: pointer;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`
+                    }
                  </div>
               </div>
 
