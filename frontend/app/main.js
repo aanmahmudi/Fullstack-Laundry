@@ -1,7 +1,7 @@
-import { initRouter, navigate } from './core/router.js?v=remon102';
-import { renderHeader } from './components/header.js?v=remon102';
+import { initRouter, navigate } from './core/router.js?v=remon117';
+import { renderHeader } from './components/header.js?v=remon117';
 
-console.log('Main App v101 Loaded - FORCE UPDATE');
+console.log('Main App v117 Loaded - FORCE UPDATE');
 
 function bootstrap() {
   renderHeader(document.getElementById('app-header'));

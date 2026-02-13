@@ -23,6 +23,10 @@ public class ProductService {
 		return productRepository.findAll();
 	}
 
+	public List<Product> getProductsByShopId(Long shopId) {
+		return productRepository.findByShopId(shopId);
+	}
+
 	public List<Product> searchProducts(String keyword) {
 		return productRepository.findByNameContainingIgnoreCase(keyword);
 	}
@@ -38,6 +42,9 @@ public class ProductService {
 		existingProduct.setPrice(updatedProduct.getPrice());
 		existingProduct.setDescription(updatedProduct.getDescription());
 		existingProduct.setPhotoUrl(updatedProduct.getPhotoUrl());
+		if (updatedProduct.getShopId() != null) {
+			existingProduct.setShopId(updatedProduct.getShopId());
+		}
 		return productRepository.save(existingProduct);
 
 	}

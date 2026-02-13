@@ -53,7 +53,6 @@ export function renderHeader(el) {
         <div class="header-actions">
           ${user ? `
             ${user.role === 'ADMIN' ? `
-              <a href="#/products/add" class="nav-link" style="color:var(--primary); font-weight:700;">+ Produk</a>
               <a href="#/admin/orders" class="nav-link">Admin</a>
             ` : `
               <a href="#/orders" class="nav-link">Transaksi</a>
@@ -82,11 +81,11 @@ export function renderHeader(el) {
                     <span class="role-badge">${user.role}</span>
                  </div>
                  ${user.role === 'ADMIN' ? `
-                   <a href="#/products/add" class="dropdown-item">Tambah Produk</a>
-                   <a href="#/admin/orders" class="dropdown-item">Kelola Pesanan</a>
-                   <a href="#/admin/my-products" class="dropdown-item">Produk Saya</a>
+                   <a href="#/admin/orders" class="dropdown-item">Pesanan Masuk</a>
+                   <a href="#/admin/my-products" class="dropdown-item">Kelola Produk</a>
+                   <a href="#/admin/shops" class="dropdown-item">Kelola Toko</a>
                  ` : `
-                   <a href="#/orders" class="dropdown-item">Pesanan Saya</a>
+                   <a href="#/orders" class="dropdown-item">Riwayat Belanja</a>
                  `}
                  <a href="#/change-password" class="dropdown-item">Ganti Password</a>
                  <div class="dropdown-divider"></div>

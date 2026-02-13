@@ -12,14 +12,14 @@ export function MyProductsPage() {
   const html = `
   <div class="hero-section" style="height: 200px; margin-bottom: 20px;">
     <div class="hero-content">
-      <h1>Produk Saya</h1>
-      <p>Kelola daftar produk yang Anda miliki</p>
+      <h1>Kelola Produk</h1>
+      <p>Kelola daftar produk yang Anda jual</p>
     </div>
   </div>
 
   <section class="product-layout" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
       <div class="actions" style="margin-bottom: 20px;">
-        <a href="#/products/add" class="btn btn-buy" style="display: inline-block;">+ Tambah Produk Baru</a>
+        <a href="#/admin/shops" class="btn btn-buy" style="display: inline-block;">📂 Kelola Toko & Tambah Produk</a>
       </div>
       <div id="my-products-grid" class="grid"></div>
   </section>`;
@@ -43,8 +43,8 @@ export function MyProductsPage() {
               <div class="panel" style="grid-column: 1/-1; text-align: center; background: white; color: #333; padding: 60px 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="font-size: 48px; margin-bottom: 20px;">📦</div>
                 <h3 style="margin-bottom: 10px;">Belum ada produk</h3>
-                <p style="color: #666; margin-bottom: 20px;">Anda belum menambahkan produk apapun ke toko.</p>
-                <a href="#/products/add" class="btn btn-buy">Mulai Jualan</a>
+                <p style="color: #666; margin-bottom: 20px;">Silakan masuk ke menu Toko untuk menambahkan produk.</p>
+                <a href="#/admin/shops" class="btn btn-buy">Ke Daftar Toko</a>
               </div>`;
             return;
         }
@@ -111,7 +111,7 @@ export function MyProductsPage() {
 function productCard(p) {
   let photoUrl = p.photoUrl;
   if (photoUrl && photoUrl.startsWith('/')) {
-      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
       photoUrl = baseUrl + photoUrl;
   }
 

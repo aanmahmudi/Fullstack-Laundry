@@ -1,13 +1,16 @@
-import { HomePage } from '../pages/home/index.js?v=remon107';
-import { ProductsPage } from '../pages/products/list.js?v=remon107';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon107';
-import { CartPage } from '../pages/cart/index.js?v=remon107';
-import { CheckoutPage } from '../pages/checkout/index.js?v=remon107';
-import { OrdersPage } from '../pages/orders/list.js?v=remon107';
-import { OrderDetailPage } from '../pages/orders/detail.js?v=remon107';
-import { AddProductPage } from '../pages/products/add.js?v=remon107';
-import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon107';
-import { MyProductsPage } from '../pages/admin/my-products.js?v=remon107';
+import { HomePage } from '../pages/home/index.js?v=remon116';
+import { ProductsPage } from '../pages/products/list.js?v=remon117';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon117';
+import { CartPage } from '../pages/cart/index.js?v=remon117';
+import { CheckoutPage } from '../pages/checkout/index.js?v=remon116';
+import { OrdersPage } from '../pages/orders/list.js?v=remon116';
+import { OrderDetailPage } from '../pages/orders/detail.js?v=remon116';
+import { AddProductPage } from '../pages/products/add.js?v=remon116';
+import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon116';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon117';
+import { ShopListPage } from '../pages/admin/shops/list.js?v=remon116';
+import { ShopAddPage } from '../pages/admin/shops/add.js?v=remon116';
+import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon117';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -18,7 +21,7 @@ import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
 import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
-import { State } from './state.js?v=remon16';
+import { State } from './state.js?v=remon115';
 
 let outletEl = null;
 
@@ -34,6 +37,9 @@ const routes = [
   { pattern: '#/products/add', render: AddProductPage },
   { pattern: '#/admin/orders', render: AdminOrdersPage },
   { pattern: '#/admin/my-products', render: MyProductsPage },
+  { pattern: '#/admin/shops', render: ShopListPage },
+  { pattern: '#/admin/shops/add', render: ShopAddPage },
+  { pattern: '#/admin/shops/:id', render: ShopDetailPage },
   { pattern: '#/auth', render: LoginPage }, // Deprecated, use /login
   { pattern: '#/login', render: LoginPage },
   { pattern: '#/register', render: RegisterPage },
@@ -76,8 +82,23 @@ export function initRouter({ outlet }) {
 }
 
 function render() {
-  let hash = location.hash || '#/';
+  let fullHash = location.hash || '#/';
+  let [hash, queryString] = fullHash.split('?');
   
+  // Normalize hash: remove trailing slash if present (except for root #/)
+  if (hash.length > 2 && hash.endsWith('/')) {
+    hash = hash.slice(0, -1);
+  }
+  
+  // Parse query params
+  const queryParams = {};
+  if (queryString) {
+      queryString.split('&').forEach(param => {
+          const [key, val] = param.split('=');
+          if (key) queryParams[key] = decodeURIComponent(val || '');
+      });
+  }
+
   // Public Access: Allow Home/Dashboard without login
   if (hash === '#/' || hash === '') {
     navigate('#/dashboard');
@@ -106,12 +127,14 @@ function render() {
 
   const match = matchRoute(hash);
   if (!match) {
-    outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${hash}</p></section>`;
+    outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${fullHash}</p></section>`;
     return;
   }
 
   try {
-    const html = match.render(match.params || {});
+    // Merge URL params (e.g. :id) with Query Params
+    const finalParams = { ...match.params, ...queryParams };
+    const html = match.render(finalParams);
     outletEl.innerHTML = html;
 
     // Reset scroll to top

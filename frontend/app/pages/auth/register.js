@@ -15,10 +15,10 @@ export function RegisterPage() {
         <p id="auth-msg" class="msg"></p>
 
         <form id="form-register" class="form-vertical">
-          <label>Nama Lengkap
+          <label><span id="lbl-name">Nama Lengkap</span>
             <div class="input-with-icon">
               <span class="icon">👤</span>
-              <input name="username" type="text" required placeholder="Nama Anda" />
+              <input id="input-name" name="username" type="text" required placeholder="Nama Anda" />
             </div>
             <small class="field-error"></small>
           </label>
@@ -52,33 +52,33 @@ export function RegisterPage() {
           <label>Daftar Sebagai</label>
           <div class="role-selector">
              <button type="button" class="role-btn active" data-value="USER">
-               <span>👤</span> Customer
+               <span>👤</span> Pembeli
              </button>
              <button type="button" class="role-btn" data-value="ADMIN">
-               <span>🛠️</span> Admin
+               <span>🏪</span> Penjual (Toko)
              </button>
           </div>
           <input type="hidden" name="role" id="role-input" value="USER" />
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-            <label>Tempat Lahir
+            <label><span id="lbl-pob">Tempat Lahir</span>
               <div class="input-with-icon">
                 <span class="icon">📍</span>
-                <input name="placeOfBirth" type="text" placeholder="Kota" />
+                <input id="input-pob" name="placeOfBirth" type="text" placeholder="Kota" />
               </div>
             </label>
-            <label>Tanggal Lahir
+            <label><span id="lbl-dob">Tanggal Lahir</span>
               <div class="input-with-icon">
                 <span class="icon">📅</span>
-                <input name="dateOfBirth" type="date" required />
+                <input id="input-dob" name="dateOfBirth" type="date" required />
               </div>
             </label>
           </div>
 
-          <label>Alamat Lengkap
+          <label><span id="lbl-address">Alamat Lengkap</span>
             <div class="input-with-icon">
               <span class="icon">🏠</span>
-              <input name="address" type="text" placeholder="Jalan, No. Rumah, Kota" />
+              <input id="input-address" name="address" type="text" placeholder="Jalan, No. Rumah, Kota" />
             </div>
             <small class="field-error"></small>
           </label>

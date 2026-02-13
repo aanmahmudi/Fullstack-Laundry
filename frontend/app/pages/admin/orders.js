@@ -9,7 +9,7 @@ export function AdminOrdersPage() {
   const html = `
     <section class="columns">
       <div class="col">
-        <h2>Kelola Pesanan (Admin)</h2>
+        <h2>Pesanan Masuk (Toko)</h2>
         <div class="actions">
            <button id="refresh-orders" class="btn">Refresh</button>
         </div>

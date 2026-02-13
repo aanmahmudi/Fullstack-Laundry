@@ -202,7 +202,7 @@ export function ProductsPage() {
 function productCard(p, user) {
   let photoUrl = p.photoUrl;
   if (photoUrl && photoUrl.startsWith('/')) {
-      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
       photoUrl = baseUrl + photoUrl;
   }
   

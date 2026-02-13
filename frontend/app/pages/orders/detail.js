@@ -161,11 +161,16 @@ export function OrderDetailPage(params) {
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
             <a href="#/orders" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Kembali</a>
             ${t.orderStatus === 'DONE' ? `<a href="#/products/${t.productId || ''}" class="btn primary" style="padding: 10px 24px; text-decoration: none; border-radius: 4px;">Beli Lagi</a>` : ''}
-            ${t.sellerPhone ? 
-               `<a href="https://wa.me/${t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '')}" target="_blank" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Hubungi Penjual</a>` 
-               : 
-               `<button class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; cursor: pointer; border-radius: 4px;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`
-            }
+            ${(() => {
+               if (t.sellerPhone) {
+                   const phoneNumber = t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '');
+                   const message = `Halo, saya ingin menanyakan tentang pesanan ini:\n\nNo. Pesanan: ${t.orderNumber || t.id}\nProduk: ${t.productName}\nJumlah: ${t.quantity}\nTotal: Rp ${Number(t.totalPrice).toLocaleString('id-ID')}\nStatus: ${t.orderStatus}`;
+                   const encodedMessage = encodeURIComponent(message);
+                   return `<a href="https://wa.me/${phoneNumber}?text=${encodedMessage}" target="_blank" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Hubungi Penjual</a>`;
+               } else {
+                   return `<button class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; cursor: pointer; border-radius: 4px;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`;
+               }
+            })()}
         </div>
       `;
       

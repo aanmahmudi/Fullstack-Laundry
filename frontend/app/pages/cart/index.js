@@ -39,7 +39,7 @@ export function CartPage() {
                 ${items.map((x, i) => {
                     let photoUrl = x.photoUrl;
                     if (photoUrl && photoUrl.startsWith('/')) {
-                        const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
+                        const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
                         photoUrl = baseUrl + photoUrl;
                     }
                     const isSelected = x.selected !== false;

@@ -190,11 +190,16 @@ export function OrdersPage() {
                  <div style="display: flex; gap: 10px;">
                     <a href="#/orders/${t.id}" class="btn small" style="background: var(--primary); color: #fff; border: none; padding: 8px 24px; font-weight: 500;">Detail Pesanan</a>
                     ${status.text === 'Selesai' ? `<a href="#/products/${t.productId}" class="btn small outline" style="border: 1px solid var(--primary); color: var(--primary); padding: 8px 24px;">Beli Lagi</a>` : ''}
-                    ${t.sellerPhone ? 
-                        `<a href="https://wa.me/${t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '')}" target="_blank" class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; text-decoration: none;">Hubungi Penjual</a>` 
-                        : 
-                        `<button class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; cursor: pointer;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`
-                    }
+                    ${(() => {
+                        if (t.sellerPhone) {
+                            const phoneNumber = t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '');
+                            const message = `Halo, saya ingin menanyakan tentang pesanan ini:\n\nNo. Pesanan: ${t.orderNumber || t.id}\nProduk: ${t.productName}\nJumlah: ${t.quantity}\nTotal: Rp ${Number(t.totalPrice).toLocaleString('id-ID')}\nStatus: ${t.orderStatus}`;
+                            const encodedMessage = encodeURIComponent(message);
+                            return `<a href="https://wa.me/${phoneNumber}?text=${encodedMessage}" target="_blank" class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; text-decoration: none;">Hubungi Penjual</a>`;
+                        } else {
+                            return `<button class="btn small outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 8px 16px; cursor: pointer;" onclick="alert('Maaf, nomor penjual belum tersedia saat ini.')">Hubungi Penjual</button>`;
+                        }
+                    })()}
                  </div>
               </div>
 

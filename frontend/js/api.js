@@ -92,4 +92,36 @@ async function apiPut(path, body) {
   }
 }
 
-window.API = { apiGet, apiPost, apiPut, BASE_URL: API_BASE };
+async function apiDelete(path) {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: "DELETE",
+      headers: { ...getAuthHeaders() },
+    });
+    // Handle 204 No Content or empty body
+    if (res.status === 204) return null;
+    
+    if (!res.ok) {
+        // reuse error handling
+        const text = await res.text();
+        let msg = text;
+        try {
+          const json = JSON.parse(text);
+          if (json.message) msg = json.message;
+        } catch {}
+        throw new Error(msg);
+    }
+    
+    // Try parsing JSON, fallback to text/null
+    try {
+        return await res.json();
+    } catch {
+        return null;
+    }
+  } catch (e) {
+     // Retry logic similar to others if needed, or just throw
+     throw e;
+  }
+}
+
+window.API = { apiGet, apiPost, apiPut, apiDelete, BASE_URL: API_BASE };

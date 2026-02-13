@@ -34,4 +34,6 @@ public class Product {
 	@Column(name = "owner_id")
 	private Long ownerId;
 
+	@Column(name = "shop_id")
+	private Long shopId;
 }
