@@ -8,7 +8,9 @@ export function AddProductPage(params) {
   }
 
   // Get shopId from params (injected by router) or URL fallback
-  const shopId = params?.shopId || new URLSearchParams(window.location.hash.split('?')[1]).get('shopId');
+  const shopId =
+    params?.shopId ||
+    new URLSearchParams(window.location.search || '').get('shopId');
 
   setTimeout(() => {
     bindEvents(shopId);
@@ -62,7 +64,7 @@ export function AddProductPage(params) {
         </div>
         
         <div class="actions form-actions">
-          <a href="#/products" class="btn btn-full">Batal</a>
+        <a href="/products" class="btn btn-full">Batal</a>
           <button type="submit" class="btn primary btn-full">Simpan Produk</button>
         </div>
       </form>
@@ -156,7 +158,7 @@ function bindEvents(shopId) {
     formData.append('file', file);
 
     try {
-      const baseUrl = window.API && window.API.BASE_URL ? window.API.BASE_URL : 'http://localhost:8080';
+      const baseUrl = window.API && window.API.BASE_URL ? window.API.BASE_URL : 'http://localhost:8081';
       const response = await fetch(`${baseUrl}/api/products/upload-image`, {
         method: 'POST',
         body: formData
@@ -215,9 +217,9 @@ function bindEvents(shopId) {
         timer: 1500
       }).then(() => {
         if (shopId) {
-          window.location.hash = `#/admin/shops/${shopId}`;
+          window.location.href = `/admin/shops/${shopId}`;
         } else {
-          window.location.hash = '#/products';
+          window.location.href = '/products';
         }
       });
 

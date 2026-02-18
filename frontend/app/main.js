@@ -1,7 +1,7 @@
-import { initRouter, navigate } from './core/router.js?v=remon117';
-import { renderHeader } from './components/header.js?v=remon117';
+import { initRouter, navigate } from './core/router.js?v=remon118';
+import { renderHeader } from './components/header.js?v=remon118';
 
-console.log('Main App v117 Loaded - FORCE UPDATE');
+console.log('Main App v118 Loaded - FORCE UPDATE');
 
 function bootstrap() {
   renderHeader(document.getElementById('app-header'));
@@ -10,6 +10,4 @@ function bootstrap() {
 
 window.addEventListener('DOMContentLoaded', bootstrap);
 // Navigasi awal ditangani oleh router
-window.addEventListener('load', () => {
-  // if (!location.hash) navigate('#/'); 
-});
+window.addEventListener('load', () => {});

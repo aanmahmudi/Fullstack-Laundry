@@ -94,16 +94,26 @@ public class AuthController {
 		}
 	}
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody Map<String, String> payload) {
+    @PostMapping(value = "/logout", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> logout(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
         if (email == null || email.isEmpty()) {
-            return ResponseEntity.badRequest().body("Email is required.");
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Email is required."
+            ));
         }
         try {
-            return ResponseEntity.ok("Logout successfuly for email : " + email);
+            customerService.logout(email);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Logout successfuly for email : " + email
+            ));
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured:" + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "message", "An error occured: " + ex.getMessage()
+            ));
         }
     }
 

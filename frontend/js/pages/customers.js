@@ -40,7 +40,7 @@ async function submitRegister(ev) {
     return setMsg(msg, "Password minimal 8 karakter", true);
   }
   try {
-    const res = await API.apiPost("/api/customers/register", payload);
+    const res = await API.apiPost("/api/auth/register", payload);
     setMsg(msg, `Registrasi sukses. customerId: ${res.customerId ?? "-"}`);
     form.reset();
     loadCustomers();

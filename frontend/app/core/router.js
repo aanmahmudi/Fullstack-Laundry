@@ -1,16 +1,15 @@
-import { HomePage } from '../pages/home/index.js?v=remon116';
-import { ProductsPage } from '../pages/products/list.js?v=remon117';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon117';
-import { CartPage } from '../pages/cart/index.js?v=remon117';
+import { ProductsPage } from '../pages/products/list.js?v=remon118';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon118';
+import { CartPage } from '../pages/cart/index.js?v=remon118';
 import { CheckoutPage } from '../pages/checkout/index.js?v=remon116';
 import { OrdersPage } from '../pages/orders/list.js?v=remon116';
 import { OrderDetailPage } from '../pages/orders/detail.js?v=remon116';
 import { AddProductPage } from '../pages/products/add.js?v=remon116';
 import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon116';
-import { MyProductsPage } from '../pages/admin/my-products.js?v=remon117';
+import { MyProductsPage } from '../pages/admin/my-products.js?v=remon118';
 import { ShopListPage } from '../pages/admin/shops/list.js?v=remon116';
 import { ShopAddPage } from '../pages/admin/shops/add.js?v=remon116';
-import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon117';
+import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon118';
 
 // Auth Pages
 import { LoginPage } from '../pages/auth/login.js';
@@ -21,39 +20,58 @@ import { VerifyResetPage } from '../pages/auth/verify-reset.js';
 import { NewPasswordPage } from '../pages/auth/new-password.js';
 import { ChangePasswordPage } from '../pages/auth/change-password.js';
 
-import { State } from './state.js?v=remon115';
+import { State } from './state.js?v=remon118';
 
 let outletEl = null;
 
 const routes = [
-  { pattern: '#/', render: HomePage },
-  { pattern: '#/dashboard', render: ProductsPage },
-  { pattern: '#/products', render: ProductsPage },
-  { pattern: '#/product/:id', render: ProductDetailPage },
-  { pattern: '#/cart', render: CartPage },
-  { pattern: '#/checkout', render: CheckoutPage },
-  { pattern: '#/orders', render: OrdersPage },
-  { pattern: '#/orders/:id', render: OrderDetailPage },
-  { pattern: '#/products/add', render: AddProductPage },
-  { pattern: '#/admin/orders', render: AdminOrdersPage },
-  { pattern: '#/admin/my-products', render: MyProductsPage },
-  { pattern: '#/admin/shops', render: ShopListPage },
-  { pattern: '#/admin/shops/add', render: ShopAddPage },
-  { pattern: '#/admin/shops/:id', render: ShopDetailPage },
-  { pattern: '#/auth', render: LoginPage }, // Deprecated, use /login
-  { pattern: '#/login', render: LoginPage },
-  { pattern: '#/register', render: RegisterPage },
-  { pattern: '#/forgot-password', render: ForgotPasswordPage },
-  { pattern: '#/verify-reset-otp', render: VerifyResetPage },
-  { pattern: '#/new-password', render: NewPasswordPage },
-  { pattern: '#/change-password', render: ChangePasswordPage },
-  { pattern: '#/verify', render: VerifyAccountPage },
+  { pattern: '/', render: ProductsPage },
+  { pattern: '/dashboard', render: ProductsPage },
+  { pattern: '/products', render: ProductsPage },
+  { pattern: '/product/:id', render: ProductDetailPage },
+  { pattern: '/cart', render: CartPage },
+  { pattern: '/checkout', render: CheckoutPage },
+  { pattern: '/orders', render: OrdersPage },
+  { pattern: '/orders/:id', render: OrderDetailPage },
+  { pattern: '/products/add', render: AddProductPage },
+  { pattern: '/admin/orders', render: AdminOrdersPage },
+  { pattern: '/admin/my-products', render: MyProductsPage },
+  { pattern: '/admin/shops', render: ShopListPage },
+  { pattern: '/admin/shops/add', render: ShopAddPage },
+  { pattern: '/admin/shops/:id', render: ShopDetailPage },
+  { pattern: '/auth', render: LoginPage }, // Deprecated, use /login
+  { pattern: '/login', render: LoginPage },
+  { pattern: '/register', render: RegisterPage },
+  { pattern: '/forgot-password', render: ForgotPasswordPage },
+  { pattern: '/verify-reset-otp', render: VerifyResetPage },
+  { pattern: '/new-password', render: NewPasswordPage },
+  { pattern: '/change-password', render: ChangePasswordPage },
+  { pattern: '/verify', render: VerifyAccountPage },
 ];
 
-function matchRoute(hash) {
+function migrateLegacyHashRouting() {
+  const hash = window.location.hash || '';
+  if (hash.startsWith('#/')) {
+    const newPath = hash.slice(1);
+    window.history.replaceState({}, '', newPath);
+  }
+}
+
+function normalizePath(path) {
+  if (!path) return '/';
+  const u = new URL(path, window.location.origin);
+  let pathname = u.pathname || '/';
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    pathname = pathname.slice(0, -1);
+  }
+  return pathname + (u.search || '');
+}
+
+function matchRoute(pathname) {
   for (const r of routes) {
-    const parts = r.pattern.split('/');
-    const hparts = hash.split('/');
+    const [patternPath] = r.pattern.split('?');
+    const parts = patternPath.split('/');
+    const hparts = pathname.split('/');
     if (parts.length !== hparts.length) continue;
     const params = {};
     let ok = true;
@@ -70,80 +88,124 @@ function matchRoute(hash) {
   return null;
 }
 
-export function navigate(hash) {
-  if (location.hash !== hash) location.hash = hash;
+export function navigate(path) {
+  const normalized = normalizePath(path);
+  const [pathname, search = ''] = normalized.split('?');
+  const target = pathname + (search ? `?${search}` : '');
+  if (window.location.pathname + window.location.search !== target) {
+    window.history.pushState({}, '', target);
+  }
   render();
 }
 
 export function initRouter({ outlet }) {
-  outletEl = outlet;
-  window.addEventListener('hashchange', render);
+  outletEl = outlet || document.getElementById('app-main');
+  if (!outletEl) {
+    console.error('Router init failed: outlet element not found');
+    return;
+  }
+  migrateLegacyHashRouting();
+  window.addEventListener('popstate', render);
   render();
 }
 
 function render() {
-  let fullHash = location.hash || '#/';
-  let [hash, queryString] = fullHash.split('?');
-  
-  // Normalize hash: remove trailing slash if present (except for root #/)
-  if (hash.length > 2 && hash.endsWith('/')) {
-    hash = hash.slice(0, -1);
+  if (!outletEl) {
+    outletEl = document.getElementById('app-main');
   }
-  
-  // Parse query params
+  if (!outletEl) {
+    console.error('Router outlet element not available');
+    return;
+  }
+  const fullPath = normalizePath(window.location.pathname + window.location.search);
+  const [pathname, queryString = ''] = fullPath.split('?');
+
   const queryParams = {};
   if (queryString) {
-      queryString.split('&').forEach(param => {
-          const [key, val] = param.split('=');
-          if (key) queryParams[key] = decodeURIComponent(val || '');
-      });
+    queryString.split('&').forEach((param) => {
+      if (!param) return;
+      const [key, val] = param.split('=');
+      if (key) queryParams[key] = decodeURIComponent(val || '');
+    });
   }
 
-  // Public Access: Allow Home/Dashboard without login
-  if (hash === '#/' || hash === '') {
-    navigate('#/dashboard');
+  const protectedRoutes = ['/checkout', '/orders', '/admin'];
+  const user = State.getUser();
+
+  if (!user && protectedRoutes.some((route) => pathname.startsWith(route))) {
+    navigate('/login');
     return;
   }
 
-  // Protected Routes - Redirect to login if not authenticated
-  // Allow Cart for guests, but protect Checkout
-  const protectedRoutes = ['#/checkout', '#/orders', '#/admin'];
-  const user = State.getUser();
-  
-  if (!user && protectedRoutes.some(route => hash.startsWith(route))) {
-     navigate('#/login');
-     return;
+  if (pathname === '/cart') {
+    const html = CartPage({});
+    outletEl.innerHTML = html;
+    window.scrollTo(0, 0);
+    if (window.__bindPage) {
+      Promise.resolve(window.__bindPage()).catch((e) => console.error('BindPage Error:', e));
+      window.__bindPage = null;
+    }
+    return;
   }
 
-  // Prevent accessing new-password if no OTP verified
-  if (hash === '#/new-password') {
+  if (pathname === '/login') {
+    const html = LoginPage({});
+    outletEl.innerHTML = html;
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (pathname === '/register') {
+    const html = RegisterPage({});
+    outletEl.innerHTML = html;
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (pathname === '/forgot-password') {
+    const html = ForgotPasswordPage({});
+    outletEl.innerHTML = html;
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (pathname === '/new-password') {
     const otp = State.getPendingOTP();
     const email = State.getPendingEmail();
     if (!otp || !email) {
-       navigate('#/login');
-       return;
+      navigate('/login');
+      return;
     }
   }
 
-  const match = matchRoute(hash);
+  const match = matchRoute(pathname);
   if (!match) {
-    outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${fullHash}</p></section>`;
+    if (pathname === '/') {
+      navigate('/dashboard');
+      return;
+    }
+    if (pathname === '/dashboard') {
+      const html = routes[0].render({});
+      outletEl.innerHTML = html;
+      if (window.__bindPage) {
+        Promise.resolve(window.__bindPage()).catch((e) => console.error('BindPage Error:', e));
+        window.__bindPage = null;
+      }
+      return;
+    }
+    outletEl.innerHTML = `<section><h2>Halaman tidak ditemukan</h2><p>${fullPath}</p></section>`;
     return;
   }
 
   try {
-    // Merge URL params (e.g. :id) with Query Params
     const finalParams = { ...match.params, ...queryParams };
     const html = match.render(finalParams);
     outletEl.innerHTML = html;
 
-    // Reset scroll to top
     window.scrollTo(0, 0);
 
-    // Jalankan binder halaman jika tersedia
     if (window.__bindPage) {
-      // Execute async binder but catch errors to prevent global rejection
-      Promise.resolve(window.__bindPage()).catch(e => console.error('BindPage Error:', e));
+      Promise.resolve(window.__bindPage()).catch((e) => console.error('BindPage Error:', e));
       window.__bindPage = null;
     }
   } catch (err) {

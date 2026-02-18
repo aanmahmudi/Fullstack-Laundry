@@ -4,23 +4,47 @@ const PENDING_OTP_KEY = 'remon_pending_otp';
 const CART_KEY_PREFIX = 'remon_cart_';
 
 export const State = {
+  guestCart: [],
+
   _getCartKey() {
     try {
-        const user = this.getUser();
-        if (user && user.id) {
-            return `${CART_KEY_PREFIX}${user.id}`;
-        }
-    } catch (e) { console.error(e); }
-    return 'remon_cart_guest';
+      const user = this.getUser();
+      if (user && user.id) {
+        return `${CART_KEY_PREFIX}${user.id}`;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
   },
 
   getCart() {
+    const user = this.getUser();
+    if (!user) {
+      try {
+        localStorage.removeItem('remon_cart_guest');
+      } catch (e) {
+        console.error(e);
+      }
+      return this.guestCart || [];
+    }
     const key = this._getCartKey();
-    try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    if (!key) return [];
+    try {
+      return JSON.parse(localStorage.getItem(key) || '[]');
+    } catch {
+      return [];
+    }
   },
   setCart(items) {
-    const key = this._getCartKey();
-    localStorage.setItem(key, JSON.stringify(items));
+    const user = this.getUser();
+    if (!user) {
+      this.guestCart = items || [];
+    } else {
+      const key = this._getCartKey();
+      if (!key) return;
+      localStorage.setItem(key, JSON.stringify(items));
+    }
     const count = items.reduce((sum, x) => sum + (Number(x.qty) || 1), 0);
     window.dispatchEvent(new CustomEvent('cart:updated', { detail: { count } }));
   },

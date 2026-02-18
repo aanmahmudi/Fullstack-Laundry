@@ -18,7 +18,7 @@ export function CartPage() {
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px;">
                     <p style="margin-bottom: 20px; color: #64748b;">Keranjang belanja Anda kosong.</p>
-                    <a href="#/products" class="btn btn-primary">Mulai Belanja</a>
+                    <a href="/products" class="btn btn-primary">Mulai Belanja</a>
                 </div>
             `;
         } else {
@@ -39,7 +39,7 @@ export function CartPage() {
                 ${items.map((x, i) => {
                     let photoUrl = x.photoUrl;
                     if (photoUrl && photoUrl.startsWith('/')) {
-                        const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+                        const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
                         photoUrl = baseUrl + photoUrl;
                     }
                     const isSelected = x.selected !== false;
@@ -78,7 +78,7 @@ export function CartPage() {
                     </div>
                     <div class="summary-actions">
                     ${selectedItems.length > 0 ? 
-                        `<a class="btn btn-primary btn-block" href="#/checkout">Checkout (${selectedItems.length})</a>` :
+                        `<a id="btn-checkout" class="btn btn-primary btn-block" href="/checkout">Checkout (${selectedItems.length})</a>` :
                         `<button class="btn btn-primary btn-block" disabled style="opacity: 0.5; cursor: not-allowed;">Checkout (0)</button>`
                     }
                     <button id="btn-clear" class="btn btn-ghost btn-block">Kosongkan Keranjang</button>
@@ -139,19 +139,31 @@ export function CartPage() {
                     }
                 });
             }
+
+            const btnCheckout = document.getElementById('btn-checkout');
+            if (btnCheckout) {
+                btnCheckout.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const user = State.getUser();
+                    if (!user) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    window.location.href = '/checkout';
+                });
+            }
         }
     };
 
     render();
-    
-    // Listen for external updates (e.g. from header or other tabs)
+
     const onCartUpdate = () => render();
+    if (window.__cartUpdatedListener) {
+      window.removeEventListener('cart:updated', window.__cartUpdatedListener);
+    }
+    window.__cartUpdatedListener = onCartUpdate;
     window.addEventListener('cart:updated', onCartUpdate);
     
-    // Cleanup when leaving page (though __bindPage is one-off, the listener persists if not careful)
-    // A better router would handle lifecycle. For now, we rely on router replacing innerHTML.
-    // Ideally we should removeEventListener but we don't have a clean unmount hook here easily.
-    // However, since 'render' checks 'if (!container) return', it's safe.
   };
 
   return html;

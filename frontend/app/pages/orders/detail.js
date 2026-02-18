@@ -42,7 +42,7 @@ export function OrderDetailPage(params) {
       // Handle Photo URL
       let photoUrl = t.productPhoto;
       if (photoUrl && photoUrl.startsWith('/')) {
-         const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+         const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
          photoUrl = baseUrl + photoUrl;
       }
       const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394a3b8'%3ENo Image%3C/text%3E%3C/svg%3E";
@@ -159,8 +159,8 @@ export function OrderDetailPage(params) {
 
         <!-- Action Buttons -->
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <a href="#/orders" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Kembali</a>
-            ${t.orderStatus === 'DONE' ? `<a href="#/products/${t.productId || ''}" class="btn primary" style="padding: 10px 24px; text-decoration: none; border-radius: 4px;">Beli Lagi</a>` : ''}
+            <a href="/orders" class="btn outline" style="border: 1px solid #cbd5e1; color: #334155; padding: 10px 24px; text-decoration: none; border-radius: 4px;">Kembali</a>
+            ${t.orderStatus === 'DONE' ? `<a href="/products/${t.productId || ''}" class="btn primary" style="padding: 10px 24px; text-decoration: none; border-radius: 4px;">Beli Lagi</a>` : ''}
             ${(() => {
                if (t.sellerPhone) {
                    const phoneNumber = t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '');

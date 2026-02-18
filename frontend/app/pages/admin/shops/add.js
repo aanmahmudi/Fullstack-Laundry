@@ -3,7 +3,7 @@ import { State } from '../../../core/state.js';
 export function ShopAddPage() {
   const user = State.getUser();
   if (!user || user.role !== 'ADMIN') {
-    setTimeout(() => { window.location.hash = '#/'; }, 0);
+    setTimeout(() => { window.location.href = '/'; }, 0);
     return '';
   }
 
@@ -28,7 +28,7 @@ export function ShopAddPage() {
       </label>
       
       <div class="actions form-actions">
-        <a href="#/admin/shops" class="btn btn-full">Batal</a>
+        <a href="/admin/shops" class="btn btn-full">Batal</a>
         <button type="submit" class="btn primary btn-full">Buat Toko</button>
       </div>
     </form>
@@ -60,7 +60,7 @@ export function ShopAddPage() {
               timer: 1500,
               showConfirmButton: false
             }).then(() => {
-              window.location.hash = `#/admin/shops/${res.id}`;
+              window.location.href = `/admin/shops/${res.id}`;
             });
           }
         } catch (err) {

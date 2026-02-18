@@ -19,7 +19,7 @@ export function ProductDetailPage(params) {
 
       let photoUrl = p.photoUrl;
       if (photoUrl && photoUrl.startsWith('/')) {
-          const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+          const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
           photoUrl = baseUrl + photoUrl;
       }
 
@@ -130,7 +130,7 @@ export function ProductDetailPage(params) {
         document.getElementById('btn-buy-now').addEventListener('click', () => {
           const qty = parseInt(qtyInput.value) || 1;
           State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
-          window.location.hash = '#/checkout'; // Go to checkout directly
+          window.location.href = '/checkout'; // Go to checkout directly
         });
       }
 

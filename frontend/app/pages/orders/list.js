@@ -34,7 +34,7 @@ export function OrdersPage() {
         listContainer.innerHTML = `
           <div style="text-align: center; padding: 40px 20px; background: #fff; border-radius: 8px; border: 1px solid #e2e8f0;">
             <p style="margin-bottom: 16px; color: #64748b;">Silakan login untuk melihat pesanan Anda.</p>
-            <a href="#/login" class="btn btn-primary">Login Sekarang</a>
+            <a href="/login" class="btn btn-primary">Login Sekarang</a>
           </div>
         `;
         return;
@@ -134,7 +134,7 @@ export function OrdersPage() {
                     <div style="font-size: 48px; margin-bottom: 16px;">📦</div>
                     <h3 style="margin-bottom: 8px; color: #334155;">Tidak ada pesanan</h3>
                     <p style="margin-bottom: 24px; color: #64748b;">Di status ini belum ada pesanan.</p>
-                    ${activeTab === 'all' ? '<a href="#/products" class="btn btn-primary">Mulai Belanja</a>' : ''}
+                    ${activeTab === 'all' ? '<a href="/products" class="btn btn-primary">Mulai Belanja</a>' : ''}
                 </div>
             `;
             return;
@@ -146,7 +146,7 @@ export function OrdersPage() {
              const status = getStatusLabel(t.orderStatus);
              let photoUrl = t.productPhoto;
              if (photoUrl && photoUrl.startsWith('/')) {
-                 const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+                 const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
                  photoUrl = baseUrl + photoUrl;
              }
              const placeholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f1f5f9'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%2394a3b8'%3ENo Image%3C/text%3E%3C/svg%3E";
@@ -168,7 +168,7 @@ export function OrdersPage() {
               </div>
 
               <!-- Card Body (Product) -->
-              <a href="#/orders/${t.id}" style="text-decoration: none; color: inherit; display: block;">
+              <a href="/orders/${t.id}" style="text-decoration: none; color: inherit; display: block;">
                 <div class="card-body" style="padding: 16px; display: flex; align-items: flex-start; gap: 16px;">
                     <img src="${photoUrl}" onerror="this.onerror=null;this.src='${placeholder.replace(/'/g, "%27")}';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc;" alt="Product">
                     <div style="flex: 1;">
@@ -188,8 +188,8 @@ export function OrdersPage() {
                     Total Pesanan: <span style="color: var(--primary); font-size: 18px; font-weight: 600;">Rp ${Number(t.totalPrice || 0).toLocaleString('id-ID')}</span>
                  </div>
                  <div style="display: flex; gap: 10px;">
-                    <a href="#/orders/${t.id}" class="btn small" style="background: var(--primary); color: #fff; border: none; padding: 8px 24px; font-weight: 500;">Detail Pesanan</a>
-                    ${status.text === 'Selesai' ? `<a href="#/products/${t.productId}" class="btn small outline" style="border: 1px solid var(--primary); color: var(--primary); padding: 8px 24px;">Beli Lagi</a>` : ''}
+                    <a href="/orders/${t.id}" class="btn small" style="background: var(--primary); color: #fff; border: none; padding: 8px 24px; font-weight: 500;">Detail Pesanan</a>
+                    ${status.text === 'Selesai' ? `<a href="/products/${t.productId}" class="btn small outline" style="border: 1px solid var(--primary); color: var(--primary); padding: 8px 24px;">Beli Lagi</a>` : ''}
                     ${(() => {
                         if (t.sellerPhone) {
                             const phoneNumber = t.sellerPhone.replace(/^0/, '62').replace(/\D/g, '');

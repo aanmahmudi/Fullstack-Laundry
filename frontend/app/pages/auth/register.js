@@ -85,7 +85,7 @@ export function RegisterPage() {
 
           <button class="btn primary full-width" type="submit">Daftar Sekarang</button>
           <div class="auth-footer">
-             <span>Sudah punya akun? <a href="#/login">Login disini</a></span>
+             <span>Sudah punya akun? <a href="/login">Login disini</a></span>
           </div>
         </form>
       </div>
@@ -139,7 +139,7 @@ function bindEvents() {
         const res = await API.apiPost('/api/auth/register', payload);
         State.setPendingEmail(payload.email);
         msg.textContent = `Registrasi sukses. Silakan verifikasi OTP yang dikirim ke ${payload.email}.`;
-        window.location.hash = '#/verify';
+        window.location.href = '/verify';
       } catch (e) {
         msg.textContent = e.message; msg.classList.add('error');
       }

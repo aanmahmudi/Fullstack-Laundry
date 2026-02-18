@@ -4,16 +4,21 @@ import { State } from '../core/state.js?v=remon14';
 export function renderHeader(el) {
   if (!el) return;
   function render() {
-    // Sembunyikan header full di halaman auth, tampilkan logo saja
-    const hash = window.location.hash;
-    const isAuthPage = hash.includes('login') || hash.includes('register') || hash.includes('forgot-password') || hash.includes('verify') || hash.includes('reset-password') || hash.includes('verify-reset-otp') || hash.includes('new-password');
+    const path = window.location.pathname;
+    const isAuthPage =
+      path.includes('/login') ||
+      path.includes('/register') ||
+      path.includes('/forgot-password') ||
+      path.includes('/verify') ||
+      path.includes('/reset-password') ||
+      path.includes('/new-password');
     
     if (isAuthPage) {
       el.style.display = 'block';
       el.innerHTML = `
         <div class="header-container">
           <div class="header-left">
-            <a class="brand" href="#/">
+            <a class="brand" href="/dashboard">
               <span style="color: var(--primary); font-weight: 800; font-size: 26px; letter-spacing: -0.5px;">Remon</span>
               <span style="font-weight: 600; font-size: 26px; color: var(--primary); margin-left: 4px;">Eccom</span>
             </a>
@@ -33,7 +38,7 @@ export function renderHeader(el) {
       <div class="header-container">
         <!-- Logo -->
         <div class="header-left">
-          <a class="brand" href="#/">
+          <a class="brand" href="/dashboard">
             <span style="color: var(--primary); font-weight: 800; font-size: 26px; letter-spacing: -0.5px;">Remon</span>
             <span style="font-weight: 600; font-size: 26px; color: var(--primary); margin-left: 4px;">Eccom</span>
           </a>
@@ -53,13 +58,13 @@ export function renderHeader(el) {
         <div class="header-actions">
           ${user ? `
             ${user.role === 'ADMIN' ? `
-              <a href="#/admin/orders" class="nav-link">Admin</a>
+              <a href="/admin/orders" class="nav-link">Admin</a>
             ` : `
-              <a href="#/orders" class="nav-link">Transaksi</a>
+              <a href="/orders" class="nav-link">Transaksi</a>
             `}
           ` : ''}
           
-          <a href="#/cart" class="icon-btn cart-btn" title="Keranjang">
+          <a href="/cart" class="icon-btn cart-btn" title="Keranjang">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             ${count > 0 ? `<span class="badge">${count}</span>` : ''}
           </a>
@@ -81,22 +86,22 @@ export function renderHeader(el) {
                     <span class="role-badge">${user.role}</span>
                  </div>
                  ${user.role === 'ADMIN' ? `
-                   <a href="#/admin/orders" class="dropdown-item">Pesanan Masuk</a>
-                   <a href="#/admin/my-products" class="dropdown-item">Kelola Produk</a>
-                   <a href="#/admin/shops" class="dropdown-item">Kelola Toko</a>
+                   <a href="/admin/orders" class="dropdown-item">Pesanan Masuk</a>
+                   <a href="/admin/my-products" class="dropdown-item">Kelola Produk</a>
+                   <a href="/admin/shops" class="dropdown-item">Kelola Toko</a>
                  ` : `
-                   <a href="#/orders" class="dropdown-item">Riwayat Belanja</a>
+                   <a href="/orders" class="dropdown-item">Riwayat Belanja</a>
                  `}
-                 <a href="#/change-password" class="dropdown-item">Ganti Password</a>
+                 <a href="/change-password" class="dropdown-item">Ganti Password</a>
                  <div class="dropdown-divider"></div>
                  <a href="#" id="header-logout" class="dropdown-item danger">Logout</a>
               </div>
             </div>
           ` : `
             <div class="auth-buttons">
-              <a href="#/register" class="btn-text" style="font-weight: 600;">Daftar</a>
+              <a href="/register" class="btn-text" style="font-weight: 600;">Daftar</a>
               <div style="width: 1px; height: 16px; background: #ddd;"></div>
-              <a href="#/login" class="btn-text" style="font-weight: 600;">Login</a>
+              <a href="/login" class="btn-text" style="font-weight: 600;">Login</a>
             </div>
           `}
         </div>
@@ -111,16 +116,14 @@ export function renderHeader(el) {
         const id = a.id;
 
         if (id === 'header-logout') {
-          // Handle Logout
           try {
             if (user?.email && typeof API !== 'undefined') {
-              await API.apiPost('/api/customers/logout', { email: user.email });
+              await API.apiPost('/api/auth/logout', { email: user.email });
             }
-          } catch (_) { /* ignore error */ }
+          } catch (_) {}
           State.clearUser();
-          navigate('#/login');
+          navigate('/login');
         } else {
-          // Handle Navigation
           navigate(href);
         }
       });
@@ -133,7 +136,7 @@ export function renderHeader(el) {
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const q = String(input.value || '').trim();
-        if (!location.hash.startsWith('#/products')) navigate('#/products');
+        if (!location.pathname.startsWith('/products')) navigate('/products');
         window.dispatchEvent(new CustomEvent('global:search', { detail: { q } }));
       });
     }
@@ -143,7 +146,7 @@ export function renderHeader(el) {
   render();
 
   // Listen for hash changes to toggle visibility
-  window.addEventListener('hashchange', render);
+  window.addEventListener('popstate', render);
 
   // Listen for user updates (login/logout) to re-render header
   window.addEventListener('user:updated', () => render());

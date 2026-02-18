@@ -32,8 +32,8 @@ export function LoginPage() {
           </label>
           <button class="btn primary full-width" type="submit">Masuk Sekarang</button>
           <div class="auth-footer">
-             <span>Belum punya akun? <a href="#/register">Daftar Sekarang</a></span>
-             <a href="#/forgot-password">Lupa Password?</a>
+             <span>Belum punya akun? <a href="/register">Daftar Sekarang</a></span>
+             <a href="/forgot-password">Lupa Password?</a>
           </div>
         </form>
       </div>
@@ -83,7 +83,7 @@ function bindEvents() {
           token 
         });
         
-        window.location.hash = '#/dashboard';
+        window.location.href = '/dashboard';
       } catch (e) {
         let errorMsg = e.message;
         // Parsing JSON string if api.js fails to parse it

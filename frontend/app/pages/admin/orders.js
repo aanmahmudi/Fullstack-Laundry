@@ -108,7 +108,7 @@ function renderRow(t) {
         </select>
       </td>
       <td>
-        <a href="#/orders/${t.id}" class="btn small">Detail</a>
+        <a href="/orders/${t.id}" class="btn small">Detail</a>
       </td>
     </tr>
   `;

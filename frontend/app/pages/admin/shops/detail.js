@@ -4,7 +4,7 @@ export function ShopDetailPage(params) {
   const shopId = params.id;
   const user = State.getUser();
   if (!user || user.role !== 'ADMIN') {
-    setTimeout(() => { window.location.hash = '#/'; }, 0);
+    setTimeout(() => { window.location.href = '/'; }, 0);
     return '';
   }
 
@@ -18,8 +18,8 @@ export function ShopDetailPage(params) {
 
   <section class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
       <div class="actions" style="margin-bottom: 20px; display: flex; justify-content: space-between;">
-        <a href="#/admin/shops" class="btn btn-text">← Kembali ke Daftar Toko</a>
-        <a href="#/products/add?shopId=${shopId}" class="btn primary">＋ Tambah Produk di Toko Ini</a>
+        <a href="/admin/shops" class="btn btn-text">← Kembali ke Daftar Toko</a>
+        <a href="/products/add?shopId=${shopId}" class="btn primary">＋ Tambah Produk di Toko Ini</a>
       </div>
       
       <h3>Produk di Toko Ini</h3>
@@ -45,7 +45,7 @@ export function ShopDetailPage(params) {
         grid.innerHTML = `
           <div class="panel" style="grid-column: 1/-1; text-align: center; padding: 40px;">
             <p>Belum ada produk di toko ini.</p>
-            <a href="#/products/add?shopId=${shopId}" class="btn primary" style="margin-top: 10px;">Tambah Produk Sekarang</a>
+            <a href="/products/add?shopId=${shopId}" class="btn primary" style="margin-top: 10px;">Tambah Produk Sekarang</a>
           </div>
         `;
         return;
@@ -54,7 +54,7 @@ export function ShopDetailPage(params) {
       grid.innerHTML = products.map(p => {
         let photoUrl = p.photoUrl;
         if (photoUrl && photoUrl.startsWith('/')) {
-            const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+            const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
             photoUrl = baseUrl + photoUrl;
         }
         return `

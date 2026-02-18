@@ -8,7 +8,7 @@ async function submitLogin(ev) {
   const msg = document.querySelector("#login-msg");
   const payload = Object.fromEntries(new FormData(ev.currentTarget));
   try {
-    const res = await API.apiPost("/api/customers/login", payload);
+    const res = await API.apiPost("/api/auth/login", payload);
     setMsg(msg, res.message || "Login sukses");
   } catch (e) {
     setMsg(msg, e.message, true);

@@ -92,7 +92,7 @@ export function ProductsPage() {
           btn.addEventListener('click', () => {
             const id = Number(btn.dataset.id);
             if (addToCart(id)) {
-                 window.location.hash = '#/checkout';
+                 window.location.href = '/checkout';
             }
           });
         });
@@ -166,12 +166,15 @@ export function ProductsPage() {
         debouncedSearch(search.value);
       });
       
-      window.addEventListener('global:search', (e) => {
+      if (window.__productsGlobalSearchListener) {
+        window.removeEventListener('global:search', window.__productsGlobalSearchListener);
+      }
+      window.__productsGlobalSearchListener = (e) => {
         const q = e.detail && e.detail.q ? e.detail.q : '';
         if (search) search.value = q;
-        // Immediate search for explicit submit
         handleSearch(q);
-      });
+      };
+      window.addEventListener('global:search', window.__productsGlobalSearchListener);
       
       refresh.addEventListener('click', async () => {
         if (document.getElementById('products-grid')) {
@@ -202,7 +205,7 @@ export function ProductsPage() {
 function productCard(p, user) {
   let photoUrl = p.photoUrl;
   if (photoUrl && photoUrl.startsWith('/')) {
-      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
       photoUrl = baseUrl + photoUrl;
   }
   
@@ -236,7 +239,7 @@ function productCard(p, user) {
       </div>
       <div class="card-actions" style="flex-direction: column; gap: 10px;">
         <div style="display: flex; gap: 10px; width: 100%;">
-            <a class="btn btn-detail" href="#/product/${p.id}" style="flex: 1; text-align: center;">Detail</a>
+            <a class="btn btn-detail" href="/product/${p.id}" style="flex: 1; text-align: center;">Detail</a>
             ${isOwnerAdmin 
               ? `<button class="btn btn-buy" disabled style="flex: 1; opacity: 0.5; cursor: not-allowed; background: #94a3b8; border-color: #94a3b8;">Milik Anda</button>`
               : `<button class="btn btn-buy btn-buy-now" data-id="${p.id}" style="flex: 1; background: #ee4d2d; color: white; border: none;">Beli</button>`

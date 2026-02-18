@@ -11,7 +11,7 @@ export function HomePage() {
            <div style="text-align: center; z-index: 1;">
               <h1 style="font-size: 2.5rem; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Belanja Hemat di Remon Eccom</h1>
               <p style="margin: 10px 0 20px; font-size: 1.1rem; opacity: 0.9;">Temukan produk terbaik dengan harga bersahabat setiap hari</p>
-              <a href="#/products" class="btn" style="background: white; color: var(--primary); border: none; padding: 10px 30px; font-weight: bold; border-radius: 2px;">Belanja Sekarang</a>
+          <a href="/products" class="btn" style="background: white; color: var(--primary); border: none; padding: 10px 30px; font-weight: bold; border-radius: 2px;">Belanja Sekarang</a>
            </div>
            <!-- Decorative circles -->
            <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
@@ -50,7 +50,7 @@ export function HomePage() {
                <h3 style="margin: 0; color: var(--primary); font-size: 1.2rem;">⚡ FLASH SALE</h3>
                <span style="background: #333; color: white; padding: 2px 8px; border-radius: 2px; font-size: 0.8rem;">00 : 12 : 45</span>
             </div>
-            <a href="#/products" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">Lihat Semua ></a>
+            <a href="/products" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">Lihat Semua ></a>
          </div>
          <div style="display: flex; gap: 15px;">
             ${[1,2,3,4,5,6].map(() => `
@@ -69,7 +69,7 @@ export function HomePage() {
       <!-- Call to Action -->
       <section style="text-align: center; padding: 40px 0;">
          <p style="color: #666; margin-bottom: 20px;">Temukan ribuan produk menarik lainnya di Remon Eccom</p>
-         <a class="btn primary" href="#/products" style="padding: 12px 40px; font-size: 1.1rem;">Mulai Belanja</a>
+         <a class="btn primary" href="/products" style="padding: 12px 40px; font-size: 1.1rem;">Mulai Belanja</a>
       </section>
 
     </div>

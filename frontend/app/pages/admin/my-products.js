@@ -5,7 +5,7 @@ export function MyProductsPage() {
   
   // Security check
   if (!user || user.role !== 'ADMIN') {
-    setTimeout(() => { window.location.hash = '#/'; }, 0);
+    setTimeout(() => { window.location.href = '/'; }, 0);
     return '';
   }
 
@@ -19,7 +19,7 @@ export function MyProductsPage() {
 
   <section class="product-layout" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
       <div class="actions" style="margin-bottom: 20px;">
-        <a href="#/admin/shops" class="btn btn-buy" style="display: inline-block;">📂 Kelola Toko & Tambah Produk</a>
+        <a href="/admin/shops" class="btn btn-buy" style="display: inline-block;">📂 Kelola Toko & Tambah Produk</a>
       </div>
       <div id="my-products-grid" class="grid"></div>
   </section>`;
@@ -44,7 +44,7 @@ export function MyProductsPage() {
                 <div style="font-size: 48px; margin-bottom: 20px;">📦</div>
                 <h3 style="margin-bottom: 10px;">Belum ada produk</h3>
                 <p style="color: #666; margin-bottom: 20px;">Silakan masuk ke menu Toko untuk menambahkan produk.</p>
-                <a href="#/admin/shops" class="btn btn-buy">Ke Daftar Toko</a>
+                <a href="/admin/shops" class="btn btn-buy">Ke Daftar Toko</a>
               </div>`;
             return;
         }
@@ -111,7 +111,7 @@ export function MyProductsPage() {
 function productCard(p) {
   let photoUrl = p.photoUrl;
   if (photoUrl && photoUrl.startsWith('/')) {
-      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8080';
+      const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
       photoUrl = baseUrl + photoUrl;
   }
 
@@ -139,7 +139,7 @@ function productCard(p) {
         <div class="price">Rp ${price}</div>
       </div>
       <div class="card-actions" style="flex-direction: column;">
-        <a class="btn btn-detail" href="#/product/${p.id}" style="text-align: center;">Lihat Detail</a>
+        <a class="btn btn-detail" href="/product/${p.id}" style="text-align: center;">Lihat Detail</a>
         ${deleteButton}
       </div>
     </article>

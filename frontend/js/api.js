@@ -1,5 +1,4 @@
-// Gunakan API_BASE dari window jika tersedia, default ke port 8080 (Local BE)
-const API_BASE = window.API_BASE || "http://localhost:8080";
+const API_BASE = window.API_BASE || "http://localhost:8081";
 
 function getAuthHeaders() {
   try {

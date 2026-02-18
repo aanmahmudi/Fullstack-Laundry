@@ -40,7 +40,7 @@ export function ChangePasswordPage() {
 
         <button class="btn purple full-width" type="submit">Simpan Perubahan</button>
         <div class="auth-footer">
-           <a href="#/dashboard">Batal</a>
+           <a href="/dashboard">Batal</a>
         </div>
       </form>
     </div>
@@ -70,7 +70,7 @@ function bindEvents() {
       ev.preventDefault();
       const user = State.getUser();
       if (!user) {
-        window.location.hash = '#/login';
+        window.location.href = '/login';
         return;
       }
 
@@ -97,7 +97,7 @@ function bindEvents() {
         form.reset();
         
         setTimeout(() => {
-           window.location.hash = '#/dashboard';
+           window.location.href = '/dashboard';
         }, 1500);
       } catch (e) {
         let errorMsg = e.message;

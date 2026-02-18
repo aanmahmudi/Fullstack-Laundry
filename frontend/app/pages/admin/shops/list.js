@@ -3,7 +3,7 @@ import { State } from '../../../core/state.js';
 export function ShopListPage() {
   const user = State.getUser();
   if (!user || user.role !== 'ADMIN') {
-    setTimeout(() => { window.location.hash = '#/'; }, 0);
+    setTimeout(() => { window.location.href = '/'; }, 0);
     return '';
   }
 
@@ -17,7 +17,7 @@ export function ShopListPage() {
 
   <section class="container" style="max-width: 1000px; margin: 0 auto; padding: 20px;">
       <div class="actions" style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
-        <a href="#/admin/shops/add" class="btn primary">＋ Buat Toko Baru</a>
+        <a href="/admin/shops/add" class="btn primary">＋ Buat Toko Baru</a>
       </div>
       
       <div id="shop-list-container" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
@@ -37,7 +37,7 @@ export function ShopListPage() {
           <div class="panel" style="grid-column: 1/-1; text-align: center; padding: 40px;">
             <h3>Belum ada toko</h3>
             <p>Anda belum memiliki toko. Silakan buat toko baru untuk mulai berjualan.</p>
-            <a href="#/admin/shops/add" class="btn primary" style="margin-top: 10px;">Buat Toko Sekarang</a>
+            <a href="/admin/shops/add" class="btn primary" style="margin-top: 10px;">Buat Toko Sekarang</a>
           </div>
         `;
         return;
@@ -51,7 +51,7 @@ export function ShopListPage() {
             <div class="shop-info" style="padding: 15px; flex: 1;">
                 <h3 style="margin: 0 0 5px 0;">${shop.name}</h3>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">${shop.description || 'Tidak ada deskripsi'}</p>
-                <a href="#/admin/shops/${shop.id}" class="btn btn-full" style="text-align: center;">Kelola Toko</a>
+                <a href="/admin/shops/${shop.id}" class="btn btn-full" style="text-align: center;">Kelola Toko</a>
             </div>
         </div>
       `).join('');

@@ -23,7 +23,7 @@ export function VerifyResetPage() {
         <button class="btn purple full-width" type="submit">Lanjut</button>
         <div class="auth-footer">
            <a href="#" id="resend-reset-otp">Kirim ulang OTP</a>
-           <a href="#/login">Kembali ke Login</a>
+           <a href="/login">Kembali ke Login</a>
         </div>
       </form>
     </div>
@@ -53,7 +53,7 @@ function bindEvents() {
          
          // Fix navigation issue
          setTimeout(() => {
-            window.location.hash = '#/new-password';
+            window.location.href = '/new-password';
          }, 100);
       } catch (err) {
          msg.textContent = err.message || 'OTP Salah atau Kadaluarsa'; msg.classList.add('error');

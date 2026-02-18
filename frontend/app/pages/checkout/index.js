@@ -7,15 +7,14 @@ export function CheckoutPage() {
   
   // If not logged in, redirect to login
   if (!user) {
-    window.location.hash = '#/login';
+    window.location.href = '/login';
     return '';
   }
 
   // If no items selected, redirect to cart
   if (!items.length) {
-      // Delay alert slightly to avoid race conditions or use a more graceful UI
       setTimeout(() => alert("Silakan pilih produk yang ingin dibayar terlebih dahulu."), 100);
-      window.location.hash = '#/cart';
+      window.location.href = '/cart';
       return '';
   }
 
@@ -187,7 +186,7 @@ export function CheckoutPage() {
             const remainingItems = allItems.filter(item => item.selected === false);
             State.setCart(remainingItems);
             
-            window.location.hash = '#/orders';
+            window.location.href = '/orders';
         }, 1500);
         
       } catch (e) {

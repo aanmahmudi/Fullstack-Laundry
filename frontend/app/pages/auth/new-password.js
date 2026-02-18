@@ -30,7 +30,7 @@ export function NewPasswordPage() {
         </label>
         <button class="btn purple full-width btn-submit" type="submit">Simpan Password</button>
         <div class="auth-footer">
-           <a href="#/login">Kembali ke Login</a>
+           <a href="/login">Kembali ke Login</a>
         </div>
       </form>
     </div>
@@ -78,7 +78,7 @@ function bindEvents() {
         showModal('Password berhasil direset. Silakan login dengan password baru.');
         State.clearPendingEmail();
         State.clearPendingOTP();
-        window.location.hash = '#/login';
+        window.location.href = '/login';
       } catch (err) {
          msg.textContent = err.message || 'Gagal mereset password'; msg.classList.add('error');
       }

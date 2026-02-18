@@ -22,7 +22,7 @@ export function ForgotPasswordPage() {
           </label>
           <button class="btn primary full-width" type="submit">Kirim Kode OTP</button>
           <div class="auth-footer">
-             <a href="#/login">← Kembali ke Login</a>
+             <a href="/login">← Kembali ke Login</a>
           </div>
         </form>
       </div>
@@ -44,7 +44,7 @@ function bindEvents() {
       try {
         await API.apiPost('/api/auth/forgot-password', { email });
         State.setPendingEmail(email);
-        window.location.hash = '#/verify-reset-otp';
+        window.location.href = '/verify-reset-otp';
       } catch (err) {
         msg.textContent = err.message || 'Gagal mengirim OTP'; msg.classList.add('error');
       }

@@ -25,7 +25,7 @@ export function VerifyAccountPage() {
         <button class="btn purple full-width" type="submit">Verifikasi</button>
         <div class="auth-footer">
             <a href="#" id="resend-otp">Kirim ulang OTP</a>
-            <a href="#/login">Kembali ke Login</a>
+            <a href="/login">Kembali ke Login</a>
         </div>
       </form>
     </div>
@@ -58,7 +58,7 @@ function bindEvents() {
         await API.apiPost('/api/otp/verify', { email, otp: otpInput.value });
         showModal('Verifikasi berhasil. Silakan masuk.');
         State.clearPendingEmail();
-        window.location.hash = '#/login';
+        window.location.href = '/login';
       } catch (e) {
         msg.textContent = e.message; msg.classList.add('error');
       }
