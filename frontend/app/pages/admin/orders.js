@@ -42,14 +42,15 @@ export function AdminOrdersPage() {
             <table class="table" style="width:100%">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Customer</th>
-                  <th>Produk</th>
-                  <th>Qty</th>
-                  <th>Total</th>
-                  <th>Status Pembayaran</th>
-                  <th>Status Pesanan</th>
-                  <th>Aksi</th>
+                  <th style="text-align:center;">ID</th>
+                  <th style="text-align:center;">Customer</th>
+                  <th style="text-align:center;">Produk</th>
+                  <th style="text-align:center;">Qty</th>
+                  <th style="text-align:center;">Total</th>
+                  <th style="text-align:center;">Metode Pembayaran</th>
+                  <th style="text-align:center;">Status Pembayaran</th>
+                  <th style="text-align:center;">Status Pesanan</th>
+                  <th style="text-align:center;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,6 +86,39 @@ function renderRow(t) {
   ];
 
   const currentStatus = t.orderStatus || 'ON_PROCESS';
+  const paymentStatusRaw = (t.paymentStatus || '').toUpperCase();
+  const paymentMethodRaw = (t.paymentMethod || '').toUpperCase();
+  let paymentLabel = 'Belum Bayar';
+  let paymentBg = '#fffbeb';
+  let paymentColor = '#f97316';
+
+  if (paymentStatusRaw === 'PAID') {
+    paymentLabel = 'Lunas';
+    paymentBg = '#dcfce7';
+    paymentColor = '#16a34a';
+  } else if (!paymentStatusRaw) {
+    paymentLabel = 'Tidak diketahui';
+    paymentBg = '#e5e7eb';
+    paymentColor = '#4b5563';
+  }
+
+  let methodLabel = 'COD';
+  let methodBg = '#e0f2fe';
+  let methodColor = '#0369a1';
+
+  if (paymentMethodRaw === 'TRANSFER') {
+    methodLabel = 'Transfer Bank';
+    methodBg = '#eef2ff';
+    methodColor = '#4f46e5';
+  } else if (paymentMethodRaw === 'CC') {
+    methodLabel = 'Kartu Kredit';
+    methodBg = '#f5f3ff';
+    methodColor = '#7c3aed';
+  } else if (!paymentMethodRaw) {
+    methodLabel = 'Tidak diketahui';
+    methodBg = '#e5e7eb';
+    methodColor = '#4b5563';
+  }
   
   const optionsHtml = statusOptions.map(opt => 
     `<option value="${opt.value}" ${opt.value === currentStatus ? 'selected' : ''}>${opt.label}</option>`
@@ -92,22 +126,47 @@ function renderRow(t) {
 
   return `
     <tr>
-      <td>#${t.id}</td>
-      <td>${t.customerName}</td>
-      <td>${t.productName}</td>
-      <td>${t.quantity}</td>
-      <td>Rp ${Number(t.totalAmount || t.totalPrice || 0).toLocaleString('id-ID')}</td>
-      <td>
-        <span class="badge ${t.paymentStatus === 'PAID' ? 'success' : 'warning'}">
-          ${t.paymentStatus}
+      <td style="text-align:center;">#${t.id}</td>
+      <td style="text-align:center;">${t.customerName}</td>
+      <td style="text-align:center;">${t.productName}</td>
+      <td style="text-align:center;">${t.quantity}</td>
+      <td style="text-align:center;">Rp ${Number(t.totalAmount || t.totalPrice || 0).toLocaleString('id-ID')}</td>
+      <td style="text-align:center;">
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          font-size:12px;
+          font-weight:600;
+          background:${methodBg};
+          color:${methodColor};
+          min-width:130px;
+          text-align:center;
+        ">
+          ${methodLabel}
         </span>
       </td>
-      <td>
+      <td style="text-align:center;">
+        <span style="
+          display:inline-block;
+          padding:4px 10px;
+          border-radius:999px;
+          font-size:12px;
+          font-weight:600;
+          background:${paymentBg};
+          color:${paymentColor};
+          min-width:110px;
+          text-align:center;
+        ">
+          ${paymentLabel}
+        </span>
+      </td>
+      <td style="text-align:center;">
         <select class="status-select" data-id="${t.id}" style="padding:4px; border-radius:4px;">
           ${optionsHtml}
         </select>
       </td>
-      <td>
+      <td style="text-align:center;">
         <a href="/orders/${t.id}" class="btn small">Detail</a>
       </td>
     </tr>
