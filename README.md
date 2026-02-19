@@ -1,6 +1,17 @@
 # 🧺 Fullstack Laundry Application
 
-Aplikasi manajemen laundry berbasis web dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (Vanilla JS SPA).
+Aplikasi manajemen laundry / ecommerce sederhana dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (Vanilla JS SPA).
+
+## ✨ Ringkasan Singkat
+
+- Frontend SPA berbasis HTML/CSS/Vanilla JS, di-serve lewat Nginx (Docker).
+- Backend Spring Boot dengan PostgreSQL, OTP email, dan migrasi Flyway.
+- Fitur:
+  - Autentikasi (register, login, lupa/reset password).
+  - Katalog produk yang terhubung ke **toko** tertentu.
+  - Keranjang & checkout dengan metode pembayaran COD / Transfer / Kartu Kredit (simulasi).
+  - Halaman pesanan untuk user dan halaman **Pesanan Masuk (Toko)** untuk admin/pemilik.
+  - Manajemen toko & produk (edit harga, deskripsi, dll.) dari UI.
 
 ---
 
@@ -116,24 +127,6 @@ sequenceDiagram
 
 ---
 
-## 📸 Galeri Tampilan (Screenshot)
-
-> **Untuk Developer/User:** Silakan ganti gambar placeholder di bawah ini dengan screenshot aplikasi yang sebenarnya. Simpan gambar Anda di folder `docs/images/` atau upload ke image host.
-
-### 1. Halaman Login
-*(Tempel screenshot halaman login di sini)*
-![Login Page](https://placehold.co/600x400?text=Screenshot+Halaman+Login)
-
-### 2. Daftar Produk
-*(Tempel screenshot halaman daftar produk di sini)*
-![Products Page](https://placehold.co/600x400?text=Screenshot+Daftar+Produk)
-
-### 3. Keranjang & Checkout
-*(Tempel screenshot halaman keranjang di sini)*
-![Cart Page](https://placehold.co/600x400?text=Screenshot+Keranjang)
-
----
-
 ## 💡 Penjelasan Teknis Khusus
 
 ### Apa itu `?v=fix8` pada tag Script?
@@ -160,6 +153,9 @@ docker compose up -d --build
 - Backend akan berjalan di: `http://localhost:8081`
 - Frontend akan berjalan di: `http://localhost:3000`
 
+> **Tip:** Pastikan Anda sudah membuat file `.env` di root project untuk konfigurasi database
+> (lihat bagian *Environment* di bawah atau file `docker-compose.yml`).
+
 ### 2. Menjalankan Frontend Manual (Opsional)
 Jika tidak menggunakan container frontend:
 ```bash
@@ -168,3 +164,24 @@ npx http-server ./frontend -p 5500 -c-1
 ```
 Buka browser di: `http://localhost:5500`
 
+---
+
+## ⚙️ Environment (Docker Compose)
+
+`docker-compose.yml` membaca konfigurasi database dari environment berikut:
+
+- `DB_NAME`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `DB_URL` (misalnya `jdbc:postgresql://db:5432/laundrydb`)
+
+Contoh `.env` sederhana:
+
+```env
+DB_NAME=laundrydb
+DB_USERNAME=laundry
+DB_PASSWORD=changeme
+DB_URL=jdbc:postgresql://db:5432/laundrydb
+```
+
+File `.env` **tidak** di-commit ke Git sehingga setiap environment (local, staging, production) bisa punya konfigurasi sendiri.
