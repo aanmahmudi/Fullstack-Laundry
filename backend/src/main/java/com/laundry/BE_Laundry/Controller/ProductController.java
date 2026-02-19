@@ -70,9 +70,25 @@ public class ProductController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-		return ResponseEntity.ok(productService.updateProduct(id, product));
+	public ResponseEntity<?> updateProduct(
+			@PathVariable Long id,
+			@RequestBody Product product,
+			@RequestParam("requesterId") Long requesterId) {
 
+		Product existing = productService.getProductById(id);
+
+		if (existing.getOwnerId() == null || !existing.getOwnerId().equals(requesterId)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN)
+					.body(Map.of("message", "Anda hanya dapat mengedit produk milik Anda sendiri."));
+		}
+
+		product.setOwnerId(existing.getOwnerId());
+		if (product.getShopId() == null) {
+			product.setShopId(existing.getShopId());
+		}
+
+		Product updated = productService.updateProduct(id, product);
+		return ResponseEntity.ok(updated);
 	}
 
 	@DeleteMapping("/{id}")

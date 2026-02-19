@@ -48,7 +48,7 @@ export function ShopListPage() {
             <div class="shop-image" style="height: 150px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 ${shop.imageUrl ? `<img src="${shop.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span style="font-size: 40px;">🏪</span>'}
             </div>
-            <div class="shop-info" style="padding: 15px; flex: 1;">
+            <div class="shop-info" style="padding: 15px; flex: 1; text-align: center;">
                 <h3 style="margin: 0 0 5px 0;">${shop.name}</h3>
                 <p style="color: #666; font-size: 14px; margin-bottom: 15px;">${shop.description || 'Tidak ada deskripsi'}</p>
                 <a href="/admin/shops/${shop.id}" class="btn btn-full" style="text-align: center;">Kelola Toko</a>

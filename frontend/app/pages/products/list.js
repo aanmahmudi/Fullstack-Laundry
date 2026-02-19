@@ -44,18 +44,43 @@ export function ProductsPage() {
         return await API.apiGet(url);
       };
 
+      const shopCache = {};
+
       // Initial load (no search)
       let items = await fetchProducts();
       
       // Safety check if navigated away
       if (!document.getElementById('products-grid')) return;
 
-      const render = (list) => {
+      const render = async (list) => {
         if (!list || list.length === 0) {
             grid.innerHTML = '<div class="panel" style="grid-column: 1/-1; text-align: center; background: white; color: #333; padding: 40px;">Tidak ada produk ditemukan.</div>';
             return;
         }
-        grid.innerHTML = list.map((p) => productCard(p, user)).join('');
+
+        const neededShopIds = Array.from(
+          new Set(
+            (list || [])
+              .map((p) => p.shopId)
+              .filter((id) => id != null && shopCache[id] === undefined)
+          )
+        );
+
+        if (neededShopIds.length > 0) {
+          await Promise.all(
+            neededShopIds.map(async (id) => {
+              try {
+                const shop = await API.apiGet(`/api/shops/${id}`);
+                shopCache[id] = shop;
+              } catch (e) {
+                console.error('Gagal memuat toko', id, e);
+                shopCache[id] = null;
+              }
+            })
+          );
+        }
+
+        grid.innerHTML = list.map((p) => productCard(p, user, shopCache)).join('');
         
         // Re-attach event listeners for buttons
         const addToCart = (id) => {
@@ -131,7 +156,7 @@ export function ProductsPage() {
         });
       };
       
-      render(items);
+      await render(items);
       
       // Debounce utility
       const debounce = (func, wait) => {
@@ -152,7 +177,7 @@ export function ProductsPage() {
         try {
            const filtered = await fetchProducts(query);
            if (!document.getElementById('products-grid')) return;
-           render(filtered);
+           await render(filtered);
         } catch (e) {
            if (document.getElementById('products-grid')) {
                document.getElementById('products-grid').innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
@@ -184,7 +209,7 @@ export function ProductsPage() {
         try {
             items = await fetchProducts();
             if (!document.getElementById('products-grid')) return;
-            render(items);
+            await render(items);
         } catch (e) {
              if (document.getElementById('products-grid')) {
                 document.getElementById('products-grid').innerHTML = `<div class="error" style="color: red;">${e.message}</div>`;
@@ -202,7 +227,7 @@ export function ProductsPage() {
   return html;
 }
 
-function productCard(p, user) {
+function productCard(p, user, shopCache) {
   let photoUrl = p.photoUrl;
   if (photoUrl && photoUrl.startsWith('/')) {
       const baseUrl = (window.API && window.API.BASE_URL) || 'http://localhost:8081';
@@ -217,6 +242,8 @@ function productCard(p, user) {
   const description = p.description || 'Produk berkualitas pilihan dari Remon Eccom.';
   const price = (Number(p.price) || 0).toLocaleString('id-ID');
   const isOwnerAdmin = user && user.role === 'ADMIN' && String(p.ownerId || '') === String(user.id || '');
+  const shop = p.shopId != null && shopCache ? shopCache[p.shopId] : null;
+  const shopName = shop && shop.name ? shop.name : null;
   const ownerBadge = isOwnerAdmin
     ? `<span class="owner-badge">Produk saya</span>`
     : '';
@@ -234,6 +261,7 @@ function productCard(p, user) {
       </figure>
       <div class="card-body">
         <h3>${p.name}</h3>
+        ${shopName ? `<p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Toko: ${shopName}</p>` : ''}
         <p>${description}</p>
         <div class="price">Rp ${price}</div>
       </div>
