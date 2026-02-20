@@ -95,7 +95,7 @@ export function OrdersPage() {
             return { text: 'Sedang Dikemas', color: 'info' };
         }
         if (status === 'BELUM_BAYAR' || status === 'MENUNGGU PEMBAYARAN' || status === 'UNPAID') {
-            return { text: 'Belum Bayar', color: 'warning' };
+            return { text: 'Menunggu Pembayaran', color: 'warning' };
         }
         
         return { text: orderStatus || 'Menunggu Konfirmasi', color: 'info' };

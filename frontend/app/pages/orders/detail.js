@@ -29,15 +29,27 @@ export function OrderDetailPage(params) {
       console.log('==========================');
 
       // Helper untuk status
-      const getStatusInfo = (orderStatus, paymentStatus) => {
-        if (orderStatus === 'DONE') return { text: 'Pesanan Selesai', desc: 'Pesanan telah diterima oleh pembeli.', icon: '✅', color: '#22c55e', bg: '#dcfce7' };
-        if (orderStatus === 'PROCESSING') return { text: 'Sedang Dikemas', desc: 'Penjual sedang menyiapkan pesanan Anda.', icon: '📦', color: '#3b82f6', bg: '#dbeafe' };
-        if (orderStatus === 'SHIPPED') return { text: 'Sedang Dikirim', desc: 'Paket sedang dalam perjalanan ke alamat tujuan.', icon: '🚚', color: '#3b82f6', bg: '#dbeafe' };
-        // if (paymentStatus === 'UNPAID') return { text: 'Belum Bayar', desc: 'Silakan lakukan pembayaran agar pesanan diproses.', icon: '💳', color: '#f59e0b', bg: '#fef3c7' };
+      const getStatusInfo = (orderStatus, paymentStatus, paymentMethod) => {
+        const os = (orderStatus || '').toUpperCase();
+        const ps = (paymentStatus || '').toUpperCase();
+        const method = (paymentMethod || '').toUpperCase();
+
+        if (os === 'DONE') {
+          return { text: 'Pesanan Selesai', desc: 'Pesanan telah diterima oleh pembeli.', icon: '✅', color: '#22c55e', bg: '#dcfce7' };
+        }
+        if (os === 'PROCESSING' || os === 'DIKEMAS') {
+          return { text: 'Sedang Dikemas', desc: 'Penjual sedang menyiapkan pesanan Anda.', icon: '📦', color: '#3b82f6', bg: '#dbeafe' };
+        }
+        if (os === 'SHIPPED' || os === 'DIKIRIM') {
+          return { text: 'Sedang Dikirim', desc: 'Paket sedang dalam perjalanan ke alamat tujuan.', icon: '🚚', color: '#3b82f6', bg: '#dbeafe' };
+        }
+        if (ps === 'UNPAID' && method && method !== 'COD') {
+          return { text: 'Menunggu Pembayaran', desc: 'Silakan lakukan pembayaran agar pesanan diproses.', icon: '💳', color: '#f59e0b', bg: '#fef3c7' };
+        }
         return { text: orderStatus || 'Menunggu Konfirmasi', desc: 'Pesanan sedang diverifikasi.', icon: '⏳', color: '#64748b', bg: '#f1f5f9' };
       };
       
-      const status = getStatusInfo(t.orderStatus, t.paymentStatus);
+      const status = getStatusInfo(t.orderStatus, t.paymentStatus, t.paymentMethod);
       
       // Handle Photo URL
       let photoUrl = t.productPhoto;
