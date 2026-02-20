@@ -53,6 +53,8 @@ export function CartPage() {
                         </div>
                         <div class="cart-item-info" style="flex: 1;">
                             <h3 class="cart-item-title" style="margin: 0 0 4px 0; font-size: 16px;">${x.name}</h3>
+                            ${x.selectedColor ? `<div style="font-size: 13px; color: #64748b; margin-bottom: 2px;">Warna: ${x.selectedColor}</div>` : ''}
+                            ${x.selectedSize ? `<div style="font-size: 13px; color: #64748b; margin-bottom: 2px;">Ukuran: ${x.selectedSize}</div>` : ''}
                             <div class="cart-item-price" style="font-weight: 600; color: var(--primary);">Rp ${Number(x.price).toLocaleString('id-ID')}</div>
                         </div>
                         <div class="cart-item-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">

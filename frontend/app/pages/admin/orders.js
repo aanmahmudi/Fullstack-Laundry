@@ -45,6 +45,8 @@ export function AdminOrdersPage() {
                   <th style="text-align:center;">ID</th>
                   <th style="text-align:center;">Customer</th>
                   <th style="text-align:center;">Produk</th>
+                  <th style="text-align:center;">Catatan</th>
+                  <th style="text-align:center;">Ukuran</th>
                   <th style="text-align:center;">Qty</th>
                   <th style="text-align:center;">Total</th>
                   <th style="text-align:center;">Metode Pembayaran</th>
@@ -129,6 +131,8 @@ function renderRow(t) {
       <td style="text-align:center;">#${t.id}</td>
       <td style="text-align:center;">${t.customerName}</td>
       <td style="text-align:center;">${t.productName}</td>
+      <td style="text-align:center; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${t.notes || ''}">${t.notes || '-'}</td>
+      <td style="text-align:center;">${t.selectedSize || '-'}</td>
       <td style="text-align:center;">${t.quantity}</td>
       <td style="text-align:center;">Rp ${Number(t.totalAmount || t.totalPrice || 0).toLocaleString('id-ID')}</td>
       <td style="text-align:center;">

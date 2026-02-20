@@ -78,7 +78,9 @@ export function OrderDetailPage(params) {
               <img src="${photoUrl}" onerror="this.onerror=null;this.src='${placeholder.replace(/'/g, "%27")}';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 4px;">
               <div style="flex: 1;">
                  <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 500; color: #333;">${t.productName || 'Produk'}</h4>
-                 <div style="color: #64748b; font-size: 14px; margin-bottom: 4px;">Variasi: -</div>
+                 <div style="color: #64748b; font-size: 14px; margin-bottom: 4px;">
+                   Ukuran: ${t.selectedSize || '-'}${t.selectedColor ? ` • Warna: ${t.selectedColor}` : ''}
+                 </div>
                  <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 14px;">x${t.quantity}</span>
                     <span style="font-weight: 500; color: #333;">${formatRupiah(t.totalPrice / (t.quantity || 1))}</span> 

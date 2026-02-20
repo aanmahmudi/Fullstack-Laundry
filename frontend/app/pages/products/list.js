@@ -81,47 +81,7 @@ export function ProductsPage() {
         }
 
         grid.innerHTML = list.map((p) => productCard(p, user, shopCache)).join('');
-        
-        // Re-attach event listeners for buttons
-        const addToCart = (id) => {
-             // Look up in current displayed list first
-             const prod = list.find((x) => x.id === id);
-             if (prod) {
-                 State.addToCart({ id: prod.id, name: prod.name, price: prod.price, qty: 1, photoUrl: prod.photoUrl });
-                 return true;
-             }
-             return false;
-        };
 
-        // Handle "Keranjang" (Add to Cart only)
-        grid.querySelectorAll('.btn-add-cart').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const id = Number(btn.dataset.id);
-            if (addToCart(id)) {
-                // Visual feedback
-                const originalText = btn.innerHTML;
-                btn.innerHTML = "Masuk Keranjang!";
-                btn.style.color = "#22c55e";
-                btn.style.borderColor = "#22c55e";
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.color = "";
-                    btn.style.borderColor = "";
-                }, 1500);
-            }
-          });
-        });
-
-        // Handle "Beli" (Add to Cart + Checkout)
-        grid.querySelectorAll('.btn-buy-now').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const id = Number(btn.dataset.id);
-            if (addToCart(id)) {
-                 window.location.href = '/checkout';
-            }
-          });
-        });
-        
         grid.querySelectorAll('.btn-delete-product').forEach((btn) => {
           btn.addEventListener('click', async () => {
             const id = Number(btn.dataset.id);
@@ -255,30 +215,18 @@ function productCard(p, user, shopCache) {
 
   return `
     <article class="card">
-      <figure class="thumb">
-        ${photoHtml}
-        ${ownerBadge}
-      </figure>
-      <div class="card-body">
-        <h3>${p.name}</h3>
-        ${shopName ? `<p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Toko: ${shopName}</p>` : ''}
-        <p>${description}</p>
-        <div class="price">Rp ${price}</div>
-      </div>
-      <div class="card-actions" style="flex-direction: column; gap: 10px;">
-        <div style="display: flex; gap: 10px; width: 100%;">
-            <a class="btn btn-detail" href="/product/${p.id}" style="flex: 1; text-align: center;">Detail</a>
-            ${isOwnerAdmin 
-              ? `<button class="btn btn-buy" disabled style="flex: 1; opacity: 0.5; cursor: not-allowed; background: #94a3b8; border-color: #94a3b8;">Milik Anda</button>`
-              : `<button class="btn btn-buy btn-buy-now" data-id="${p.id}" style="flex: 1; background: #ee4d2d; color: white; border: none;">Beli</button>`
-            }
+      <a href="/product/${p.id}" style="text-decoration: none; color: inherit; display: block;">
+        <figure class="thumb">
+          ${photoHtml}
+          ${ownerBadge}
+        </figure>
+        <div class="card-body">
+          <h3>${p.name}</h3>
+          ${shopName ? `<p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Toko: ${shopName}</p>` : ''}
+          <p>${description}</p>
+          <div class="price">Rp ${price}</div>
         </div>
-        ${!isOwnerAdmin ? 
-           `<button class="btn btn-add-cart" data-id="${p.id}" style="width: 100%; border: 1px solid #ee4d2d; color: #ee4d2d; background: white; margin-top: 5px;">
-              <span style="font-size: 1.2em; margin-right: 5px;">🛒</span> + Keranjang
-            </button>` : ''
-        }
-      </div>
+      </a>
       ${deleteButton ? `<div style="padding: 0 24px 24px;">${deleteButton}</div>` : ''}
     </article>
   `;

@@ -50,7 +50,12 @@ export const State = {
   },
   addToCart(item) {
     const items = State.getCart();
-    const idx = items.findIndex((x) => x.id === item.id);
+    const idx = items.findIndex(
+      (x) =>
+        x.id === item.id &&
+        (x.selectedSize || null) === (item.selectedSize || null) &&
+        (x.selectedColor || null) === (item.selectedColor || null)
+    );
     if (idx >= 0) {
       const current = items[idx];
       const nextQty = (Number(current.qty) || 1) + (Number(item.qty) || 1);

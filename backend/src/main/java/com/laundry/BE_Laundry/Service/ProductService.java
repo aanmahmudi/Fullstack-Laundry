@@ -41,6 +41,8 @@ public class ProductService {
 		existingProduct.setName(updatedProduct.getName());
 		existingProduct.setPrice(updatedProduct.getPrice());
 		existingProduct.setDescription(updatedProduct.getDescription());
+		existingProduct.setSizes(updatedProduct.getSizes());
+		existingProduct.setColors(updatedProduct.getColors());
 		existingProduct.setPhotoUrl(updatedProduct.getPhotoUrl());
 		if (updatedProduct.getShopId() != null) {
 			existingProduct.setShopId(updatedProduct.getShopId());

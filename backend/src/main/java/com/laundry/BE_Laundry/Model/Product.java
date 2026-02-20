@@ -31,6 +31,12 @@ public class Product {
 	
 	private String description;
 
+	@Column(name = "sizes")
+	private String sizes;
+
+	@Column(name = "colors")
+	private String colors;
+
 	@Column(name = "owner_id")
 	private Long ownerId;
 

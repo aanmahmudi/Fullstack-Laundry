@@ -95,6 +95,9 @@ public class TransactionService {
 			transaction.setCustomer(customer);
 			transaction.setProduct(product);
 			transaction.setQuantity(requestDTO.getQuantity());
+			transaction.setSelectedSize(requestDTO.getSelectedSize());
+			transaction.setSelectedColor(requestDTO.getSelectedColor());
+			transaction.setNotes(requestDTO.getNotes());
 			transaction.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(requestDTO.getQuantity())));
 			transaction.setTransactionDate(LocalDateTime.now());
 			
@@ -182,6 +185,8 @@ public class TransactionService {
 				.customerName(transaction.getCustomer().getUsername())
 				.productId(transaction.getProduct().getId())
 				.productName(transaction.getProduct().getName())
+				.selectedSize(transaction.getSelectedSize())
+				.selectedColor(transaction.getSelectedColor())
 				.quantity(transaction.getQuantity())
 				.totalPrice(transaction.getTotalPrice())
 				.transactionDate(transaction.getTransactionDate())
@@ -191,6 +196,7 @@ public class TransactionService {
 				.shippingAddress(transaction.getShippingAddress())
 				.paymentMethod(transaction.getPaymentMethod())
 				.productPhoto(transaction.getProduct().getPhotoUrl())
+				.notes(transaction.getNotes())
 				.orderNumber(transaction.getOrderNumber() != null ? transaction.getOrderNumber() : String.valueOf(transaction.getId()))
 				.paymentCode(transaction.getPaymentCode())
 				.sellerPhone(sellerPhone)

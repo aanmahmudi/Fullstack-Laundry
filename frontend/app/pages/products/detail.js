@@ -37,6 +37,18 @@ export function ProductDetailPage(params) {
       const user = State.getUser();
       const isOwner = user && String(user.id) === String(p.ownerId);
 
+      const rawSizes = typeof p.sizes === 'string' ? p.sizes : '';
+      const sizeOptions = rawSizes
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const rawColors = typeof p.colors === 'string' ? p.colors : '';
+      const colorOptions = rawColors
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
       // Prevent setting innerHTML on null if navigated away
       if (!document.getElementById('product-detail')) return;
 
@@ -106,6 +118,76 @@ export function ProductDetailPage(params) {
               }
             </div>
 
+            <div class="pd-section">
+              <h3 class="pd-section-title" style="margin:0 0 4px 0;">Ukuran</h3>
+              ${
+                !isOwner && sizeOptions.length
+                  ? `
+                <div style="margin-top:8px;">
+                  <div style="font-size:13px; color:#4b5563; margin-bottom:4px;">Pilih ukuran</div>
+                  <div id="size-choices" class="pd-size-choice-group">
+                    ${sizeOptions
+                      .map(
+                        (s, idx) => `
+                          <button
+                            type="button"
+                            class="pd-size-pill ${idx === 0 ? 'active' : ''}"
+                            data-size="${s}"
+                          >
+                            ${s}
+                          </button>
+                        `
+                      )
+                      .join('')}
+                  </div>
+                </div>`
+                  : ''
+              }
+              ${
+                isOwner
+                  ? `<input id="edit-sizes" type="text" class="input"
+                        style="width:100%; margin-top:8px; display:none;"
+                        placeholder="Contoh: S,M,L atau 30x30,40x40"
+                        value="${rawSizes}" />`
+                  : ''
+              }
+            </div>
+
+            <div class="pd-section">
+              <h3 class="pd-section-title" style="margin:0 0 4px 0;">Warna</h3>
+              ${
+                !isOwner && colorOptions.length
+                  ? `
+                <div style="margin-top:8px;">
+                  <div style="font-size:13px; color:#4b5563; margin-bottom:4px;">Pilih warna</div>
+                  <div id="color-choices" class="pd-size-choice-group">
+                    ${colorOptions
+                      .map(
+                      (c, idx) => `
+                          <button
+                          type="button"
+                          class="pd-color-pill ${idx === 0 ? 'active' : ''}"
+                          data-color="${c}"
+                          >
+                            ${c}
+                          </button>
+                        `
+                      )
+                      .join('')}
+                  </div>
+                </div>`
+                  : ''
+              }
+              ${
+                isOwner
+                  ? `<input id="edit-colors" type="text" class="input"
+                        style="width:100%; margin-top:8px; display:none;"
+                        placeholder="Contoh: Hitam, Putih, Abu, Cream, Merah"
+                        value="${rawColors}" />`
+                  : ''
+              }
+            </div>
+
             <div class="pd-actions">
               <div class="pd-quantity">
                 <label>Kuantitas</label>
@@ -122,10 +204,10 @@ export function ProductDetailPage(params) {
                        Anda adalah pemilik produk ini
                      </div>`
                   : `
-                    <button id="btn-add-cart" class="btn btn-outline-primary btn-lg">
+                    <button id="btn-add-cart" class="btn-shopee-cart">
                       <span class="icon">🛒</span> Masukkan Keranjang
                     </button>
-                    <button id="btn-buy-now" class="btn btn-primary btn-lg">
+                    <button id="btn-buy-now" class="btn-shopee-buy">
                       Beli Sekarang
                     </button>
                   `
@@ -153,6 +235,47 @@ export function ProductDetailPage(params) {
         });
       }
 
+      let selectedSize = sizeOptions.length ? sizeOptions[0] : null;
+      let selectedColor = colorOptions.length ? colorOptions[0] : null;
+
+      if (!isOwner && sizeOptions.length) {
+        const sizeButtons = document.querySelectorAll('.pd-size-pill');
+        if (sizeButtons.length) {
+          sizeButtons.forEach((btn) => {
+            const value = btn.dataset.size;
+            if (value === (p.selectedSize || selectedSize)) {
+              selectedSize = value;
+              sizeButtons.forEach((b) => b.classList.remove('active'));
+              btn.classList.add('active');
+            }
+            btn.addEventListener('click', () => {
+              selectedSize = value;
+              sizeButtons.forEach((b) => b.classList.remove('active'));
+              btn.classList.add('active');
+            });
+          });
+        }
+      }
+
+      if (!isOwner && colorOptions.length) {
+        const colorButtons = document.querySelectorAll('.pd-color-pill');
+        if (colorButtons.length) {
+          colorButtons.forEach((btn) => {
+            const value = btn.dataset.color;
+            if (value === (p.selectedColor || selectedColor)) {
+              selectedColor = value;
+              colorButtons.forEach((b) => b.classList.remove('active'));
+              btn.classList.add('active');
+            }
+            btn.addEventListener('click', () => {
+              selectedColor = value;
+              colorButtons.forEach((b) => b.classList.remove('active'));
+              btn.classList.add('active');
+            });
+          });
+        }
+      }
+
       if (isOwner) {
         const toggleBtn = document.getElementById('btn-toggle-edit');
         const btnSave = document.getElementById('btn-save-product');
@@ -163,13 +286,21 @@ export function ProductDetailPage(params) {
         const priceTextEl = document.getElementById('pd-price-text');
         const descTextEl = document.getElementById('pd-description-text');
         const controlsEl = document.getElementById('edit-controls');
+        const inputSizes = document.getElementById('edit-sizes');
+        const inputColors = document.getElementById('edit-colors');
+        const sizesTextEl = document.getElementById('pd-sizes-text');
+        const colorsTextEl = document.getElementById('pd-colors-text');
 
         const setEditing = (on) => {
           if (toggleBtn) toggleBtn.style.display = on ? 'none' : 'inline-block';
           if (inputPrice) inputPrice.style.display = on ? 'inline-block' : 'none';
           if (inputDesc) inputDesc.style.display = on ? 'block' : 'none';
+          if (inputSizes) inputSizes.style.display = on ? 'block' : 'none';
+          if (inputColors) inputColors.style.display = on ? 'block' : 'none';
           if (priceTextEl) priceTextEl.style.display = on ? 'none' : 'inline';
           if (descTextEl) descTextEl.style.display = on ? 'none' : 'block';
+          if (sizesTextEl) sizesTextEl.style.display = on ? 'none' : 'block';
+          if (colorsTextEl) colorsTextEl.style.display = on ? 'none' : 'block';
           if (controlsEl) controlsEl.style.display = on ? 'flex' : 'none';
         };
 
@@ -181,6 +312,8 @@ export function ProductDetailPage(params) {
             }
             if (inputDesc) inputDesc.value = p.description || '';
             if (inputPrice) inputPrice.value = p.price != null ? Number(p.price) : '';
+            if (inputSizes) inputSizes.value = rawSizes;
+            if (inputColors) inputColors.value = rawColors;
             setEditing(true);
           });
         }
@@ -193,6 +326,8 @@ export function ProductDetailPage(params) {
             }
             if (inputDesc) inputDesc.value = p.description || '';
             if (inputPrice) inputPrice.value = p.price != null ? Number(p.price) : '';
+            if (inputSizes) inputSizes.value = rawSizes;
+            if (inputColors) inputColors.value = rawColors;
             setEditing(false);
           });
         }
@@ -201,6 +336,8 @@ export function ProductDetailPage(params) {
           btnSave.addEventListener('click', async () => {
             const newDesc = inputDesc.value.trim();
             const newPrice = Number(inputPrice.value);
+            const newSizes = inputSizes ? inputSizes.value.trim() : rawSizes;
+            const newColors = inputColors ? inputColors.value.trim() : rawColors;
 
             if (Number.isNaN(newPrice) || newPrice <= 0) {
               if (msgEl) {
@@ -220,6 +357,8 @@ export function ProductDetailPage(params) {
                 name: p.name,
                 price: newPrice,
                 description: newDesc,
+                sizes: newSizes || null,
+                colors: newColors || null,
                 photoUrl: p.photoUrl,
                 ownerId: p.ownerId,
                 shopId: p.shopId
@@ -234,9 +373,25 @@ export function ProductDetailPage(params) {
               if (descTextEl) {
                 descTextEl.textContent = updated.description || 'Tidak ada deskripsi.';
               }
+              if (sizesTextEl) {
+                const updatedSizes = updated.sizes || newSizes || '';
+                const arrSizes = typeof updatedSizes === 'string'
+                  ? updatedSizes.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
+                  : [];
+                sizesTextEl.textContent = arrSizes.length ? arrSizes.join(', ') : 'Tidak ada ukuran khusus.';
+              }
+              if (colorsTextEl) {
+                const updatedColors = updated.colors || newColors || '';
+                const arrColors = typeof updatedColors === 'string'
+                  ? updatedColors.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
+                  : [];
+                colorsTextEl.textContent = arrColors.length ? arrColors.join(', ') : 'Tidak ada variasi warna.';
+              }
 
               p.price = updated.price;
               p.description = updated.description;
+              p.sizes = updated.sizes || newSizes;
+              p.colors = updated.colors || newColors;
 
               if (msgEl) {
                 msgEl.style.display = 'block';
@@ -260,7 +415,15 @@ export function ProductDetailPage(params) {
       } else {
         document.getElementById('btn-add-cart').addEventListener('click', () => {
           const qty = parseInt(qtyInput.value) || 1;
-          State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
+          State.addToCart({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            qty: qty,
+            photoUrl: p.photoUrl,
+            selectedSize,
+            selectedColor
+          });
           
           // Visual feedback
           const btn = document.getElementById('btn-add-cart');
@@ -282,7 +445,15 @@ export function ProductDetailPage(params) {
 
         document.getElementById('btn-buy-now').addEventListener('click', () => {
           const qty = parseInt(qtyInput.value) || 1;
-          State.addToCart({ id: p.id, name: p.name, price: p.price, qty: qty, photoUrl: p.photoUrl });
+          State.addToCart({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            qty: qty,
+            photoUrl: p.photoUrl,
+            selectedSize,
+            selectedColor
+          });
           window.location.href = '/checkout'; // Go to checkout directly
         });
       }

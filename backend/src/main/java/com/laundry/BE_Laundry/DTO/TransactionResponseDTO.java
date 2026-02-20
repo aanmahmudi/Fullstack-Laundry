@@ -24,8 +24,11 @@ public class TransactionResponseDTO {
 	private String shippingAddress;
 	private String paymentMethod;
 	private String productPhoto;
+	private String selectedSize;
+	private String selectedColor;
 	private String orderNumber;
 	private String paymentCode;
 	private String sellerPhone;
+	private String notes;
 
 } 

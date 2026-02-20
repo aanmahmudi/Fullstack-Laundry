@@ -91,9 +91,15 @@ export function CheckoutPage() {
           <h3 style="margin-top:0;">Ringkasan Pesanan</h3>
           ${items.length ? `
             <div class="checkout-items">
-              ${items.map((x) => `
+              ${items.map((x, i) => `
                 <div class="checkout-item" style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:14px;">
-                  <span>${x.name} <span class="muted">x${x.qty || 1}</span></span>
+                  <div>
+                    <div>
+                      ${x.name}
+                      <span class="muted">x${x.qty || 1}</span>
+                    </div>
+                    <div class="checkout-item-size" data-index="${i}" style="margin-top:4px;"></div>
+                  </div>
                   <span style="font-weight:600;">Rp ${(x.price * (x.qty||1)).toLocaleString('id-ID')}</span>
                 </div>
               `).join('')}
@@ -108,7 +114,7 @@ export function CheckoutPage() {
       </aside>
     </div>
     
-    <style>
+      <style>
       .radio-card input { display: none; }
       .radio-card .card-content {
         border: 1px solid #e2e8f0;
@@ -132,13 +138,78 @@ export function CheckoutPage() {
         color: #333;
         font-weight: 500;
       }
-    </style>
+      </style>
   `;
 
   window.__bindPage = () => {
     const form = document.getElementById('form-checkout');
     if (!form) return;
-    
+
+    const sizeContainers = document.querySelectorAll('.checkout-item-size');
+    if (sizeContainers.length) {
+      (async () => {
+        const uniqueIds = Array.from(new Set(items.map((x) => x.id))).filter((id) => id != null);
+        const productSizes = {};
+
+        for (const pid of uniqueIds) {
+          try {
+            const p = await API.apiGet(`/api/products/${pid}`);
+            const raw = typeof p.sizes === 'string' ? p.sizes : '';
+            const opts = raw
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+            productSizes[pid] = opts;
+          } catch (e) {
+            productSizes[pid] = [];
+          }
+        }
+
+        const applyToState = () => {
+          const cartItems = State.getCart();
+          items.forEach((item) => {
+            if (!item || !item.id || !item.selectedSize) return;
+            const idx = cartItems.findIndex(
+              (ci) => ci.id === item.id && (ci.selectedSize || null) === null
+            );
+            if (idx >= 0) {
+              cartItems[idx].selectedSize = item.selectedSize;
+            }
+          });
+          State.setCart(cartItems);
+        };
+
+        sizeContainers.forEach((el) => {
+          const idx = Number(el.dataset.index);
+          const item = items[idx];
+          if (!item || !item.id) return;
+          const opts = productSizes[item.id] || [];
+          if (!opts.length) return;
+
+          const current =
+            item.selectedSize && opts.includes(item.selectedSize)
+              ? item.selectedSize
+              : opts[0];
+
+          item.selectedSize = current;
+          
+          const parts = [];
+          if (current) {
+            parts.push(`Ukuran: ${current}`);
+          }
+          if (item.selectedColor) {
+            parts.push(`Warna: ${item.selectedColor}`);
+          }
+
+          el.innerHTML = parts.length
+            ? `<div style="font-size:12px; color:#64748b;">${parts.join(' • ')}</div>`
+            : '';
+        });
+
+        applyToState();
+      })();
+    }
+
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const payload = Object.fromEntries(new FormData(form));
@@ -171,8 +242,11 @@ export function CheckoutPage() {
             customerId, 
             productId: Number(item.id), 
             quantity: Number(item.qty) || 1, 
+            selectedSize: item.selectedSize || null,
+            selectedColor: item.selectedColor || null,
             paymentMethod: payload.paymentMethod,
-            shippingAddress: payload.shippingAddress
+            shippingAddress: payload.shippingAddress,
+            notes: payload.notes || null
           };
           const res = await API.apiPost('/api/transactions', body);
           results.push(res);

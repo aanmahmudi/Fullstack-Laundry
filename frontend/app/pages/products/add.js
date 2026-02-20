@@ -38,6 +38,22 @@ export function AddProductPage(params) {
           </div>
         </label>
         
+        <label>Ukuran (opsional)
+          <div class="input-with-icon">
+            <span class="icon">📏</span>
+            <input name="sizes" type="text" placeholder="Contoh: S,M,L atau Kecil,Sedang,Besar" />
+          </div>
+          <div class="muted" style="font-size:12px; margin-top:4px;">Pisahkan dengan koma (,)</div>
+        </label>
+        
+        <label>Warna (opsional)
+          <div class="input-with-icon">
+            <span class="icon">🎨</span>
+            <input name="colors" type="text" placeholder="Contoh: Hitam, Putih, Abu, Cream, Merah" />
+          </div>
+          <div class="muted" style="font-size:12px; margin-top:4px;">Pisahkan dengan koma (,)</div>
+        </label>
+        
         <label>Harga (Rp)
           <div class="input-with-icon">
             <span class="icon">💰</span>
@@ -201,6 +217,8 @@ function bindEvents(shopId) {
       const productData = {
         name: formData.get('name'),
         description: formData.get('description'),
+        sizes: formData.get('sizes') || null,
+        colors: formData.get('colors') || null,
         price: price,
         photoUrl: formData.get('photoUrl'),
         ownerId: user.id,

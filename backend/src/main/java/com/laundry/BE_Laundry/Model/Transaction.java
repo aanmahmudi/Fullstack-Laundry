@@ -55,7 +55,16 @@ public class Transaction {
 
 	@Column(name = "order_number")
 	private String orderNumber;
+
+	@Column(name = "selected_size")
+	private String selectedSize;
+
+	@Column(name = "selected_color")
+	private String selectedColor;
 	
 	@Column(name = "payment_code")
 	private String paymentCode;
+	
+	@Column(name = "notes")
+	private String notes;
 }

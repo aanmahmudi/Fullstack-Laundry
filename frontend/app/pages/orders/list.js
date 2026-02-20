@@ -173,7 +173,7 @@ export function OrdersPage() {
                     <img src="${photoUrl}" onerror="this.onerror=null;this.src='${placeholder.replace(/'/g, "%27")}';" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc;" alt="Product">
                     <div style="flex: 1;">
                         <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 500; line-height: 1.4;">${t.productName || 'Produk Tanpa Nama'}</h4>
-                        <p style="margin: 0; color: #64748b; font-size: 14px;">Variasi: -</p>
+                        <p style="margin: 0; color: #64748b; font-size: 14px;">Ukuran: ${t.selectedSize || '-'}</p>
                         <p style="margin: 4px 0 0 0; font-size: 14px;">x${t.quantity}</p>
                     </div>
                     <div style="text-align: right;">
