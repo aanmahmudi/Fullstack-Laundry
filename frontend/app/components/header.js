@@ -58,7 +58,10 @@ export function renderHeader(el) {
         <div class="header-actions">
           ${user ? `
             ${user.role === 'ADMIN' ? `
-              <a href="/admin/orders" class="nav-link">Admin</a>
+              <a href="/admin/shops" class="nav-link">
+                Admin
+                <span id="admin-msg-badge" style="display:none; margin-left:6px; width:8px; height:8px; border-radius:999px; background:#ef4444;"></span>
+              </a>
             ` : `
               <a href="/orders" class="nav-link">Transaksi</a>
             `}
@@ -86,9 +89,9 @@ export function renderHeader(el) {
                     <span class="role-badge">${user.role}</span>
                  </div>
                  ${user.role === 'ADMIN' ? `
-                   <a href="/admin/orders" class="dropdown-item">Pesanan Masuk</a>
+                   <a href="/admin/orders" class="dropdown-item">Pesanan Masuk (Toko)</a>
+                   <a href="/admin/shops" class="dropdown-item">Pesan Masuk (Chat)</a>
                    <a href="/admin/my-products" class="dropdown-item">Kelola Produk</a>
-                   <a href="/admin/shops" class="dropdown-item">Kelola Toko</a>
                  ` : `
                    <a href="/orders" class="dropdown-item">Riwayat Belanja</a>
                  `}
@@ -107,6 +110,28 @@ export function renderHeader(el) {
         </div>
       </div>
     `;
+
+    if (user && user.role === 'ADMIN' && typeof API !== 'undefined') {
+      (async () => {
+        try {
+          const shops = await API.apiGet(`/api/shops?ownerId=${user.id}`);
+          if (!Array.isArray(shops) || shops.length === 0) return;
+          let totalUnread = 0;
+          for (const shop of shops) {
+            try {
+              const count = await API.apiGet(`/api/shops/${shop.id}/messages/unread-count`);
+              if (typeof count === 'number') {
+                totalUnread += count;
+              }
+            } catch (_) {}
+          }
+          const badge = document.getElementById('admin-msg-badge');
+          if (badge) {
+            badge.style.display = totalUnread > 0 ? 'inline-block' : 'none';
+          }
+        } catch (_) {}
+      })();
+    }
 
     // Bind event listeners
     el.querySelectorAll('a').forEach((a) => {

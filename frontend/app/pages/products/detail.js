@@ -15,11 +15,24 @@ export function ProductDetailPage(params) {
     try {
       const p = await API.apiGet(`/api/products/${id}`);
       let shopName = null;
-      if (p.shopId != null) {
+      let shopId = p.shopId || null;
+      let sellerPhone = null;
+
+      if (shopId != null) {
         try {
-          const shop = await API.apiGet(`/api/shops/${p.shopId}`);
+          const shop = await API.apiGet(`/api/shops/${shopId}`);
           if (shop && shop.name) {
             shopName = shop.name;
+          }
+          if (shop && shop.ownerId) {
+            try {
+              const owner = await API.apiGet(`/api/customers/${shop.ownerId}`);
+              if (owner && owner.phoneNumber) {
+                sellerPhone = owner.phoneNumber;
+              }
+            } catch (err) {
+              console.error('Gagal memuat data pemilik toko', shop.ownerId, err);
+            }
           }
         } catch (err) {
           console.error('Gagal memuat data toko untuk produk', id, err);
@@ -67,11 +80,6 @@ export function ProductDetailPage(params) {
           <!-- Right Column: Info -->
           <div class="pd-info">
             <h1 class="pd-title">${p.name}</h1>
-            ${
-              shopName
-                ? `<div style="margin-top: 4px; font-size: 14px; color: #64748b;">Toko: ${shopName}</div>`
-                : ''
-            }
             
             <div class="pd-price-box">
               <span class="pd-currency">Rp</span>
@@ -84,6 +92,37 @@ export function ProductDetailPage(params) {
                   : ''
               }
             </div>
+
+            ${
+              shopName
+                ? `
+            <div class="pd-section" style="border:1px solid #e5e7eb; border-radius:6px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fafafa; margin-top:4px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:36px;height:36px;border-radius:999px;background:#111827;color:#f9fafb;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;overflow:hidden;">
+                  ${(shopName || 'Toko').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:14px;color:#111827;">${shopName}</div>
+                  <div style="font-size:12px;color:#9ca3af;">Toko resmi di Remon Mall</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                ${isOwner 
+                  ? `<button id="btn-view-inbox" class="btn" style="background:#22c55e;color:white;border:none;padding:6px 12px;border-radius:4px;font-size:13px;display:flex;align-items:center;gap:6px;">
+                       <span>📩</span><span>Lihat Pesan Masuk</span>
+                     </button>`
+                  : `<button id="btn-chat-seller" class="btn" style="background:#f97316;color:white;border:none;padding:6px 12px;border-radius:4px;font-size:13px;display:flex;align-items:center;gap:6px;">
+                       <span>💬</span><span>Chat Sekarang</span>
+                     </button>`
+                }
+                <a href="${shopId != null ? `/shops/${shopId}` : '#'}" id="btn-visit-shop" class="btn" style="border:1px solid #d1d5db;color:#111827;padding:6px 12px;border-radius:4px;font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;">
+                  <span>🏬</span><span>Kunjungi Toko</span>
+                </a>
+              </div>
+            </div>
+                `
+                : ''
+            }
 
             <div class="pd-section">
               <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -219,6 +258,17 @@ export function ProductDetailPage(params) {
       `;
 
       // Event Listeners
+      const btnViewInbox = document.getElementById('btn-view-inbox');
+      if (btnViewInbox) {
+        btnViewInbox.addEventListener('click', () => {
+          if (shopId) {
+            window.location.href = `/admin/shops/${shopId}?openChat=true`;
+          } else {
+            alert('Toko tidak ditemukan.');
+          }
+        });
+      }
+
       const qtyInput = document.getElementById('qty-input');
       const btnMinus = document.getElementById('qty-minus');
       const btnPlus = document.getElementById('qty-plus');
@@ -456,6 +506,235 @@ export function ProductDetailPage(params) {
           });
           window.location.href = '/checkout'; // Go to checkout directly
         });
+      }
+
+      if (shopName) {
+        const chatBtn = document.getElementById('btn-chat-seller');
+        if (chatBtn) {
+          const openChatDrawer = () => {
+            const defaultMessage = `Halo, saya tertarik dengan produk ini:\n\nNama Produk: ${p.name}\nHarga: Rp ${Number(p.price || 0).toLocaleString('id-ID')}`;
+
+            let overlay = document.getElementById('chat-drawer-overlay');
+            if (!overlay) {
+              overlay = document.createElement('div');
+              overlay.id = 'chat-drawer-overlay';
+              overlay.style.position = 'fixed';
+              overlay.style.bottom = '16px';
+              overlay.style.right = '16px';
+              overlay.style.width = '360px';
+              overlay.style.height = 'auto';
+              overlay.style.maxHeight = '80vh';
+              overlay.style.display = 'flex';
+              overlay.style.justifyContent = 'flex-end';
+              overlay.style.alignItems = 'flex-end';
+              overlay.style.zIndex = '9999';
+              overlay.style.background = 'transparent';
+
+              overlay.innerHTML = `
+                <div class="chat-drawer-panel" style="width:100%;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(15,23,42,0.25);max-height:80vh;">
+                  <div style="padding:12px 14px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                      <div style="font-size:14px;font-weight:600;color:#111827;">Chat</div>
+                      <div style="font-size:12px;color:#6b7280;">${shopName}</div>
+                    </div>
+                    <button type="button" class="chat-drawer-close" style="border:none;background:transparent;color:#6b7280;font-size:18px;cursor:pointer;">×</button>
+                  </div>
+                  <div style="padding:12px 14px;border-bottom:1px solid #f3f4f6;display:flex;gap:10px;align-items:center;">
+                    <div style="width:40px;height:40px;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;background:#f9fafb;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#111827;">
+                      ${(p.name || 'P').charAt(0).toUpperCase()}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:13px;font-weight:500;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                      <div style="font-size:12px;color:#ef4444;font-weight:600;">Rp ${Number(p.price || 0).toLocaleString('id-ID')}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;padding:12px 14px;gap:8px;">
+                    <div id="chat-thread" style="max-height:230px;border-radius:8px;background:#f9fafb;padding:8px 10px;overflow-y:auto;font-size:12px;color:#6b7280;">
+                      <div style="font-size:12px;color:#9ca3af;">Memuat percakapan...</div>
+                    </div>
+                    <div style="border-radius:8px;border:1px solid #d1d5db;padding:8px 10px;display:flex;flex-direction:column;gap:6px;">
+                      <textarea id="chat-input-msg" rows="3" style="width:100%;border:none;outline:none;font-size:12px;resize:vertical;min-height:60px;max-height:120px;box-sizing:border-box;" placeholder="Tulis pesan ke penjual..."></textarea>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <div id="chat-send-status" style="font-size:11px;color:#16a34a;display:none;"></div>
+                        <div style="display:flex;gap:8px;">
+                          <button type="button" class="chat-drawer-close" style="border:1px solid #d1d5db;background:white;color:#374151;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Batal</button>
+                          <button type="button" class="chat-drawer-send" style="border:none;background:#22c55e;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                            <span>📩</span><span>Kirim ke Toko</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+
+              document.body.appendChild(overlay);
+
+              const closeButtons = overlay.querySelectorAll('.chat-drawer-close');
+              closeButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                  overlay.style.display = 'none';
+                });
+              });
+
+              overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                  overlay.style.display = 'none';
+                }
+              });
+
+              const loadThread = async () => {
+                const threadEl = overlay.querySelector('#chat-thread');
+                const user = State.getUser();
+                if (!threadEl || !user || !p.shopId) return;
+                try {
+                  const items = await API.apiGet(`/api/shops/${p.shopId}/messages/thread?customerId=${user.id}`);
+                  if (!items || items.length === 0) {
+                    threadEl.innerHTML = `<div style="font-size:12px;color:#9ca3af;">Belum ada percakapan. Kirim pesan pertama ke penjual.</div>`;
+                    const textarea = overlay.querySelector('#chat-input-msg');
+                    if (textarea && !textarea.value.trim()) {
+                        textarea.value = defaultMessage;
+                    }
+                    return;
+                  }
+                  threadEl.innerHTML = items
+                    .map((m) => {
+                      const isMe = !m.fromAdmin;
+                      const time = m.createdAt ? new Date(m.createdAt).toLocaleString('id-ID') : '';
+                      return `
+                        <div style="display:flex;margin-bottom:6px;${isMe ? 'justify-content:flex-end;' : 'justify-content:flex-start;'}">
+                          <div style="max-width:75%;padding:6px 8px;border-radius:8px;background:${isMe ? '#22c55e' : '#ffffff'};color:${isMe ? '#ffffff' : '#111827'};font-size:12px;white-space:pre-line;box-shadow:0 1px 2px rgba(15,23,42,0.08);">
+                            <div>${m.content}</div>
+                            <div style="font-size:10px;opacity:0.7;margin-top:2px;text-align:${isMe ? 'right' : 'left'};">${time}</div>
+                          </div>
+                        </div>
+                      `;
+                    })
+                    .join('');
+                  threadEl.scrollTop = threadEl.scrollHeight;
+                } catch (err) {
+                  threadEl.innerHTML = `<div style="font-size:12px;color:#dc2626;">Gagal memuat percakapan: ${err.message}</div>`;
+                }
+              };
+
+              const sendBtn = overlay.querySelector('.chat-drawer-send');
+              const statusEl = overlay.querySelector('#chat-send-status');
+              if (sendBtn) {
+                sendBtn.addEventListener('click', async () => {
+                  const textarea = overlay.querySelector('#chat-input-msg');
+                  const finalMessage = textarea && textarea.value ? textarea.value : defaultMessage;
+                  if (statusEl) {
+                    statusEl.textContent = 'Mengirim pesan...';
+                    statusEl.style.display = 'block';
+                  }
+                  try {
+                    const user = State.getUser();
+                    if (!user) {
+                      throw new Error('Silakan login terlebih dahulu.');
+                    }
+                    if (!p.shopId) {
+                      throw new Error('Toko untuk produk ini tidak ditemukan.');
+                    }
+                    await API.apiPost(`/api/shops/${p.shopId}/messages`, {
+                      senderCustomerId: user.id,
+                      content: finalMessage,
+                      fromAdmin: false
+                    });
+                    if (statusEl) {
+                      statusEl.textContent = 'Pesan terkirim ke toko.';
+                    }
+                    if (textarea) {
+                      textarea.value = '';
+                    }
+                    loadThread();
+                  } catch (err) {
+                    if (statusEl) {
+                      statusEl.textContent = err.message || 'Gagal mengirim pesan.';
+                      statusEl.style.color = '#dc2626';
+                    }
+                  }
+                });
+              }
+              loadThread();
+            } else {
+              const textarea = overlay.querySelector('#chat-input-msg');
+              // Only set default message if textarea is empty and history check later confirms no messages
+              // Wait for async check below
+              
+              const threadEl = overlay.querySelector('#chat-thread');
+              if (threadEl) {
+                threadEl.innerHTML = `<div style="font-size:12px;color:#9ca3af;">Memuat percakapan...</div>`;
+              }
+              const user = State.getUser();
+              if (user && p.shopId) {
+                (async () => {
+                  try {
+                    const items = await API.apiGet(`/api/shops/${p.shopId}/messages/thread?customerId=${user.id}`);
+                    const tEl = overlay.querySelector('#chat-thread');
+                    if (!tEl) return;
+                    if (!items || items.length === 0) {
+                      tEl.innerHTML = `<div style="font-size:12px;color:#9ca3af;">Belum ada percakapan. Kirim pesan pertama ke penjual.</div>`;
+                      if (textarea && !textarea.value.trim()) {
+                          textarea.value = defaultMessage;
+                      }
+                      return;
+                    }
+                    tEl.innerHTML = items
+                      .map((m) => {
+                        const isMe = !m.fromAdmin;
+                        const time = m.createdAt ? new Date(m.createdAt).toLocaleString('id-ID') : '';
+                        return `
+                          <div style="display:flex;margin-bottom:6px;${isMe ? 'justify-content:flex-end;' : 'justify-content:flex-start;'}">
+                            <div style="max-width:75%;padding:6px 8px;border-radius:8px;background:${isMe ? '#22c55e' : '#ffffff'};color:${isMe ? '#ffffff' : '#111827'};font-size:12px;white-space:pre-line;box-shadow:0 1px 2px rgba(15,23,42,0.08);">
+                              <div>${m.content}</div>
+                              <div style="font-size:10px;opacity:0.7;margin-top:2px;text-align:${isMe ? 'right' : 'left'};">${time}</div>
+                            </div>
+                          </div>
+                        `;
+                      })
+                      .join('');
+                    tEl.scrollTop = tEl.scrollHeight;
+                  } catch (err) {
+                    const tEl = overlay.querySelector('#chat-thread');
+                    if (tEl) {
+                      tEl.innerHTML = `<div style="font-size:12px;color:#dc2626;">Gagal memuat percakapan: ${err.message}</div>`;
+                    }
+                  }
+                })();
+              }
+            }
+
+            overlay.style.display = 'flex';
+          };
+
+          chatBtn.addEventListener('click', openChatDrawer);
+
+          let chatFab = document.getElementById('global-chat-fab');
+          if (!chatFab) {
+            chatFab = document.createElement('button');
+            chatFab.id = 'global-chat-fab';
+            chatFab.type = 'button';
+            chatFab.style.position = 'fixed';
+            chatFab.style.bottom = '16px';
+            chatFab.style.right = '16px';
+            chatFab.style.zIndex = '9998';
+            chatFab.style.border = 'none';
+            chatFab.style.borderRadius = '999px';
+            chatFab.style.background = '#22c55e';
+            chatFab.style.color = 'white';
+            chatFab.style.padding = '8px 14px';
+            chatFab.style.fontSize = '13px';
+            chatFab.style.display = 'flex';
+            chatFab.style.alignItems = 'center';
+            chatFab.style.gap = '6px';
+            chatFab.style.boxShadow = '0 6px 18px rgba(15,23,42,0.3)';
+            chatFab.style.cursor = 'pointer';
+            chatFab.innerHTML = '<span>💬</span><span>Chat</span>';
+            document.body.appendChild(chatFab);
+          }
+
+          chatFab.addEventListener('click', openChatDrawer);
+        }
       }
 
     } catch (e) {

@@ -43,6 +43,13 @@ export function ShopListPage() {
         return;
       }
 
+      if (shops.length === 1) {
+        setTimeout(() => {
+          window.location.href = `/admin/shops/${shops[0].id}`;
+        }, 0);
+        return;
+      }
+
       container.innerHTML = shops.map(shop => `
         <div class="card shop-card" style="display: flex; flex-direction: column; border: 1px solid #eee; border-radius: 8px; overflow: hidden; transition: transform 0.2s;">
             <div class="shop-image" style="height: 150px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden;">
