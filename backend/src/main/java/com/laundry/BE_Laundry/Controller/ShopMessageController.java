@@ -1,6 +1,7 @@
 package com.laundry.BE_Laundry.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,14 +49,41 @@ public class ShopMessageController {
 	}
 
 	@GetMapping("/{shopId}/messages/unread-count")
-	public ResponseEntity<Long> getUnreadCount(@PathVariable Long shopId) {
+	public ResponseEntity<Long> getUnreadCount(@PathVariable Long shopId,
+			@RequestParam(name = "viewer", required = false, defaultValue = "admin") String viewer,
+			@RequestParam(name = "customerId", required = false) Long customerId) {
+		if ("customer".equalsIgnoreCase(viewer)) {
+			if (customerId == null) {
+				throw new RuntimeException("customerId is required for viewer=customer");
+			}
+			return ResponseEntity.ok(shopMessageService.countUnreadForCustomerThread(shopId, customerId));
+		}
+		if (customerId != null) {
+			return ResponseEntity.ok(shopMessageService.countUnreadForAdminThread(shopId, customerId));
+		}
 		return ResponseEntity.ok(shopMessageService.countUnreadForShop(shopId));
+	}
+
+	@GetMapping("/{shopId}/messages/unread-by-customer")
+	public ResponseEntity<Map<Long, Long>> getUnreadByCustomer(@PathVariable Long shopId) {
+		return ResponseEntity.ok(shopMessageService.countUnreadByCustomerForShop(shopId));
 	}
 
 	@PostMapping("/{shopId}/messages/mark-read")
 	public ResponseEntity<Void> markAllAsRead(@PathVariable Long shopId) {
 		shopRepository.findById(shopId).orElseThrow(() -> new RuntimeException("Shop not found"));
 		shopMessageService.markAllAsRead(shopId);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/{shopId}/messages/thread/mark-read")
+	public ResponseEntity<Void> markThreadAsRead(@PathVariable Long shopId, @RequestParam("customerId") Long customerId,
+			@RequestParam(name = "viewer", required = false, defaultValue = "admin") String viewer) {
+		if ("customer".equalsIgnoreCase(viewer)) {
+			shopMessageService.markThreadAsReadForCustomer(shopId, customerId);
+		} else {
+			shopMessageService.markThreadAsReadForAdmin(shopId, customerId);
+		}
 		return ResponseEntity.ok().build();
 	}
 

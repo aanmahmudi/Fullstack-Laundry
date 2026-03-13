@@ -554,9 +554,9 @@ export function ProductDetailPage(params) {
                     </div>
                     <div style="border-radius:8px;border:1px solid #d1d5db;padding:8px 10px;display:flex;flex-direction:column;gap:6px;">
                       <textarea id="chat-input-msg" rows="3" style="width:100%;border:none;outline:none;font-size:12px;resize:vertical;min-height:60px;max-height:120px;box-sizing:border-box;" placeholder="Tulis pesan ke penjual..."></textarea>
-                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <div id="chat-send-status" style="font-size:11px;color:#16a34a;display:none;"></div>
-                        <div style="display:flex;gap:8px;">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <div id="chat-send-status" style="flex:1;min-width:0;font-size:11px;color:#16a34a;display:block;visibility:hidden;"></div>
+                        <div style="display:flex;gap:8px;margin-left:auto;">
                           <button type="button" class="chat-drawer-close" style="border:1px solid #d1d5db;background:white;color:#374151;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Batal</button>
                           <button type="button" class="chat-drawer-send" style="border:none;background:#22c55e;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
                             <span>📩</span><span>Kirim ke Toko</span>
@@ -612,6 +612,15 @@ export function ProductDetailPage(params) {
                     })
                     .join('');
                   threadEl.scrollTop = threadEl.scrollHeight;
+                  try {
+                    await API.apiPost(
+                      `/api/shops/${p.shopId}/messages/thread/mark-read?viewer=customer&customerId=${user.id}`,
+                      {}
+                    );
+                  } catch (_) {}
+                  try {
+                    updateChatBadge();
+                  } catch (_) {}
                 } catch (err) {
                   threadEl.innerHTML = `<div style="font-size:12px;color:#dc2626;">Gagal memuat percakapan: ${err.message}</div>`;
                 }
@@ -625,7 +634,7 @@ export function ProductDetailPage(params) {
                   const finalMessage = textarea && textarea.value ? textarea.value : defaultMessage;
                   if (statusEl) {
                     statusEl.textContent = 'Mengirim pesan...';
-                    statusEl.style.display = 'block';
+                    statusEl.style.visibility = 'visible';
                   }
                   try {
                     const user = State.getUser();
@@ -642,6 +651,7 @@ export function ProductDetailPage(params) {
                     });
                     if (statusEl) {
                       statusEl.textContent = 'Pesan terkirim ke toko.';
+                      statusEl.style.visibility = 'visible';
                     }
                     if (textarea) {
                       textarea.value = '';
@@ -651,6 +661,7 @@ export function ProductDetailPage(params) {
                     if (statusEl) {
                       statusEl.textContent = err.message || 'Gagal mengirim pesan.';
                       statusEl.style.color = '#dc2626';
+                      statusEl.style.visibility = 'visible';
                     }
                   }
                 });
@@ -658,9 +669,6 @@ export function ProductDetailPage(params) {
               loadThread();
             } else {
               const textarea = overlay.querySelector('#chat-input-msg');
-              // Only set default message if textarea is empty and history check later confirms no messages
-              // Wait for async check below
-              
               const threadEl = overlay.querySelector('#chat-thread');
               if (threadEl) {
                 threadEl.innerHTML = `<div style="font-size:12px;color:#9ca3af;">Memuat percakapan...</div>`;
@@ -694,6 +702,15 @@ export function ProductDetailPage(params) {
                       })
                       .join('');
                     tEl.scrollTop = tEl.scrollHeight;
+                    try {
+                      await API.apiPost(
+                        `/api/shops/${p.shopId}/messages/thread/mark-read?viewer=customer&customerId=${user.id}`,
+                        {}
+                      );
+                    } catch (_) {}
+                    try {
+                      updateChatBadge();
+                    } catch (_) {}
                   } catch (err) {
                     const tEl = overlay.querySelector('#chat-thread');
                     if (tEl) {
@@ -705,6 +722,9 @@ export function ProductDetailPage(params) {
             }
 
             overlay.style.display = 'flex';
+            try {
+              updateChatBadge();
+            } catch (_) {}
           };
 
           chatBtn.addEventListener('click', openChatDrawer);
@@ -729,11 +749,37 @@ export function ProductDetailPage(params) {
             chatFab.style.gap = '6px';
             chatFab.style.boxShadow = '0 6px 18px rgba(15,23,42,0.3)';
             chatFab.style.cursor = 'pointer';
-            chatFab.innerHTML = '<span>💬</span><span>Chat</span>';
+            chatFab.style.overflow = 'visible';
+            chatFab.innerHTML =
+              '<span>💬</span><span>Chat</span><span id="global-chat-badge" style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#ffffff;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:700;line-height:1;display:none;min-width:18px;text-align:center;"></span>';
             document.body.appendChild(chatFab);
           }
 
           chatFab.addEventListener('click', openChatDrawer);
+
+          const updateChatBadge = async () => {
+            const u = State.getUser();
+            const badge = document.getElementById('global-chat-badge');
+            if (!badge || !u || !p.shopId) return;
+            try {
+              const n = await API.apiGet(`/api/shops/${p.shopId}/messages/unread-count?viewer=customer&customerId=${u.id}`);
+              const count = Number(n || 0);
+              if (count > 0) {
+                badge.textContent = String(count);
+                badge.style.display = 'inline-flex';
+              } else {
+                badge.style.display = 'none';
+              }
+            } catch (_) {
+              badge.style.display = 'none';
+            }
+          };
+
+          if (window.__globalChatBadgeTimer) {
+            clearInterval(window.__globalChatBadgeTimer);
+          }
+          window.__globalChatBadgeTimer = setInterval(updateChatBadge, 8000);
+          updateChatBadge();
         }
       }
 

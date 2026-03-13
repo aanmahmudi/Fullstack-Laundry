@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
 import com.laundry.BE_Laundry.Model.Customer;
 import com.laundry.BE_Laundry.Service.CustomerService;
+import com.laundry.BE_Laundry.Service.ShopMessageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerController {
 
 	private final CustomerService customerService;
+	private final ShopMessageService shopMessageService;
 
 	@PutMapping("/update-password")
 	public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequestDTO updatePasswordDTO) {
@@ -70,6 +72,30 @@ public class CustomerController {
 	public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
 		customerService.deleteCustomer(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{id}/chat/unread-count")
+	public ResponseEntity<Long> getChatUnreadCount(@PathVariable Long id) {
+		Customer c = customerService.getCustomerById(id);
+		if (c == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		if (c.getRole() == Customer.RoleType.ADMIN) {
+			return ResponseEntity.ok(shopMessageService.countUnreadForAdminAllShops(id));
+		}
+		return ResponseEntity.ok(shopMessageService.countUnreadForCustomerAllShops(id));
+	}
+
+	@GetMapping("/{id}/chat/conversations")
+	public ResponseEntity<?> listChatConversations(@PathVariable Long id) {
+		Customer c = customerService.getCustomerById(id);
+		if (c == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		if (c.getRole() == Customer.RoleType.ADMIN) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only USER can access conversations");
+		}
+		return ResponseEntity.ok(shopMessageService.listCustomerConversations(id));
 	}
 
 }

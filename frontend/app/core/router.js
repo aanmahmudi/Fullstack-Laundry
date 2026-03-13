@@ -1,5 +1,5 @@
 import { ProductsPage } from '../pages/products/list.js?v=remon118';
-import { ProductDetailPage } from '../pages/products/detail.js?v=remon120';
+import { ProductDetailPage } from '../pages/products/detail.js?v=remon122';
 import { CartPage } from '../pages/cart/index.js?v=remon118';
 import { CheckoutPage } from '../pages/checkout/index.js?v=remon116';
 import { OrdersPage } from '../pages/orders/list.js?v=remon116';
@@ -9,7 +9,7 @@ import { AdminOrdersPage } from '../pages/admin/orders.js?v=remon116';
 import { MyProductsPage } from '../pages/admin/my-products.js?v=remon118';
 import { ShopListPage } from '../pages/admin/shops/list.js?v=remon116';
 import { ShopAddPage } from '../pages/admin/shops/add.js?v=remon116';
-import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon120';
+import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon122';
 import { PublicShopDetailPage } from '../pages/shops/detail.js';
 
 // Auth Pages

@@ -17,10 +17,13 @@ export function ShopDetailPage(params) {
   </div>
 
   <section class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-      <div class="actions" style="margin-bottom: 20px; display: flex; justify-content: space-between; gap: 16px; align-items: center;">
-        <a href="/admin/shops" class="btn btn-text">← Kembali ke Daftar Toko</a>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button id="btn-open-chat" class="btn" style="background:#f97316;color:white;">Buka Chat Toko</button>
+        <div class="actions" style="margin-bottom: 20px; display: flex; justify-content: space-between; gap: 16px; align-items: center;">
+          <a href="/admin/shops" class="btn btn-text">← Kembali ke Daftar Toko</a>
+          <div style="display:flex; gap:10px; align-items:center;">
+          <button id="btn-open-chat" class="btn" style="background:#f97316;color:white;position:relative;overflow:visible;">
+            <span>Buka Chat Toko</span>
+            <span id="admin-open-chat-badge" style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#ffffff;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:700;line-height:1;display:none;min-width:18px;text-align:center;"></span>
+          </button>
           <a href="/products/add?shopId=${shopId}" class="btn primary">＋ Tambah Produk di Toko Ini</a>
         </div>
       </div>
@@ -71,9 +74,9 @@ export function ShopDetailPage(params) {
               <div style="border-radius:8px;border:1px solid #d1d5db;padding:8px 10px;display:flex;flex-direction:column;gap:6px;background:#ffffff;">
                 <div id="shop-chat-recipient" style="font-size:12px;color:#6b7280;">Pilih pelanggan dulu sebelum membalas.</div>
                 <textarea id="shop-chat-input" rows="3" style="width:100%;border:none;outline:none;font-size:12px;resize:vertical;min-height:60px;max-height:120px;box-sizing:border-box;" placeholder="Tulis balasan ke pelanggan..." disabled></textarea>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                  <div id="shop-chat-status" style="font-size:11px;color:#16a34a;display:none;"></div>
-                  <div style="display:flex;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div id="shop-chat-status" style="flex:1;min-width:0;font-size:11px;color:#16a34a;display:block;visibility:hidden;"></div>
+                  <div style="display:flex;gap:8px;margin-left:auto;">
                     <button id="shop-chat-cancel" type="button" style="border:1px solid #d1d5db;background:white;color:#374151;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">Batal</button>
                     <button id="shop-chat-send" class="btn primary" style="border:none;background:#22c55e;color:white;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" disabled>
                       <span>📩</span><span>Kirim</span>
@@ -86,14 +89,15 @@ export function ShopDetailPage(params) {
         </div>
       </aside>
 
-      <button id="admin-chat-fab" type="button" style="position:fixed;bottom:16px;right:16px;z-index:9998;border:none;border-radius:999px;background:#22c55e;color:white;padding:8px 14px;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 18px rgba(15,23,42,0.3);cursor:pointer;">
+      <button id="admin-chat-fab" type="button" style="position:fixed;bottom:16px;right:16px;z-index:9998;border:none;border-radius:999px;background:#22c55e;color:white;padding:8px 14px;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 6px 18px rgba(15,23,42,0.3);cursor:pointer;overflow:visible;">
         <span>💬</span><span>Chat</span>
+        <span id="admin-chat-badge" style="position:absolute;top:-6px;right:-6px;background:#ef4444;color:#ffffff;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:700;line-height:1;display:none;min-width:18px;text-align:center;"></span>
       </button>
   </div>
   </section>`;
 
   window.__bindPage = async () => {
-    console.log('ShopDetailPage v120 loaded');
+    console.log('ShopDetailPage v122 loaded');
     try {
       // 1. Get Shop Detail
       const shop = await API.apiGet(`/api/shops/${shopId}`);
@@ -165,6 +169,8 @@ export function ShopDetailPage(params) {
       const openChatBtn = document.getElementById('btn-open-chat');
       const closeChatBtn = document.getElementById('shop-chat-close');
       const adminChatFab = document.getElementById('admin-chat-fab');
+      const adminChatBadge = document.getElementById('admin-chat-badge');
+      const adminOpenChatBadge = document.getElementById('admin-open-chat-badge');
 
       let activeCustomerId = null;
       let activeCustomerName = '';
@@ -219,10 +225,32 @@ export function ShopDetailPage(params) {
           const items = await API.apiGet(`/api/shops/${shopId}/messages/thread?customerId=${customerId}`);
           renderThread(items || []);
           try {
-            await API.apiPost(`/api/shops/${shopId}/messages/mark-read`, {});
+            await API.apiPost(`/api/shops/${shopId}/messages/thread/mark-read?viewer=admin&customerId=${customerId}`, {});
+          } catch (_) {}
+          try {
+            await updateAdminBadge();
           } catch (_) {}
         } catch (e) {
           chatThreadEl.innerHTML = `<div style="font-size:12px;color:#dc2626;">Gagal memuat percakapan: ${e.message}</div>`;
+        }
+      };
+
+      const updateAdminBadge = async () => {
+        try {
+          const n = await API.apiGet(`/api/shops/${shopId}/messages/unread-count?viewer=admin`);
+          const count = Number(n || 0);
+          const show = count > 0;
+          if (adminChatBadge) {
+            adminChatBadge.textContent = String(count);
+            adminChatBadge.style.display = show ? 'inline-flex' : 'none';
+          }
+          if (adminOpenChatBadge) {
+            adminOpenChatBadge.textContent = String(count);
+            adminOpenChatBadge.style.display = show ? 'inline-flex' : 'none';
+          }
+        } catch (_) {
+          if (adminChatBadge) adminChatBadge.style.display = 'none';
+          if (adminOpenChatBadge) adminOpenChatBadge.style.display = 'none';
         }
       };
 
@@ -253,16 +281,21 @@ export function ShopDetailPage(params) {
             const list = grouped[cid];
             list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
             const latest = list[0];
+            const unreadCount = list.filter((x) => !x.fromAdmin && !x.read).length;
             return {
               customerId: Number(cid),
               name: latest.senderName || `Customer #${cid}`,
               phone: latest.senderPhone || '',
               lastMessage: latest.content || '',
-              lastTime: latest.createdAt || null
+              lastTime: latest.createdAt || null,
+              unreadCount
             };
           });
 
-          chats.sort((a, b) => new Date(b.lastTime || 0) - new Date(a.lastTime || 0));
+          chats.sort((a, b) => {
+            if ((b.unreadCount || 0) !== (a.unreadCount || 0)) return (b.unreadCount || 0) - (a.unreadCount || 0);
+            return new Date(b.lastTime || 0) - new Date(a.lastTime || 0);
+          });
 
           chatListEl.innerHTML = chats
             .map((c) => {
@@ -277,7 +310,10 @@ export function ShopDetailPage(params) {
                   <div style="flex:1;min-width:0;">
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
                       <span style="font-weight:600;color:#111827;">${c.name}</span>
-                      <span style="font-size:11px;color:#9ca3af;">${timeText}</span>
+                      <div style="display:flex;align-items:center;gap:6px;">
+                        ${c.unreadCount > 0 ? `<span style="background:#ef4444;color:#ffffff;border-radius:999px;padding:2px 6px;font-size:11px;font-weight:700;line-height:1;min-width:18px;text-align:center;">${c.unreadCount}</span>` : ``}
+                        <span style="font-size:11px;color:#9ca3af;">${timeText}</span>
+                      </div>
                     </div>
                     <div style="font-size:11px;color:#6b7280;">${c.phone || '-'}</div>
                     <div style="font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${preview}</div>
@@ -310,6 +346,9 @@ export function ShopDetailPage(params) {
             const cphone = first.getAttribute('data-customer-phone') || '';
             loadThread(cid, cname, cphone);
           }
+          try {
+            await updateAdminBadge();
+          } catch (_) {}
         } catch (e) {
           chatListEl.innerHTML = `<div style="font-size:13px; color:#dc2626; padding:8px 10px;">Gagal memuat daftar chat: ${e.message}</div>`;
         }
@@ -318,6 +357,7 @@ export function ShopDetailPage(params) {
       const openAdminChat = () => {
         if (!chatPanelEl) return;
         chatPanelEl.style.display = 'flex';
+        updateAdminBadge();
         loadChatList();
       };
 
@@ -348,6 +388,12 @@ export function ShopDetailPage(params) {
         window.history.replaceState({path:newUrl},'',newUrl);
       }
 
+      if (window.__adminChatBadgeTimer) {
+        clearInterval(window.__adminChatBadgeTimer);
+      }
+      window.__adminChatBadgeTimer = setInterval(updateAdminBadge, 8000);
+      updateAdminBadge();
+
         if (chatSendBtn) {
         chatSendBtn.addEventListener('click', async () => {
           if (!activeCustomerId) {
@@ -359,7 +405,7 @@ export function ShopDetailPage(params) {
           if (!text) return;
           chatSendBtn.disabled = true;
           if (chatStatusEl) {
-            chatStatusEl.style.display = 'block';
+            chatStatusEl.style.visibility = 'visible';
             chatStatusEl.style.color = '#16a34a';
             chatStatusEl.textContent = 'Mengirim balasan...';
           }
@@ -373,7 +419,7 @@ export function ShopDetailPage(params) {
               chatInputEl.value = '';
             }
             if (chatStatusEl) {
-              chatStatusEl.style.display = 'block';
+              chatStatusEl.style.visibility = 'visible';
               chatStatusEl.style.color = '#16a34a';
               chatStatusEl.textContent = 'Balasan terkirim.';
             }
@@ -381,7 +427,7 @@ export function ShopDetailPage(params) {
             await loadChatList();
           } catch (e) {
             if (chatStatusEl) {
-              chatStatusEl.style.display = 'block';
+              chatStatusEl.style.visibility = 'visible';
               chatStatusEl.style.color = '#dc2626';
               chatStatusEl.textContent = 'Gagal mengirim balasan: ' + e.message;
             } else {
@@ -396,7 +442,8 @@ export function ShopDetailPage(params) {
       if (chatCancelBtn && chatInputEl && chatStatusEl) {
         chatCancelBtn.addEventListener('click', () => {
           chatInputEl.value = '';
-          chatStatusEl.style.display = 'none';
+          chatStatusEl.style.visibility = 'hidden';
+          chatStatusEl.textContent = '';
         });
       }
 
