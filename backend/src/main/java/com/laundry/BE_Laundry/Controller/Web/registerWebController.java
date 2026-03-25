@@ -49,9 +49,6 @@ public class registerWebController {
 	public String showRegisterPage(Model model) {
 		model.addAttribute("registerDTO", new RegisterRequestDTO());
 		model.addAttribute("roles", RoleType.values());
-		// Misal roles kamu bisa "CUSTOMER", "ADMIN", dll
-//		List<String> roles = List.of("CUSTOMER", "ADMIN", "PM");
-//		model.addAttribute("roles", roles);
 
 		return "application"; // ini render application.html
 	}

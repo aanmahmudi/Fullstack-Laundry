@@ -81,8 +81,7 @@ public class Customer {
 	
 	public enum RoleType {
 		USER,
-		ADMIN,
-		PM
+		ADMIN
 	}
 	
 	public void generateVerificationToken() {
