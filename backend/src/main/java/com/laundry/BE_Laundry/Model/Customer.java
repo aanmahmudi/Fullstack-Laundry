@@ -40,6 +40,9 @@ public class Customer {
 	
 	@Column(nullable = false)
 	private String username;
+
+	@Column(name = "ktp_number", unique = true, nullable = true)
+	private String ktpNumber;
 	
 	@Column(nullable = false)
 	private String placeOfBirth;

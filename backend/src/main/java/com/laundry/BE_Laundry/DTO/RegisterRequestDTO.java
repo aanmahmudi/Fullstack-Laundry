@@ -24,6 +24,11 @@ public class RegisterRequestDTO {
 
 	@NotBlank(message = "Name is required")
 	private String username;
+
+	private String ktpNumber;
+	private String shopName;
+	private String shopDescription;
+
 	private String placeOfBirth;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

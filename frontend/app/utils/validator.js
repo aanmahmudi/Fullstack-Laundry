@@ -29,6 +29,12 @@ export function validateInput(input, context) {
     if (!ok) message = 'Nomor HP harus 12–13 digit angka';
   } else if (name === 'dateOfBirth' && context === 'register') {
     if (!val) message = 'Tanggal lahir wajib diisi';
+  } else if (name === 'shopName' && input.required) {
+    if (val.length < 3) message = 'Nama toko minimal 3 karakter';
+  } else if (name === 'shopDescription' && input.required) {
+    if (val.length < 10) message = 'Deskripsi toko minimal 10 karakter';
+  } else if (name === 'ktpNumber') {
+    if (!/^\d{16}$/.test(val)) message = 'No. KTP harus tepat 16 digit angka';
   }
   setFieldError(input, message);
   return !message;
@@ -36,7 +42,7 @@ export function validateInput(input, context) {
 
 export function attachValidation(form, context) {
   if (!form) return;
-  const inputs = form.querySelectorAll('input');
+  const inputs = form.querySelectorAll('input, textarea');
   inputs.forEach((i) => {
     i.addEventListener('input', () => validateInput(i, context));
     i.addEventListener('blur', () => validateInput(i, context));

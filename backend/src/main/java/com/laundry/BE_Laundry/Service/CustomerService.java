@@ -20,7 +20,9 @@ import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
 import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
 import com.laundry.BE_Laundry.DTO.VerifyTokenDTO;
 import com.laundry.BE_Laundry.Model.Customer;
+import com.laundry.BE_Laundry.Model.Shop;
 import com.laundry.BE_Laundry.Repository.CustomerRepository;
+import com.laundry.BE_Laundry.Repository.ShopRepository;
 import com.laundry.BE_Laundry.Utill.GenerateOTP;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerService {
 
 	private final CustomerRepository customerRepository;
+	private final ShopRepository shopRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final EmailService emailService;
 	private final OTPService otpService;
@@ -39,6 +42,12 @@ public class CustomerService {
 	public Customer registerCustomer(RegisterRequestDTO registerDTO) {
 		if (customerRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
 			throw new IllegalArgumentException("Email already exist");
+		}
+
+		if (registerDTO.getKtpNumber() != null && !registerDTO.getKtpNumber().isEmpty()) {
+			if (customerRepository.findByKtpNumber(registerDTO.getKtpNumber()).isPresent()) {
+				throw new IllegalArgumentException("KTP Number already registered");
+			}
 		}
 
 		// Map dari DTO ke entity
@@ -58,6 +67,15 @@ public class CustomerService {
 				
 		// Simpan ke database
 		Customer saved = customerRepository.save(customer);
+
+		// Jika role adalah ADMIN (Penjual), buat Toko otomatis
+		if (customer.getRole() == Customer.RoleType.ADMIN) {
+			Shop shop = new Shop();
+			shop.setName(registerDTO.getShopName() != null ? registerDTO.getShopName() : customer.getUsername() + " Shop");
+			shop.setDescription(registerDTO.getShopDescription() != null ? registerDTO.getShopDescription() : "Welcome to my shop!");
+			shop.setOwnerId(saved.getId());
+			shopRepository.save(shop);
+		}
 		
 		// Kirim Token ke email
 		emailService.sendVerificationLink(customer.getEmail(), token);
@@ -71,6 +89,7 @@ public class CustomerService {
 	private Customer mapToCustomer(RegisterRequestDTO registerDTO) {
 		Customer customer = new Customer();
 		customer.setUsername(registerDTO.getUsername());
+		customer.setKtpNumber(registerDTO.getKtpNumber());
 		customer.setEmail(registerDTO.getEmail());
 		customer.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 		customer.setAddress(registerDTO.getAddress());

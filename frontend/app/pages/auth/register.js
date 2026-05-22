@@ -60,6 +60,36 @@ export function RegisterPage() {
           </div>
           <input type="hidden" name="role" id="role-input" value="USER" />
 
+          <!-- Field Khusus Penjual (Toko) -->
+          <div id="seller-fields" style="display: none; border: 1px dashed var(--border-color); padding: 16px; border-radius: 8px; margin-bottom: 16px; background: rgba(0,0,0,0.02);">
+            <p style="font-weight: 600; margin-bottom: 12px; color: var(--primary-color);">Informasi Toko</p>
+            <label>Nama Toko
+              <div class="input-with-icon">
+                <span class="icon">🏪</span>
+                <input name="shopName" type="text" placeholder="Nama brand/toko Anda" />
+              </div>
+              <small class="field-error"></small>
+            </label>
+            <label>Deskripsi Toko
+              <div class="input-with-icon" style="align-items: flex-start;">
+                <span class="icon" style="top: 12px; transform: none;">📝</span>
+                <textarea name="shopDescription" rows="3" maxlength="200" placeholder="Ceritakan tentang toko Anda (kategori produk, keunggulan, dll)..." style="width: 100%; border: 1px solid #e0e0e0; border-radius: 2px; outline: none; background: #fff; padding: 12px 12px 12px 40px; resize: none; font-family: inherit; font-size: 14px; line-height: 1.4; transition: all 0.2s;"></textarea>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                <small class="field-error"></small>
+                <small id="desc-counter" style="color: var(--text-muted); font-size: 12px;">0/200</small>
+              </div>
+            </label>
+          </div>
+
+          <label>No. KTP (NIK)
+            <div class="input-with-icon">
+              <span class="icon">🆔</span>
+              <input name="ktpNumber" type="text" required pattern="[0-9]{16}" maxlength="16" inputmode="numeric" placeholder="16 digit NIK" />
+            </div>
+            <small class="field-error"></small>
+          </label>
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <label><span id="lbl-pob">Tempat Lahir</span>
               <div class="input-with-icon">
@@ -115,6 +145,7 @@ function bindEvents() {
     // Setup Role Toggle
     const roleInput = document.getElementById('role-input');
     const roleBtns = register.querySelectorAll('.role-btn');
+    const sellerFields = document.getElementById('seller-fields');
     
     roleBtns.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -123,15 +154,44 @@ function bindEvents() {
         // Add active to clicked
         btn.classList.add('active');
         // Update hidden input
-        roleInput.value = btn.dataset.value;
+        const role = btn.dataset.value;
+        roleInput.value = role;
+
+        // Show/hide seller fields
+        if (role === 'ADMIN') {
+          sellerFields.style.display = 'block';
+          sellerFields.querySelectorAll('input, textarea').forEach(el => el.setAttribute('required', 'true'));
+        } else {
+          sellerFields.style.display = 'none';
+          sellerFields.querySelectorAll('input, textarea').forEach(el => el.removeAttribute('required'));
+        }
       });
     });
+
+    // Shop Description Counter
+    const shopDesc = register.querySelector('textarea[name="shopDescription"]');
+    const descCounter = document.getElementById('desc-counter');
+    if (shopDesc && descCounter) {
+      shopDesc.addEventListener('input', () => {
+        const len = shopDesc.value.length;
+        descCounter.textContent = `${len}/200`;
+        if (len >= 200) descCounter.style.color = 'var(--danger)';
+        else descCounter.style.color = 'var(--text-muted)';
+      });
+    }
 
     attachValidation(register, 'register');
     register.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const payload = Object.fromEntries(new FormData(register));
-      const valid = [...register.querySelectorAll('input')].every((i) => validateInput(i, 'register'));
+      
+      // Validasi NIK 16 digit khusus
+      if (!/^\d{16}$/.test(payload.ktpNumber)) {
+        alert('No. KTP harus tepat 16 digit angka!');
+        return;
+      }
+
+      const valid = [...register.querySelectorAll('input, textarea')].every((i) => validateInput(i, 'register'));
       if (!valid) { msg.textContent = 'Periksa kembali data pendaftaran.'; msg.classList.add('error'); return; }
       
       msg.textContent = 'Mendaftar...'; msg.classList.remove('error');

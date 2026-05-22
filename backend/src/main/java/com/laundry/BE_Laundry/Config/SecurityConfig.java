@@ -18,43 +18,30 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import jakarta.servlet.Filter;
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig{
 	
 	private final WebAccessConfig webAccessConfig;
-	
-	public SecurityConfig (WebAccessConfig webAccessConfig) {
-		this.webAccessConfig = webAccessConfig;
-	}
+	private final JwtAuthenticationFilter jwtAuthFilter;
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http.csrf().disable()
+		http.csrf(csrf -> csrf.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 						webAccessConfig.publicEndpoints()).permitAll()
 				.anyRequest().authenticated()
 			)
+			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 			.addFilterAfter(new CustomLoggingFilter(), UsernamePasswordAuthenticationFilter.class)
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 				
-//				.formLogin()
-//					.loginPage("/api/customers/login")
-//					.defaultSuccessUrl("/api/customers/login/dashboard", true)
-//					.permitAll()
-//			.and()
-//				.logout()
-////					.logoutUrl("/api/customers/logout")
-////				.logoutSuccessUrl("/api/customers/login")
-//					.logoutUrl("/api/customers/logout")
-//					.logoutSuccessUrl("/api/customers/login?logout")
-//					.invalidateHttpSession(true)
-//					.clearAuthentication(true)
-//					.deleteCookies("JSESSIONID");
 		return http.build();
 	}
 	

@@ -16,6 +16,7 @@ import com.laundry.BE_Laundry.Model.Transaction;
 import com.laundry.BE_Laundry.Repository.CustomerRepository;
 import com.laundry.BE_Laundry.Repository.ProductRepository;
 import com.laundry.BE_Laundry.Repository.TransactionRepository;
+import com.laundry.BE_Laundry.Utill.SecurityUtil;
 
 @Service
 public class TransactionService {
@@ -56,27 +57,68 @@ public class TransactionService {
 
 	// get data berdasarkan yang sudah dipayment
 	public List<TransactionResponseDTO> getPaidTransactions() {
-		return transactionRepository.findAll().stream()
-				.filter(transaction -> "PAID".equalsIgnoreCase(transaction.getPaymentStatus()))
+		String email = SecurityUtil.getCurrentUserEmail();
+		if (email == null) return List.of();
+		
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+				
+		if (customer.getRole() == Customer.RoleType.ADMIN) {
+			return transactionRepository.findAll().stream()
+					.filter(t -> t.getProduct().getOwnerId().equals(customer.getId()) && "PAID".equalsIgnoreCase(t.getPaymentStatus()))
+					.map(this::mapToResponseDTO).collect(Collectors.toList());
+		}
+		
+		return transactionRepository.findByCustomerEmailAndPaymentStatus(email, "PAID").stream()
 				.map(this::mapToResponseDTO).collect(Collectors.toList());
 	}
 	
 	public List<TransactionResponseDTO> getUnpaidTransactions(){
-		return transactionRepository.findAll().stream()
-				.filter(transaction -> "UNPAID".equalsIgnoreCase(transaction.getPaymentStatus()))
+		String email = SecurityUtil.getCurrentUserEmail();
+		if (email == null) return List.of();
+		
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+				
+		if (customer.getRole() == Customer.RoleType.ADMIN) {
+			return transactionRepository.findAll().stream()
+					.filter(t -> t.getProduct().getOwnerId().equals(customer.getId()) && "UNPAID".equalsIgnoreCase(t.getPaymentStatus()))
+					.map(this::mapToResponseDTO).collect(Collectors.toList());
+		}
+		
+		return transactionRepository.findByCustomerEmailAndPaymentStatus(email, "UNPAID").stream()
 				.map(this::mapToResponseDTO).collect(Collectors.toList());
 		
 	}
 
 	// get data all in
 	public List<TransactionResponseDTO> getAllTransactions() {
-		return transactionRepository.findAll().stream().map(this::mapToResponseDTO).collect(Collectors.toList());
+		String email = SecurityUtil.getCurrentUserEmail();
+		if (email == null) return List.of();
+		
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User not found"));
+				
+		if (customer.getRole() == Customer.RoleType.ADMIN) {
+			return transactionRepository.findByProductOwnerId(customer.getId()).stream()
+					.map(this::mapToResponseDTO).collect(Collectors.toList());
+		}
+		
+		return transactionRepository.findByCustomerEmail(email).stream()
+				.map(this::mapToResponseDTO).collect(Collectors.toList());
 	}
 
 	// get data berdasarkan id
 	public TransactionResponseDTO getTransactionById(Long id) {
 		Transaction transaction = transactionRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Transaction not found"));
+		
+		// Security check: ensure user owns this transaction
+		String email = SecurityUtil.getCurrentUserEmail();
+		if (!transaction.getCustomer().getEmail().equals(email)) {
+			throw new RuntimeException("Unauthorized access to transaction");
+		}
+		
 		return mapToResponseDTO(transaction);
 
 	}

@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.laundry.BE_Laundry.Model.Shop;
+import com.laundry.BE_Laundry.Model.Customer;
 import com.laundry.BE_Laundry.Repository.ShopRepository;
+import com.laundry.BE_Laundry.Repository.CustomerRepository;
+import com.laundry.BE_Laundry.Utill.SecurityUtil;
 
 @Service
 public class ShopService {
@@ -15,7 +18,14 @@ public class ShopService {
     @Autowired
     private ShopRepository shopRepository;
 
+    @Autowired
+    private CustomerRepository customerRepository;
+
     public Shop createShop(Shop shop) {
+        String email = SecurityUtil.getCurrentUserEmail();
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        shop.setOwnerId(customer.getId());
         return shopRepository.save(shop);
     }
 
@@ -29,17 +39,33 @@ public class ShopService {
     }
 
     public Shop updateShop(Long id, Shop shopDetails) {
-        Shop shop = shopRepository.findById(id).orElse(null);
-        if (shop != null) {
-            shop.setName(shopDetails.getName());
-            shop.setDescription(shopDetails.getDescription());
-            shop.setImageUrl(shopDetails.getImageUrl());
-            return shopRepository.save(shop);
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new RuntimeException("Shop not found"));
+        
+        String email = SecurityUtil.getCurrentUserEmail();
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!shop.getOwnerId().equals(customer.getId())) {
+            throw new RuntimeException("Unauthorized access to shop");
         }
-        return null;
+
+        shop.setName(shopDetails.getName());
+        shop.setDescription(shopDetails.getDescription());
+        shop.setImageUrl(shopDetails.getImageUrl());
+        return shopRepository.save(shop);
     }
 
     public void deleteShop(Long id) {
+        Shop shop = shopRepository.findById(id).orElseThrow(() -> new RuntimeException("Shop not found"));
+        
+        String email = SecurityUtil.getCurrentUserEmail();
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!shop.getOwnerId().equals(customer.getId())) {
+            throw new RuntimeException("Unauthorized access to shop");
+        }
+
         shopRepository.deleteById(id);
     }
 }

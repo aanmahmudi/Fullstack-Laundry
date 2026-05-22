@@ -98,9 +98,11 @@ export const State = {
   },
   clearUser() {
     localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(PENDING_EMAIL_KEY);
+    localStorage.removeItem(PENDING_OTP_KEY);
+    // Note: User-specific carts are already safe because they use the user.id in the key
     window.dispatchEvent(new CustomEvent('user:updated', { detail: { user: null } }));
   },
-
   setPendingEmail(email) {
     if (email) localStorage.setItem(PENDING_EMAIL_KEY, String(email));
     else localStorage.removeItem(PENDING_EMAIL_KEY);

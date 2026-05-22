@@ -21,21 +21,13 @@ public class WebAccessConfig {
 				"/favicon.ico",
 				"/error/**", "/css/**", "/js/**", "/images/**", "/webjars/**", "/assets/**",
 				
-				//customer & auth
+				//customer & auth (Sensitive ones removed)
 				"/api/customers/register",
 				"/api/customers/verify-token",
 				"/api/customers/verify-otp",
 				"/api/customers/login",
-				"/api/customers/logout",
-				"/api/customers/update-password",
 				"/api/customers/forgot-password",
 				"/api/customers/reset-password",
-				"/api/customers",
-				"/api/customers/**",
-				"/api/customers/upload/photo",
-				"/api/customers/upload-photo",
-				"/api/customers/upload/pdf",
-				"/api/customers/upload-pdf",
 				
 				// Auth Controller (New)
 				"/api/auth/**",
@@ -55,19 +47,9 @@ public class WebAccessConfig {
 				"/api/token/send",
 				"/api/token/verify",
 				
-				//Product & Transaction
+				//Product & Transaction (Public view only)
 				"/api/products",
 				"/api/products/**",
-				"/api/transactions",
-				"/api/transactions/**",
-				"/api/transactions/payment",
-				"/api/transactions/paid",
-				
-				// Shops
-				"/api/shops",
-				"/api/shops/**",
-				
-				// Uploads
 				"/uploads/**"
 		};
 	}

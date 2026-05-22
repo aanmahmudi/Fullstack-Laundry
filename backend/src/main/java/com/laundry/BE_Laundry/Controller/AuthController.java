@@ -21,7 +21,10 @@ import com.laundry.BE_Laundry.DTO.CustomerLoginDTO;
 import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
 import com.laundry.BE_Laundry.DTO.ResetPasswordDTO;
 import com.laundry.BE_Laundry.Model.Customer;
+import com.laundry.BE_Laundry.Model.Shop;
+import com.laundry.BE_Laundry.Repository.ShopRepository;
 import com.laundry.BE_Laundry.Service.CustomerService;
+import com.laundry.BE_Laundry.Utill.JwtUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final CustomerService customerService;
+    private final ShopRepository shopRepository;
+    private final JwtUtil jwtUtil;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,13 +79,26 @@ public class AuthController {
 			Customer customer = customerService.login(customerLoginDTO);
 			logger.info("Login successful for email: {}", customerLoginDTO.getEmail());
 			
+			String token = jwtUtil.generateToken(customer.getEmail(), customer.getRole().name());
+			
 			Map<String, Object> response = new HashMap<>();
 			response.put("message", "Login Successfuly");
 			response.put("success", true);
+			response.put("token", token);
 			response.put("customerId", customer.getId());
 			response.put("username", customer.getUsername());
 			response.put("email", customer.getEmail());
 			response.put("role", customer.getRole());
+
+			if (customer.getRole() == Customer.RoleType.ADMIN) {
+				java.util.List<Shop> shops = shopRepository.findByOwnerId(customer.getId());
+				if (!shops.isEmpty()) {
+					Shop shop = shops.get(0);
+					response.put("shopId", shop.getId());
+					response.put("shopName", shop.getName());
+					response.put("shopDescription", shop.getDescription());
+				}
+			}
 			
 			return ResponseEntity.ok(response);
 		} catch (RuntimeException ex) {

@@ -80,7 +80,10 @@ function bindEvents() {
           id, 
           username, 
           role,
-          token 
+          token,
+          shopId: res.shopId || null,
+          shopName: res.shopName || null,
+          shopDescription: res.shopDescription || null
         });
         
         window.location.href = '/dashboard';

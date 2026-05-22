@@ -83,10 +83,10 @@ export function renderHeader(el) {
             <div class="user-menu-container">
               <div class="user-menu-trigger">
                 <div class="avatar-placeholder" style="background: var(--primary);">
-                  ${(user.username || user.email || 'U').charAt(0).toUpperCase()}
+                  ${(user.shopName || user.username || user.email || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div class="user-info-mini">
-                   <span class="user-name">${user.username || 'User'}</span>
+                   <span class="user-name">${user.shopName || user.username || 'User'}</span>
                 </div>
               </div>
               

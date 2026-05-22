@@ -91,9 +91,18 @@ label {
 }
 
 .input-with-icon input:focus,
-.input-with-icon select:focus {
+.input-with-icon select:focus,
+.input-with-icon textarea:focus {
   border-color: #333;
   box-shadow: none;
+  outline: none;
+}
+
+.input-with-icon.input-error input,
+.input-with-icon.input-error select,
+.input-with-icon.input-error textarea {
+  border-color: #ef4444;
+  background-color: #fff5f5;
 }
 
 .input-with-icon input::placeholder {
