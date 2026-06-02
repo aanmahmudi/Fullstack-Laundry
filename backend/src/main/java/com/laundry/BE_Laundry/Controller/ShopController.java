@@ -18,6 +18,15 @@ public class ShopController {
     @Autowired
     private ShopService shopService;
 
+    @GetMapping("/mine/details")
+    public ResponseEntity<Shop> getMyShop() {
+        Shop shop = shopService.getMyShop();
+        if (shop != null) {
+            return ResponseEntity.ok(shop);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @PostMapping
     public ResponseEntity<Shop> createShop(@RequestBody Shop shop) {
         return ResponseEntity.ok(shopService.createShop(shop));
@@ -28,7 +37,7 @@ public class ShopController {
         if (ownerId != null) {
             return ResponseEntity.ok(shopService.getShopsByOwner(ownerId));
         }
-        return ResponseEntity.badRequest().build(); // Or list all shops if admin
+        return ResponseEntity.ok(List.of());
     }
 
     @GetMapping("/{id}")

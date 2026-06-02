@@ -98,6 +98,7 @@ export function renderHeader(el) {
                  ${user.role === 'ADMIN' ? `
                    <a href="/admin/orders" class="dropdown-item">Pesanan Masuk (Toko)</a>
                    <a href="/admin/shops" class="dropdown-item">Pesan Masuk (Chat)</a>
+                   <a href="/admin/shop-settings" class="dropdown-item">Pengaturan Toko</a>
                    <a href="/admin/my-products" class="dropdown-item">Kelola Produk</a>
                  ` : `
                    <a href="/orders" class="dropdown-item">Riwayat Belanja</a>

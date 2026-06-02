@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +16,9 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Menggunakan key tetap agar tidak berubah saat aplikasi restart (Minimal 32 karakter untuk HS256)
+    private static final String SECRET_KEY = "RemonLaundrySuperSecretKeyForJWTAuthentication2026!";
+    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     private final long expirationTime = 1000 * 60 * 60 * 24; // 24 hours
 
     public String generateToken(String email, String role) {

@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userEmail;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.debug("No Bearer token found in request to {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -41,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         try {
             userEmail = jwtUtil.extractEmail(jwt);
+            logger.debug("JWT token found for email: {} in request to {}", userEmail, request.getRequestURI());
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 String role = jwtUtil.extractClaim(jwt, claims -> claims.get("role", String.class));
@@ -53,10 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+                logger.debug("Authentication set for user: {} with role: {}", userEmail, role);
             }
         } catch (Exception e) {
-            // Token invalid or expired
-            logger.error("Could not set user authentication in security context", e);
+            logger.error("Could not set user authentication in security context for request to {}: {}", request.getRequestURI(), e.getMessage());
         }
 
         filterChain.doFilter(request, response);

@@ -10,6 +10,7 @@ import { MyProductsPage } from '../pages/admin/my-products.js?v=remon118';
 import { ShopListPage } from '../pages/admin/shops/list.js?v=remon116';
 import { ShopAddPage } from '../pages/admin/shops/add.js?v=remon116';
 import { ShopDetailPage } from '../pages/admin/shops/detail.js?v=remon122';
+import { ShopSettingsPage } from '../pages/admin/shop-settings.js';
 import { PublicShopDetailPage } from '../pages/shops/detail.js';
 
 // Auth Pages
@@ -40,6 +41,7 @@ const routes = [
   { pattern: '/admin/shops', render: ShopListPage },
   { pattern: '/admin/shops/add', render: ShopAddPage },
   { pattern: '/admin/shops/:id', render: ShopDetailPage },
+  { pattern: '/admin/shop-settings', render: ShopSettingsPage },
   { pattern: '/shops/:id', render: PublicShopDetailPage },
   { pattern: '/auth', render: LoginPage }, // Deprecated, use /login
   { pattern: '/login', render: LoginPage },

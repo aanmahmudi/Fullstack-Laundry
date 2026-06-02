@@ -100,8 +100,12 @@ public class TransactionService {
 				.orElseThrow(() -> new RuntimeException("User not found"));
 				
 		if (customer.getRole() == Customer.RoleType.ADMIN) {
-			return transactionRepository.findByProductOwnerId(customer.getId()).stream()
-					.map(this::mapToResponseDTO).collect(Collectors.toList());
+			// Hanya ambil transaksi yang produknya memang milik admin ini
+			// dan pastikan produk tersebut ada (tidak null)
+			return transactionRepository.findAll().stream()
+					.filter(t -> t.getProduct() != null && customer.getId().equals(t.getProduct().getOwnerId()))
+					.map(this::mapToResponseDTO)
+					.collect(Collectors.toList());
 		}
 		
 		return transactionRepository.findByCustomerEmail(email).stream()

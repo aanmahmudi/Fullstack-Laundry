@@ -33,6 +33,27 @@ public class ShopService {
         return shopRepository.findByOwnerId(ownerId);
     }
 
+    public Shop getMyShop() {
+        String email = SecurityUtil.getCurrentUserEmail();
+        if (email == null) {
+            throw new RuntimeException("Authentication required");
+        }
+        
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        List<Shop> shops = shopRepository.findByOwnerId(customer.getId());
+        if (shops.isEmpty()) {
+            // Jika belum punya toko, buatkan satu secara otomatis (fallback)
+            Shop newShop = new Shop();
+            newShop.setName(customer.getUsername() + " Shop");
+            newShop.setDescription("Welcome to my shop!");
+            newShop.setOwnerId(customer.getId());
+            return shopRepository.save(newShop);
+        }
+        return shops.get(0);
+    }
+
     public Shop getShopById(Long id) {
         Optional<Shop> shop = shopRepository.findById(id);
         return shop.orElse(null);

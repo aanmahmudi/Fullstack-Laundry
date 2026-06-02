@@ -68,24 +68,18 @@ public class ShopMessageService {
 	}
 
 	public long countUnreadForAdminThread(Long shopId, Long customerId) {
-		shopRepository.findById(shopId).orElseThrow(() -> new RuntimeException("Shop not found"));
-		customerRepository.findById(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 		return shopMessageRepository.countByShopIdAndSenderCustomerIdAndFromAdminFalseAndReadFalse(shopId, customerId);
 	}
 
 	public long countUnreadForCustomerThread(Long shopId, Long customerId) {
-		shopRepository.findById(shopId).orElseThrow(() -> new RuntimeException("Shop not found"));
-		customerRepository.findById(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 		return shopMessageRepository.countByShopIdAndSenderCustomerIdAndFromAdminTrueAndReadFalse(shopId, customerId);
 	}
 
 	public long countUnreadForCustomerAllShops(Long customerId) {
-		customerRepository.findById(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 		return shopMessageRepository.countBySenderCustomerIdAndFromAdminTrueAndReadFalse(customerId);
 	}
 
 	public long countUnreadForAdminAllShops(Long ownerId) {
-		customerRepository.findById(ownerId).orElseThrow(() -> new RuntimeException("Customer not found"));
 		List<Shop> shops = shopRepository.findByOwnerId(ownerId);
 		long total = 0L;
 		for (Shop s : shops) {

@@ -28,14 +28,16 @@ public class WebAccessConfig {
 				"/api/customers/login",
 				"/api/customers/forgot-password",
 				"/api/customers/reset-password",
+				"/api/customers/*/chat/unread-count",
+				"/api/shops/*/messages/unread-count",
 				
 				// Auth Controller (New)
-				"/api/auth/**",
 				"/api/auth/login",
 				"/api/auth/register",
 				"/api/auth/forgot-password",
 				"/api/auth/reset-password",
 				"/api/auth/logout",
+				"/api/auth/**",
 
 				//OTP & TOKEN
 				"/api/otp/send",
@@ -50,6 +52,8 @@ public class WebAccessConfig {
 				//Product & Transaction (Public view only)
 				"/api/products",
 				"/api/products/**",
+				
+				// Uploads
 				"/uploads/**"
 		};
 	}

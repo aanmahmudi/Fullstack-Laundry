@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.laundry.BE_Laundry.DTO.ApiResponse;
 import com.laundry.BE_Laundry.DTO.CustomerLoginDTO;
 import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
 import com.laundry.BE_Laundry.DTO.ResetPasswordDTO;
@@ -71,7 +70,7 @@ public class AuthController {
 			String errorMessage = bindingResult.getAllErrors().stream().map(ObjectError::getDefaultMessage)
 					.collect(Collectors.joining(", "));
 			logger.warn("Validation failed: {}", errorMessage);
-			return ResponseEntity.badRequest().body(new ApiResponse("Invalid input: " + errorMessage, false));
+			return ResponseEntity.badRequest().body(Map.of("message", "Invalid input: " + errorMessage, "success", false));
 		}
 
 		logger.info("Login attempt for email: {}", customerLoginDTO.getEmail());
@@ -79,7 +78,12 @@ public class AuthController {
 			Customer customer = customerService.login(customerLoginDTO);
 			logger.info("Login successful for email: {}", customerLoginDTO.getEmail());
 			
-			String token = jwtUtil.generateToken(customer.getEmail(), customer.getRole().name());
+			String roleName = "USER";
+			if (customer.getRole() != null) {
+				roleName = customer.getRole().name();
+			}
+			
+			String token = jwtUtil.generateToken(customer.getEmail(), roleName);
 			
 			Map<String, Object> response = new HashMap<>();
 			response.put("message", "Login Successfuly");
@@ -88,11 +92,11 @@ public class AuthController {
 			response.put("customerId", customer.getId());
 			response.put("username", customer.getUsername());
 			response.put("email", customer.getEmail());
-			response.put("role", customer.getRole());
+			response.put("role", roleName);
 
-			if (customer.getRole() == Customer.RoleType.ADMIN) {
+			if (customer.getRole() != null && customer.getRole() == Customer.RoleType.ADMIN) {
 				java.util.List<Shop> shops = shopRepository.findByOwnerId(customer.getId());
-				if (!shops.isEmpty()) {
+				if (shops != null && !shops.isEmpty()) {
 					Shop shop = shops.get(0);
 					response.put("shopId", shop.getId());
 					response.put("shopName", shop.getName());
@@ -102,13 +106,13 @@ public class AuthController {
 			
 			return ResponseEntity.ok(response);
 		} catch (RuntimeException ex) {
-			logger.error("Login failed for email: {} due to {}", customerLoginDTO.getEmail(), ex.getMessage());
+			logger.error("Login failed for email: {} - Error: {}", customerLoginDTO.getEmail(), ex.getMessage(), ex);
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(new ApiResponse("Login failed: " + ex.getMessage(), false));
-		} catch (Exception ex) {
-			logger.error("Unexpected error occurred during login: {}", ex.getMessage());
+					.body(Map.of("message", "Login failed: " + ex.getMessage(), "success", false));
+		} catch (Throwable ex) {
+			logger.error("CRITICAL LOGIN ERROR for email: {} - Exception: {}", customerLoginDTO.getEmail(), ex.getClass().getName(), ex);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ApiResponse("An error occurred: " + ex.getMessage(), false));
+					.body(Map.of("message", "Internal Error: " + ex.getMessage(), "success", false));
 		}
 	}
 
