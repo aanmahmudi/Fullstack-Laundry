@@ -32,9 +32,9 @@ public class OTPService {
 		sendOtpToCustomer(customer);
 	}
 	
-	public String generate (String email) {
+	public String generate(String email) {
 		Customer c = customerRepository.findByEmail(email)
-				.orElseThrow(()-> new RuntimeException("User not found"));
+				.orElseThrow(() -> new RuntimeException("User not found"));
 		
 		
 		//Cegah generate OTP Jika sudah verifikasi
@@ -42,24 +42,13 @@ public class OTPService {
 			throw new IllegalStateException("Akun sudah terverifikasi, OTP tidak diperlukan");
 		}
 		
-		String otp;
-		OffsetDateTime expiry;
+		//Selalu generate OTP baru dan perbarui waktu expirednya
+		String otp = GenerateOTP.generateOTP();
+		OffsetDateTime expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(2));
 		
-		//Jika OTP masih aktif, gunakan OTP yang sama tapi kirim ulang emailnya
-		if (c.getVerificationOtp() != null &&
-				c.getOtpExpiry() != null &&
-				c.getOtpExpiry().isAfter(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
-			otp = c.getVerificationOtp();
-			expiry = c.getOtpExpiry();
-		} else {
-			//Generate OTP baru
-			otp = GenerateOTP.generateOTP();
-			expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(2));
-			
-			c.setVerificationOtp(otp);
-			c.setOtpExpiry(expiry);
-			customerRepository.save(c);
-		}
+		c.setVerificationOtp(otp);
+		c.setOtpExpiry(expiry);
+		customerRepository.save(c);
 		
 		// Kirim event ke Kafka alih-alih langsung kirim email
 		EmailEventDTO event = EmailEventDTO.builder()
