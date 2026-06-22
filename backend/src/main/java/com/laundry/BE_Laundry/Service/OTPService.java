@@ -6,6 +6,7 @@ import java.time.ZoneId;
 
 import org.springframework.stereotype.Service;
 
+import com.laundry.BE_Laundry.DTO.EmailEventDTO;
 import com.laundry.BE_Laundry.Model.Customer;
 import com.laundry.BE_Laundry.Repository.CustomerRepository;
 import com.laundry.BE_Laundry.Utill.GenerateOTP;
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OTPService {
 	private final CustomerRepository customerRepository;
-	private final EmailService emailService;
+	private final KafkaProducerService kafkaProducerService;
 	
 	public void sendOtpToCustomer(Customer customer) {
 		if (customer == null) {
@@ -41,22 +42,33 @@ public class OTPService {
 			throw new IllegalStateException("Akun sudah terverifikasi, OTP tidak diperlukan");
 		}
 		
-		//Cegah spam OTP, jika OTP masih aktif, jangan buat baru.
+		String otp;
+		OffsetDateTime expiry;
+		
+		//Jika OTP masih aktif, gunakan OTP yang sama tapi kirim ulang emailnya
 		if (c.getVerificationOtp() != null &&
 				c.getOtpExpiry() != null &&
 				c.getOtpExpiry().isAfter(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
-				return c.getVerificationOtp();
+			otp = c.getVerificationOtp();
+			expiry = c.getOtpExpiry();
+		} else {
+			//Generate OTP baru
+			otp = GenerateOTP.generateOTP();
+			expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(2));
+			
+			c.setVerificationOtp(otp);
+			c.setOtpExpiry(expiry);
+			customerRepository.save(c);
 		}
 		
-		//Generate OTP baru
-		String otp = GenerateOTP.generateOTP();
-		OffsetDateTime expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5));
+		// Kirim event ke Kafka alih-alih langsung kirim email
+		EmailEventDTO event = EmailEventDTO.builder()
+				.type("OTP")
+				.to(email)
+				.otp(otp)
+				.build();
+		kafkaProducerService.sendEmailEvent(event);
 		
-		c.setVerificationOtp(otp);
-		c.setOtpExpiry(expiry);
-		customerRepository.save(c);
-		
-		emailService.sendOTPEmail(email, otp);
 		return otp;
 	}
 	
@@ -116,13 +128,20 @@ public class OTPService {
 		
 		//Generate OTP baru untuk reset password (tidak peduli status verified)
 		String otp = GenerateOTP.generateOTP();
-		OffsetDateTime expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5));
+		OffsetDateTime expiry = (OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(2));
 		
 		c.setVerificationOtp(otp);
 		c.setOtpExpiry(expiry);
 		customerRepository.save(c);
 		
-		emailService.sendOTPEmail(email, otp);
+		// Kirim event ke Kafka
+		EmailEventDTO event = EmailEventDTO.builder()
+				.type("OTP")
+				.to(email)
+				.otp(otp)
+				.build();
+		kafkaProducerService.sendEmailEvent(event);
+		
 		return otp;
 	}
 	

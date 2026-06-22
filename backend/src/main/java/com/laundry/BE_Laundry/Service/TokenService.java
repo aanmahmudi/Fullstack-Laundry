@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.laundry.BE_Laundry.DTO.EmailEventDTO;
 import com.laundry.BE_Laundry.Model.Customer;
 import com.laundry.BE_Laundry.Repository.CustomerRepository;
 
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenService {
 	private final CustomerRepository customerRepository;
-	private final EmailService emailService;
+	private final KafkaProducerService kafkaProducerService;
 	
 	public void generate (String email) {
 		Customer c = customerRepository.findByEmail(email)
@@ -33,7 +34,13 @@ public class TokenService {
 		c.setVerificationToken(token);
 		customerRepository.save(c);
 		
-		emailService.sendVerificationLink(email, token);
+		// Kirim event ke Kafka
+		EmailEventDTO event = EmailEventDTO.builder()
+				.type("VERIFICATION")
+				.to(email)
+				.token(token)
+				.build();
+		kafkaProducerService.sendEmailEvent(event);
 		
 	}
 	

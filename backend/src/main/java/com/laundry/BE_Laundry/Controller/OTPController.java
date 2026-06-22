@@ -34,18 +34,24 @@ public class OTPController {
 	private static final Logger logger = LoggerFactory.getLogger(OTPController.class);
 
 	@PostMapping("/send")
-	public ResponseEntity<String> send(@RequestBody @Valid OTPSendDTO otpSend) {
+	public ResponseEntity<Map<String, String>> send(@RequestBody @Valid OTPSendDTO otpSend) {
 		String email = otpSend.getEmail();
 		try {
 			otpService.generate(email);
 			logger.info("OTP sent Successfully to {}", email);
-			return ResponseEntity.ok("OTP Sent");
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "OTP Sent");
+			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
 			logger.warn("Failed to send OTP to {} - {}", email, ex.getMessage());
-			return ResponseEntity.badRequest().body("Failed to send OTP: " + ex.getMessage());
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "Failed to send OTP: " + ex.getMessage());
+			return ResponseEntity.badRequest().body(response);
 		} catch (Exception ex) {
 			logger.error("Unexpected error while sending OTP to {}: {}", email, ex.getMessage(), ex);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured while sending OTP");
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "An error occured while sending OTP");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
 
@@ -90,18 +96,24 @@ public class OTPController {
 	}
 
 	@PostMapping("/resend")
-	public ResponseEntity<?> resend(@RequestBody @Valid OTPSendDTO resend) {
+	public ResponseEntity<Map<String, String>> resend(@RequestBody @Valid OTPSendDTO resend) {
 		String email = resend.getEmail();
 		try {
 			otpService.generate(email);
 			logger.info("OTP resend Successfuly to {}", email);
-			return ResponseEntity.ok("OTP Resend");
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "OTP Resend");
+			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
 			logger.warn("Failed to resend OTP to {} - {}", email, ex.getMessage());
-			return ResponseEntity.badRequest().body("Failed to resend OTP: " + ex.getMessage());
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "Failed to resend OTP: " + ex.getMessage());
+			return ResponseEntity.badRequest().body(response);
 		} catch (Exception ex) {
 			logger.error("Unexcepted error while resend OTP to {}: {}", email, ex.getMessage(), ex);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occured while resend OTP");
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "An error occured while resend OTP");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
 

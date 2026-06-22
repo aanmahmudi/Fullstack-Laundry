@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.laundry.BE_Laundry.DTO.CustomerLoginDTO;
+import com.laundry.BE_Laundry.DTO.EmailEventDTO;
 import com.laundry.BE_Laundry.DTO.OTPVerificationDTO;
 import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
 import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
@@ -33,7 +34,7 @@ public class CustomerService {
 	private final CustomerRepository customerRepository;
 	private final ShopRepository shopRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final EmailService emailService;
+	private final KafkaProducerService kafkaProducerService;
 	private final OTPService otpService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
@@ -57,12 +58,6 @@ public class CustomerService {
 		customer.setVerificationOtp(otp);
 		customer.setOtpExpiry((OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5)));
 		customer.setVerified(false);
-		
-		//Logika Link Token
-		String token = UUID.randomUUID().toString();
-		customer.setVerificationToken(token);
-		customer.setTokenExpiry((OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5)));
-		customer.setVerified(false);
 				
 		// Simpan ke database
 		Customer saved = customerRepository.save(customer);
@@ -76,11 +71,14 @@ public class CustomerService {
 			shopRepository.save(shop);
 		}
 		
-		// Kirim Token ke email
-		emailService.sendVerificationLink(customer.getEmail(), token);
+		// Kirim OTP ke email via Kafka
+		EmailEventDTO otpEvent = EmailEventDTO.builder()
+				.type("OTP")
+				.to(customer.getEmail())
+				.otp(otp)
+				.build();
+		kafkaProducerService.sendEmailEvent(otpEvent);
 		
-		// Kirim OTP ke email
-		emailService.sendOTPEmail(customer.getEmail(), otp);
 		return saved;
 		
 	}
