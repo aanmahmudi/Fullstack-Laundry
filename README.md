@@ -143,10 +143,7 @@ Pastikan Docker Desktop sudah menyala!
 Tunggu beberapa saat sampai semua container berjalan!
 
 ### Akses Aplikasi
-- **Frontend**: `http://localhost:3000`
-- **Backend API**: `http://localhost:8081`
-- **PostgreSQL**: `localhost:5433` (untuk manajemen database)
-- **Kafka**: `localhost:29092` (untuk akses dari luar Docker)
+- Frontend, backend, database, dan Kafka mengikuti konfigurasi pada environment dan `docker-compose.yml`.
 
 ### 2. Melihat Log Aplikasi
 Untuk melihat log dan memastikan Kafka berjalan dengan baik:
@@ -220,35 +217,16 @@ Aplikasi ini dibangun dengan teknologi berikut:
 - `DB_NAME` - Nama database
 - `DB_USERNAME` - Username database
 - `DB_PASSWORD` - Password database
-- `DB_URL` - JDBC URL database (misalnya `jdbc:postgresql://db:5432/laundrydb`)
+- `DB_URL` - JDBC URL database
 
 ### Email
 Untuk mengirim email via SMTP (contoh Gmail):
-- `SPRING_MAIL_HOST` - Host SMTP (misalnya `smtp.gmail.com`)
-- `SPRING_MAIL_PORT` - Port SMTP (misalnya `587`)
+- `SPRING_MAIL_HOST` - Host SMTP
+- `SPRING_MAIL_PORT` - Port SMTP
 - `SPRING_MAIL_USERNAME` - Alamat email pengirim
 - `SPRING_MAIL_PASSWORD` - App Password email (untuk Gmail, gunakan App Password, bukan password utama)
 
 ### Kafka
-- `SPRING_KAFKA_BOOTSTRAP_SERVERS` - Alamat Kafka broker (default: `kafka:9092` untuk Docker, `localhost:29092` untuk local)
-
-Contoh `.env` sederhana:
-
-```env
-# Database Configuration
-DB_NAME=db-laundry
-DB_USERNAME=subrutin
-DB_PASSWORD=subrutin
-DB_URL=jdbc:postgresql://db:5432/db-laundry
-
-# Email Configuration (Gmail example)
-SPRING_MAIL_HOST=smtp.gmail.com
-SPRING_MAIL_PORT=587
-SPRING_MAIL_USERNAME=your-email@gmail.com
-SPRING_MAIL_PASSWORD=your-app-password
-
-# Kafka Configuration (optional, default sudah ada di docker-compose.yml)
-SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-```
+- `SPRING_KAFKA_BOOTSTRAP_SERVERS` - Alamat Kafka broker
 
 File `.env` **tidak** di-commit ke Git sehingga setiap environment (local, staging, production) bisa punya konfigurasi sendiri.
