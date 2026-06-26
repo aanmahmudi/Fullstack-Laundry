@@ -1,99 +1,21 @@
 <!doctype html>
 <html lang="id">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Remon Eccom - Belanja Online Terpercaya</title>
-    <link rel="stylesheet" href="/assets/styles.css?v=remon113" />
-    <link rel="stylesheet" href="/assets/auth.css?v=remon113" />
-    <link rel="stylesheet" href="/assets/home.css?v=remon113" />
-    <link rel="stylesheet" href="/assets/products.css?v=remon113" />
-    <link rel="stylesheet" href="/assets/cart.css?v=remon113" />
-    
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laundry App</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+    </style>
   </head>
   <body>
-    <div id="global-error-display" style="display:none; position:fixed; top:0; left:0; right:0; background:red; color:white; padding:20px; z-index:9999; font-family:monospace; white-space:pre-wrap;"></div>
-    <script>
-      window.onerror = function(msg, url, line, col, error) {
-        var display = document.getElementById('global-error-display');
-        display.style.display = 'block';
-        display.innerHTML += 'Global Error: ' + msg + '\nLocation: ' + url + ':' + line + ':' + col + '\nStack: ' + (error ? error.stack : 'no stack') + '\n\n';
-        console.error('Global Error:', msg, url, line, col, error);
-        return false;
-      };
-      window.addEventListener('unhandledrejection', function(event) {
-        // Suppress specific UI error related to race conditions during navigation
-        // This error happens when async operations try to update the DOM after the page has changed.
-        // It is harmless as the old page is already gone.
-        if (event.reason && event.reason.message && event.reason.message.includes("Cannot set properties of null")) {
-             console.warn('Suppressed navigation race condition error:', event.reason);
-             return;
-        }
-
-        var display = document.getElementById('global-error-display');
-        display.style.display = 'block';
-        display.innerHTML += 'Unhandled Promise Rejection: ' + event.reason + '\n\n';
-      });
-    </script>
-    <header id="app-header"></header>
-
-    <main id="app-main"></main>
-
-    <footer id="app-footer">
-      <div class="footer-content">
-        <div class="footer-col">
-          <h3>Layanan Pelanggan</h3>
-          <ul>
-            <li><a href="#">Bantuan</a></li>
-            <li><a href="#">Metode Pembayaran</a></li>
-            <li><a href="#">Lacak Pesanan</a></li>
-            <li><a href="#">Hubungi Kami</a></li>
-            <li><a href="#">Garansi Shopee</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3>Tentang Remon Eccom</h3>
-          <ul>
-            <li><a href="#">Tentang Kami</a></li>
-            <li><a href="#">Karir</a></li>
-            <li><a href="#">Kebijakan Privasi</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Media Kontak</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3>Pembayaran</h3>
-          <div style="display:flex; gap:10px; flex-wrap: wrap;">
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BCA</span>
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">Mandiri</span>
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BNI</span>
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">BRI</span>
-          </div>
-          <h3 style="margin-top: 20px;">Pengiriman</h3>
-          <div style="display:flex; gap:10px; flex-wrap: wrap;">
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">JNE</span>
-             <span style="background:#fff; padding:5px; border-radius:2px; border:1px solid #ddd; font-size:12px;">J&T</span>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h3>Ikuti Kami</h3>
-          <div style="display:flex; gap:10px;">
-            <a href="#">FB</a> | <a href="#">IG</a> | <a href="#">TW</a>
-          </div>
-          <h3 style="margin-top: 20px;">Download Aplikasi</h3>
-          <p class="muted">Scan QR Code untuk download aplikasi Remon Eccom</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        &copy; 2026 Remon Eccom. Hak Cipta Dilindungi.
-      </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-     <script src="/js/api.js?v=remon121"></script>
-     <script type="module" src="/app/main.js?v=remon121"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -38,7 +38,7 @@ public class OTPController {
 		String email = otpSend.getEmail();
 		try {
 			otpService.generate(email);
-			logger.info("OTP sent Successfully to {}", email);
+			logger.info("OTP sent successfully to {}", email);
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "OTP Sent");
 			return ResponseEntity.ok(response);
@@ -50,7 +50,7 @@ public class OTPController {
 		} catch (Exception ex) {
 			logger.error("Unexpected error while sending OTP to {}: {}", email, ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "An error occured while sending OTP");
+			response.put("message", "An error occurred while sending OTP");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
@@ -66,11 +66,11 @@ public class OTPController {
 			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
 			Map<String, String> response = new HashMap<>();
-			response.put("error", "Verification failed:" + ex.getMessage());
+			response.put("message", "Verification failed: " + ex.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception ex) {
 			Map<String, String> response = new HashMap<>();
-			response.put("error", "An error occurred:" + ex.getMessage());
+			response.put("message", "An error occurred: " + ex.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
@@ -86,11 +86,11 @@ public class OTPController {
 			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
 			Map<String, String> response = new HashMap<>();
-			response.put("error", ex.getMessage());
+			response.put("message", ex.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception ex) {
 			Map<String, String> response = new HashMap<>();
-			response.put("error", "An error occurred:" + ex.getMessage());
+			response.put("message", "An error occurred: " + ex.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
@@ -100,9 +100,9 @@ public class OTPController {
 		String email = resend.getEmail();
 		try {
 			otpService.generate(email);
-			logger.info("OTP resend Successfuly to {}", email);
+			logger.info("OTP resent successfully to {}", email);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "OTP Resend");
+			response.put("message", "OTP Resent");
 			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
 			logger.warn("Failed to resend OTP to {} - {}", email, ex.getMessage());
@@ -110,9 +110,9 @@ public class OTPController {
 			response.put("message", "Failed to resend OTP: " + ex.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		} catch (Exception ex) {
-			logger.error("Unexcepted error while resend OTP to {}: {}", email, ex.getMessage(), ex);
+			logger.error("Unexpected error while resending OTP to {}: {}", email, ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "An error occured while resend OTP");
+			response.put("message", "An error occurred while resending OTP");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}

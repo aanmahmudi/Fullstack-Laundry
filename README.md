@@ -1,13 +1,14 @@
 # 🧺 Fullstack Laundry Application
 
-Aplikasi manajemen laundry / ecommerce sederhana dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (Vanilla JS SPA).
+Aplikasi manajemen laundry / ecommerce sederhana dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (React JS), dilengkapi dengan **Apache Kafka** untuk asynchronous processing!
 
 ## ✨ Ringkasan Singkat
 
-- Frontend SPA berbasis HTML/CSS/Vanilla JS, di-serve lewat Nginx (Docker).
+- Frontend SPA berbasis **React JS + Vite**, di-serve lewat Nginx (Docker).
 - Backend Spring Boot dengan PostgreSQL, OTP email, dan migrasi Flyway.
+- **Apache Kafka** untuk asynchronous email processing dan event-driven architecture.
 - Fitur:
-  - Autentikasi (register, login, lupa/reset password).
+  - Autentikasi (register, login, lupa/reset password) dengan OTP via email.
   - Katalog produk yang terhubung ke **toko** tertentu.
   - Keranjang & checkout dengan metode pembayaran COD / Transfer / Kartu Kredit (simulasi).
   - Halaman pesanan untuk user dan halaman **Pesanan Masuk (Toko)** untuk admin/pemilik.
@@ -17,15 +18,25 @@ Aplikasi manajemen laundry / ecommerce sederhana dengan arsitektur **Monorepo** 
 
 ## 🏗️ Arsitektur Sistem
 
-Aplikasi ini terdiri dari dua bagian utama yang berkomunikasi melalui REST API.
+Aplikasi ini terdiri dari beberapa layanan yang saling berkomunikasi:
 
 ```mermaid
 graph TD
     User((User)) -->|Akses Browser| FE[Frontend SPA]
     FE -->|REST API Request| BE[Backend Spring Boot]
     BE -->|Query/Save| DB[(PostgreSQL Database)]
-    BE -->|Email Service| SMTP[SMTP Server]
+    BE -->|Kirim Event| K[Apache Kafka]
+    K -->|Consume Event| BE[Backend Spring Boot]
+    BE -->|Kirim Email| SMTP[SMTP Server]
 ```
+
+### Bagaimana Kafka Bekerja di Aplikasi Ini?
+Kafka digunakan untuk **memisahkan proses pengiriman email** dari request utama user. Ketika user request OTP atau register:
+1. Backend mengirim event ke Kafka topic `laundry-email-events`
+2. User langsung mendapatkan response "OTP dikirim" tanpa menunggu email selesai
+3. Consumer di backend mengambil event dari Kafka dan mengirim email secara asynchronous
+
+---
 
 ---
 
@@ -80,13 +91,23 @@ Backend dibangun menggunakan Java Spring Boot dengan struktur Layered Architectu
 
 ```text
 backend/src/main/java/com/laundry/BE_Laundry/
+├── Config/                 # Konfigurasi aplikasi (Security, CORS, WebAccess)
 ├── Controller/             # Menangani request HTTP dari Frontend
 │   ├── AuthController.java
 │   ├── CustomerController.java
+│   ├── OTPController.java
 │   ├── ProductController.java
 │   └── TransactionController.java
 │
 ├── Service/                # Logika bisnis
+│   ├── EmailService.java
+│   ├── KafkaProducerService.java    # Producer untuk kirim event ke Kafka
+│   ├── KafkaConsumerService.java    # Consumer untuk terima event dari Kafka
+│   └── ...
+│
+├── DTO/                    # Data Transfer Object (request/response payload)
+│   └── EmailEventDTO.java  # DTO untuk event email di Kafka
+│
 ├── Repository/             # Akses ke Database
 └── Model/                  # Definisi struktur data (Entity)
 ```
@@ -145,43 +166,136 @@ Dengan menambahkan parameter unik seperti `?v=fix8` (Version Fix 8), kita "menip
 
 ## 🚀 Cara Menjalankan Aplikasi
 
-### 1. Menjalankan Backend & Frontend (Docker)
-Pastikan Docker Desktop sudah menyala.
-```bash
-docker compose up -d --build
-```
-- Backend akan berjalan di: `http://localhost:8081`
-- Frontend akan berjalan di: `http://localhost:3000`
+### Prasyarat
+Pastikan Anda memiliki:
+- **Docker Desktop** (untuk Windows/macOS) atau **Docker Engine** (untuk Linux)
+- **Git** (opsional, untuk clone repository)
 
-> **Tip:** Pastikan Anda sudah membuat file `.env` di root project untuk konfigurasi database
-> (lihat bagian *Environment* di bawah atau file `docker-compose.yml`).
+### 1. Menjalankan Semua Layanan (Docker)
+Pastikan Docker Desktop sudah menyala!
 
-### 2. Menjalankan Frontend Manual (Opsional)
-Jika tidak menggunakan container frontend:
+1. Clone repository (jika belum):
+   ```bash
+   git clone <repository-url>
+   cd Fullstack-Laundry
+   ```
+
+2. Buat file `.env` di root project (contoh di bagian Environment).
+
+3. Jalankan semua layanan:
+   ```bash
+   docker compose up -d --build
+   ```
+
+Tunggu beberapa saat sampai semua container berjalan!
+
+### Akses Aplikasi
+- **Frontend**: `http://localhost:3000`
+- **Backend API**: `http://localhost:8081`
+- **PostgreSQL**: `localhost:5433` (untuk manajemen database)
+- **Kafka**: `localhost:29092` (untuk akses dari luar Docker)
+
+### 2. Melihat Log Aplikasi
+Untuk melihat log dan memastikan Kafka berjalan dengan baik:
 ```bash
-# Dari folder root proyek
-npx http-server ./frontend -p 5500 -c-1
+# Melihat log semua container
+docker compose logs -f
+
+# Melihat log backend saja
+docker compose logs -f app
+
+# Melihat log Kafka saja
+docker compose logs -f kafka
 ```
-Buka browser di: `http://localhost:5500`
+
+### 3. Menghentikan Aplikasi
+```bash
+docker compose down
+
+# Untuk menghapus volume database juga (hati-hati!)
+docker compose down -v
+```
+
+### 4. Menjalankan Frontend Secara Lokal (Opsional)
+Jika ingin menjalankan frontend secara lokal untuk development:
+```bash
+# Dari folder frontend
+cd frontend
+npm install
+npm run dev
+```
+Buka browser di: `http://localhost:3000`
+
+---
+
+## 🛠️ Tech Stack
+
+Aplikasi ini dibangun dengan teknologi berikut:
+
+### Backend
+- **Java 21** - Bahasa pemrograman
+- **Spring Boot 3.3.13** - Framework backend
+  - Spring Data JPA - ORM untuk akses database
+  - Spring Security - Keamanan aplikasi (JWT)
+  - Spring Kafka - Integrasi dengan Apache Kafka
+  - Spring Mail - Pengiriman email
+- **PostgreSQL 16** - Database relational
+- **Maven** - Build tools dan manajemen dependensi
+- **Lombok** - Mengurangi boilerplate code
+- **Flyway** - Database migration (opsional, dinonaktifkan)
+- **Apache Kafka** - Message broker untuk asynchronous processing
+- **Zookeeper** - Manajemen cluster Kafka
+
+### Frontend
+- **React 18** - Library untuk UI
+- **Vite** - Build tool & dev server
+- **React Router Dom** - Routing
+- **Axios** - HTTP Client
+- **Nginx** - Web server untuk serve production build
+
+### DevOps
+- **Docker** - Containerization
+- **Docker Compose** - Orkestrasi multi-container
 
 ---
 
 ## ⚙️ Environment (Docker Compose)
 
-`docker-compose.yml` membaca konfigurasi database dari environment berikut:
+`docker-compose.yml` dan backend membaca konfigurasi dari environment berikut:
 
-- `DB_NAME`
-- `DB_USERNAME`
-- `DB_PASSWORD`
-- `DB_URL` (misalnya `jdbc:postgresql://db:5432/laundrydb`)
+### Database
+- `DB_NAME` - Nama database
+- `DB_USERNAME` - Username database
+- `DB_PASSWORD` - Password database
+- `DB_URL` - JDBC URL database (misalnya `jdbc:postgresql://db:5432/laundrydb`)
+
+### Email
+Untuk mengirim email via SMTP (contoh Gmail):
+- `SPRING_MAIL_HOST` - Host SMTP (misalnya `smtp.gmail.com`)
+- `SPRING_MAIL_PORT` - Port SMTP (misalnya `587`)
+- `SPRING_MAIL_USERNAME` - Alamat email pengirim
+- `SPRING_MAIL_PASSWORD` - App Password email (untuk Gmail, gunakan App Password, bukan password utama)
+
+### Kafka
+- `SPRING_KAFKA_BOOTSTRAP_SERVERS` - Alamat Kafka broker (default: `kafka:9092` untuk Docker, `localhost:29092` untuk local)
 
 Contoh `.env` sederhana:
 
 ```env
-DB_NAME=laundrydb
-DB_USERNAME=laundry
-DB_PASSWORD=changeme
-DB_URL=jdbc:postgresql://db:5432/laundrydb
+# Database Configuration
+DB_NAME=db-laundry
+DB_USERNAME=subrutin
+DB_PASSWORD=subrutin
+DB_URL=jdbc:postgresql://db:5432/db-laundry
+
+# Email Configuration (Gmail example)
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_PORT=587
+SPRING_MAIL_USERNAME=your-email@gmail.com
+SPRING_MAIL_PASSWORD=your-app-password
+
+# Kafka Configuration (optional, default sudah ada di docker-compose.yml)
+SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 ```
 
 File `.env` **tidak** di-commit ke Git sehingga setiap environment (local, staging, production) bisa punya konfigurasi sendiri.

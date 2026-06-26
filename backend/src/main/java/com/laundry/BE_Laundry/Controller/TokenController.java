@@ -33,7 +33,7 @@ public class TokenController {
 		String email = tokenSend.getEmail();
 		try {
 			tokenService.generate(email);
-			logger.info("Token sent Successfully to {}", email);
+			logger.info("Token sent successfully to {}", email);
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "Token Sent");
 			return ResponseEntity.ok(response);
@@ -45,7 +45,7 @@ public class TokenController {
 		} catch (Exception ex) {
 			logger.error("Unexpected error while sending Token to {}: {}", email, ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "An error occured while sending Token");
+			response.put("message", "An error occurred while sending Token");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
@@ -61,12 +61,12 @@ public class TokenController {
 		}catch (IllegalArgumentException ex) {
 			logger.warn("Token verification failed for {}: {}", verifyDTO.getEmail(), ex.getMessage());
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "Verification failed:" + ex.getMessage());
+			response.put("message", "Verification failed: " + ex.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}catch (Exception ex) {
-			logger.error("Error Verify token for {}: {}", verifyDTO.getEmail(), ex.getMessage(), ex);
+			logger.error("Error verifying token for {}: {}", verifyDTO.getEmail(), ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "An Error occured during verification");
+			response.put("message", "An error occurred during verification");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		
@@ -83,12 +83,12 @@ public class TokenController {
 		}catch (IllegalArgumentException ex) {
 			logger.warn("Resend failed for {}: {}", verifyDTO.getEmail(), ex.getMessage());
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "Resend failed:" + ex.getMessage());
+			response.put("message", "Resend failed: " + ex.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}catch (Exception ex) {
-			logger.error("Error Resend token for {}: {}", verifyDTO.getEmail(), ex.getMessage(), ex);
+			logger.error("Error resending token for {}: {}", verifyDTO.getEmail(), ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
-			response.put("message", "An Error occured while resending verification");
+			response.put("message", "An error occurred while resending verification");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		

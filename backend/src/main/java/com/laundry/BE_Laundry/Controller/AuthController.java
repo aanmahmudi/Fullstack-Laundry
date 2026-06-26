@@ -86,7 +86,7 @@ public class AuthController {
 			String token = jwtUtil.generateToken(customer.getEmail(), roleName);
 			
 			Map<String, Object> response = new HashMap<>();
-			response.put("message", "Login Successfuly");
+			response.put("message", "Login Successfully");
 			response.put("success", true);
 			response.put("token", token);
 			response.put("customerId", customer.getId());
@@ -129,12 +129,12 @@ public class AuthController {
             customerService.logout(email);
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "message", "Logout successfuly for email : " + email
+                    "message", "Logout successfully for email: " + email
             ));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "success", false,
-                    "message", "An error occured: " + ex.getMessage()
+                    "message", "An error occurred: " + ex.getMessage()
             ));
         }
     }

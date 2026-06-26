@@ -41,7 +41,6 @@ public class WebAccessConfig {
 
 				//OTP & TOKEN
 				"/api/otp/send",
-				"/spi/otp/otp",
 				"/api/otp/verify",
 				"/api/otp/verify-reset",
 				"/api/otp/resend",
