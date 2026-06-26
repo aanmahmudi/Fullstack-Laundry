@@ -13,6 +13,7 @@ import Cart from './pages/cart/Cart'
 import Checkout from './pages/checkout/Checkout'
 import Orders from './pages/orders/List'
 import OrderDetail from './pages/orders/Detail'
+import SellerProducts from './pages/seller/Products'
 import Header from './components/Header'
 import './App.css'
 
@@ -139,6 +140,18 @@ function App() {
             path="/orders/:id"
             element={
               user ? <OrderDetail user={user} /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/seller/products"
+            element={
+              user && user.role === 'ADMIN' ? (
+                <SellerProducts user={user} />
+              ) : user ? (
+                <Navigate to="/" />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
         </Routes>

@@ -1,78 +1,113 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import api from '../../services/api'
 
-function Products({ addToCart }) {
+function Products({ addToCart, user }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [message, setMessage] = useState('')
+  const [searchParams] = useSearchParams()
+  const initialSearch = searchParams.get('search') || ''
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async (query = '') => {
     try {
-      const res = await api.get('/products')
+      setLoading(true)
+      let url = '/products'
+      if (query) {
+        url += `?search=${encodeURIComponent(query)}`
+      }
+      const res = await api.get(url)
       setProducts(res.data || [])
     } catch (error) {
-      setMessage('Gagal memuat produk')
+      console.error('Gagal memuat produk:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const getProductImage = (product) => {
-    if (product.images && product.images.length > 0) {
-      return `/uploads/${product.images[0].filename}`
-    }
-    return 'https://via.placeholder.com/250x200?text=No+Image'
-  }
+  useEffect(() => {
+    fetchProducts(searchQuery)
+  }, [fetchProducts, searchQuery])
 
-  if (loading) {
-    return <div className="loading">Loading...</div>
+  const handleSearchSubmit = (e) => {
+    e.preventDefault()
+    fetchProducts(searchQuery)
   }
 
   return (
-    <div>
-      <h2>Daftar Produk</h2>
-      {message && <div className="alert alert-error">{message}</div>}
-      <div className="product-grid">
-        {products.map((product) => (
-          <div key={product.id} className="product-card">
-            <img
-              src={getProductImage(product)}
-              alt={product.name}
-              className="product-image"
+    <div className="product-layout">
+      <div className="actions">
+        <h2>Produk Terbaru</h2>
+        <div style={{ display: 'flex', gap: '10px', flex: '1', maxWidth: '400px' }}>
+          <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: '10px', flex: '1' }}>
+            <input
+              className="input"
+              placeholder="Cari produk..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ background: 'white', border: '1px solid #e2e8f0', color: '#333', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
             />
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                {product.description}
-              </p>
-              <p className="product-price">
-                Rp {product.price.toLocaleString('id-ID')}
-              </p>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Link
-                  to={`/products/${product.id}`}
-                  className="btn btn-secondary"
-                  style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}
-                >
-                  Detail
-                </Link>
+            <button type="submit" className="btn" style={{ background: '#1a1a1a', color: 'white' }}>
+              Cari
+            </button>
+          </form>
+          <button
+            onClick={() => {
+              setSearchQuery('')
+              fetchProducts('')
+            }}
+            className="btn"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="loading" style={{ color: '#333', padding: '40px' }}>Memuat produk...</div>
+      ) : products.length === 0 ? (
+        <section>
+          <p style={{ textAlign: 'center', color: '#666' }}>Tidak ada produk ditemukan.</p>
+        </section>
+      ) : (
+        <div id="products-grid" className="grid">
+          {products.map((product) => (
+            <article key={product.id} className="card">
+              <Link to={`/products/${product.id}`}>
+                <figure className="thumb">
+                  {product.photoUrl ? (
+                    <img
+                      src={product.photoUrl}
+                      alt={product.name}
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/400x300/f1f5f9/94a3b8?text=No+Image'
+                      }}
+                    />
+                  ) : (
+                    <img src="https://via.placeholder.com/400x300/f1f5f9/94a3b8?text=No+Image" alt="No Image" />
+                  )}
+                </figure>
+                <div className="card-body">
+                  <h3>{product.name}</h3>
+                  <p>{product.description || 'Produk berkualitas pilihan dari Remon Eccom.'}</p>
+                  <div className="price">
+                    Rp {Number(product.price || 0).toLocaleString('id-ID')}
+                  </div>
+                </div>
+              </Link>
+              <div style={{ padding: '0 24px 24px' }}>
                 <button
-                  onClick={() => addToCart(product)}
-                  className="btn btn-primary"
-                  style={{ flex: 1 }}
+                  onClick={() => addToCart(product, 1)}
+                  className="btn primary"
+                  style={{ width: '100%' }}
                 >
-                  + Keranjang
+                  Tambah ke Keranjang
                 </button>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

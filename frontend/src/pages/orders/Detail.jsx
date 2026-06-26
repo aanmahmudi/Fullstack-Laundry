@@ -1,55 +1,101 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import api from '../../services/api'
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import api from '../../services/api';
 
 function OrderDetail() {
-  const [order, setOrder] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const { id } = useParams()
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
 
   useEffect(() => {
-    fetchOrder()
-  }, [id])
+    fetchOrder();
+  }, [id]);
 
   const fetchOrder = async () => {
     try {
-      const res = await api.get(`/transactions/${id}`)
-      setOrder(res.data)
+      const res = await api.get(`/transactions/${id}`);
+      setOrder(res.data);
     } catch (error) {
-      console.error('Error fetching order:', error)
+      console.error('Error fetching order:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
-    return <div className="loading">Loading...</div>
+    return <div className="loading">Loading...</div>;
   }
 
   if (!order) {
-    return <div>Pesanan tidak ditemukan</div>
+    return <div style={{ textAlign: 'center', padding: '3rem', color: 'white' }}>Pesanan tidak ditemukan</div>;
   }
 
   return (
-    <div className="card" style={{ maxWidth: '800px' }}>
-      <Link to="/orders">← Kembali ke Daftar Pesanan</Link>
-      <h2 style={{ marginTop: '1rem' }}>Detail Pesanan #{order.id}</h2>
-      <p>Tanggal: {new Date(order.createdAt).toLocaleDateString('id-ID')}</p>
-      <p>Status: <strong>{order.status}</strong></p>
-      <hr />
-      <h3>Daftar Produk</h3>
-      {order.items?.map((item, idx) => (
-        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', padding: '0.5rem 0', borderBottom: '1px solid #eee' }}>
-          <span>{item.productName} x {item.quantity}</span>
-          <span>Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
+    <div className="card order-detail-card">
+      <Link to="/orders" className="back-link">
+        ← Kembali ke Daftar Pesanan
+      </Link>
+      <h2>Detail Pesanan #{order.id}</h2>
+      
+      <div className="order-item">
+        <div className="order-item-name">Nomor Order</div>
+        <div className="order-item-info">{order.orderNumber || '-'}</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Produk</div>
+        <div className="order-item-info">{order.productName || '-'}</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Jumlah</div>
+        <div className="order-item-info">{order.quantity || 0} pcs</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Total Harga</div>
+        <div className="order-item-info" style={{ fontWeight: 'bold', color: '#667eea', fontSize: '1.25rem' }}>
+          Rp {Number(order.totalPrice || 0).toLocaleString('id-ID')}
         </div>
-      ))}
-      <hr />
-      <div style={{ textAlign: 'right', marginTop: '1rem' }}>
-        <h3>Total: Rp {order.total.toLocaleString('id-ID')}</h3>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Status Pesanan</div>
+        <div className={`order-status ${order.orderStatus?.toLowerCase() || 'pending'}`}>
+          {order.orderStatus || 'PENDING'}
+        </div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Status Pembayaran</div>
+        <div className={`order-status ${order.paymentStatus === 'PAID' ? 'paid' : 'pending'}`}>
+          {order.paymentStatus || 'UNPAID'}
+        </div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Metode Pembayaran</div>
+        <div className="order-item-info">{order.paymentMethod || '-'}</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Alamat Pengiriman</div>
+        <div className="order-item-info">{order.shippingAddress || '-'}</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Catatan</div>
+        <div className="order-item-info">{order.notes || '-'}</div>
+      </div>
+
+      <div className="order-item">
+        <div className="order-item-name">Kode Pembayaran</div>
+        <div className="order-item-info" style={{ fontWeight: 'bold', color: '#667eea' }}>
+          {order.paymentCode || '-'}
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default OrderDetail
+export default OrderDetail;

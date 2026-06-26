@@ -8,6 +8,7 @@ import com.laundry.BE_Laundry.Model.Customer.RoleType;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,18 +26,24 @@ public class RegisterRequestDTO {
 	@NotBlank(message = "Name is required")
 	private String username;
 
+	@NotBlank(message = "No. KTP wajib diisi")
+	@Pattern(regexp = "\\d{16}", message = "No. KTP harus 16 digit angka")
 	private String ktpNumber;
 	private String shopName;
 	private String shopDescription;
 
+	@NotBlank(message = "Tempat lahir wajib diisi")
 	private String placeOfBirth;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@NotNull(message = "Tanggal lahir wajib diisi")
 	private LocalDate dateOfBirth;
+	
+	@NotBlank(message = "Alamat wajib diisi")
 	private String address;
 	@NotBlank(message = "Phone number is required")
 						// (\\+62)?
-    @Pattern(regexp = "\\d{12,13}", message = "Phone number must be 12 or 13 digits")
+    @Pattern(regexp = "\\d{10,13}", message = "Phone number must be 10 to 13 digits")
 	private String phoneNumber;
 
 	@NotBlank(message = "Email is required")

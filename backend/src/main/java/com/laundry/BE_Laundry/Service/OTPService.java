@@ -28,13 +28,13 @@ public class OTPService {
 	
 	public void sendOtpEmail(String email) {
 		Customer customer = customerRepository.findByEmail(email)
-				.orElseThrow(()-> new RuntimeException("Customer tidak ditemukan"));
+				.orElseThrow(() -> new IllegalArgumentException("Customer tidak ditemukan"));
 		sendOtpToCustomer(customer);
 	}
 	
 	public String generate(String email) {
 		Customer c = customerRepository.findByEmail(email)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		
 		
 		//Cegah generate OTP Jika sudah verifikasi
@@ -63,7 +63,7 @@ public class OTPService {
 	
 	public boolean checkOtp(String email, String otp) {
 		Customer c = customerRepository.findByEmail(email)
-				.orElseThrow(()-> new RuntimeException("User not found"));
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		
 		if (c.getVerificationOtp() == null || !c.getVerificationOtp().equals(otp)) {
 			throw new IllegalArgumentException("OTP Salah");
@@ -78,7 +78,7 @@ public class OTPService {
 
 	public void verify (String email, String otp) {
 		Customer c = customerRepository.findUnverifiedByEmailAndOtp(email, otp)
-				.orElseThrow(()-> new RuntimeException("User not found"));
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		
 		if (c.isVerified()) {
 			throw new IllegalStateException("User already verified");
@@ -104,16 +104,16 @@ public class OTPService {
 	
 	public void resend(String email) {
 		Customer c = customerRepository.findByEmail(email)
-				.orElseThrow(()-> new RuntimeException("User not found"));
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		if (c.isVerified()) {
-			throw new RuntimeException("User Already verified, no need to resend OTP");
+			throw new IllegalStateException("User Already verified, no need to resend OTP");
 		}
 		generate(email);
 	}
 	
 	public String generateResetOtp(String email) {
 		Customer c = customerRepository.findByEmail(email)
-				.orElseThrow(()-> new RuntimeException("User not found"));
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		
 		//Generate OTP baru untuk reset password (tidak peduli status verified)
 		String otp = GenerateOTP.generateOTP();

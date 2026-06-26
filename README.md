@@ -38,51 +38,55 @@ Kafka digunakan untuk **memisahkan proses pengiriman email** dari request utama 
 
 ---
 
----
-
 ## 📂 Struktur Folder Terbaru
-
-Untuk memudahkan pengembangan dan pemeliharaan, struktur folder frontend telah dikelompokkan berdasarkan **Fitur**. Developer tidak perlu lagi bingung mencari file; cukup buka folder sesuai fitur yang ingin diedit.
 
 ### 1. Frontend (`/frontend`)
 
+Struktur frontend dikelompokkan berdasarkan **Fitur** untuk memudahkan pengembangan:
+
 ```text
 frontend/
-├── app/
-│   ├── core/               # Logika Inti Aplikasi
-│   │   ├── router.js       # Pengatur navigasi halaman
-│   │   └── state.js        # Penyimpan data sementara (User, Cart)
+├── src/
+│   ├── components/       # Komponen Reusable (Header, dll)
+│   │   └── Header.jsx
 │   │
-│   ├── pages/              # Halaman-halaman (Dikelompokkan per Fitur)
-│   │   ├── auth/           # Fitur Autentikasi
-│   │   │   ├── login.js
-│   │   │   ├── register.js
-│   │   │   └── ...
+│   ├── pages/            # Halaman-halaman (Dikelompokkan per Fitur)
+│   │   ├── auth/         # Fitur Autentikasi
+│   │   │   ├── Login.jsx
+│   │   │   ├── Register.jsx
+│   │   │   ├── VerifyAccount.jsx
+│   │   │   ├── ForgotPassword.jsx
+│   │   │   ├── VerifyReset.jsx
+│   │   │   └── NewPassword.jsx
 │   │   │
-│   │   ├── home/           # Halaman Utama
-│   │   │   └── index.js
+│   │   ├── home/         # Halaman Utama
+│   │   │   └── Home.jsx
 │   │   │
-│   │   ├── products/       # Fitur Produk
-│   │   │   ├── list.js     # Daftar produk
-│   │   │   └── detail.js   # Detail produk
+│   │   ├── products/     # Fitur Produk
+│   │   │   ├── List.jsx  # Daftar produk
+│   │   │   └── Detail.jsx  # Detail produk
 │   │   │
-│   │   ├── cart/           # Fitur Keranjang
-│   │   │   └── index.js
+│   │   ├── cart/         # Fitur Keranjang
+│   │   │   └── Cart.jsx
 │   │   │
-│   │   ├── checkout/       # Fitur Pembayaran
-│   │   │   └── index.js
+│   │   ├── checkout/     # Fitur Pembayaran
+│   │   │   └── Checkout.jsx
 │   │   │
-│   │   └── orders/         # Fitur Riwayat Pesanan
-│   │       ├── list.js
-│   │       └── detail.js
+│   │   └── orders/       # Fitur Riwayat Pesanan
+│   │       ├── List.jsx
+│   │       └── Detail.jsx
 │   │
-│   └── utils/              # Fungsi bantuan (Validasi, Format uang, dll)
-│       └── validator.js
+│   ├── services/         # API Client (Axios)
+│   │   └── api.js
+│   │
+│   ├── App.jsx           # Routing & State Utama
+│   ├── App.css           # Styling Global
+│   └── main.jsx          # Entry Point
 │
-├── js/
-│   └── api.js              # Penghubung ke Backend (Fetch API Wrapper)
-│
-└── index.html              # File utama yang memuat aplikasi
+├── index.html
+├── vite.config.js
+├── package.json
+└── nginx.conf            # Konfigurasi Nginx untuk Production
 ```
 
 ### 2. Backend (`/backend`)
@@ -114,62 +118,13 @@ backend/src/main/java/com/laundry/BE_Laundry/
 
 ---
 
-## 🔄 Alur Pengguna (User Flow)
-
-Berikut adalah diagram alur bagaimana pengguna berinteraksi dengan aplikasi:
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant F as Frontend
-    participant B as Backend
-    
-    Note over U, F: Proses Belanja
-    U->>F: Buka Halaman Produk
-    F->>B: GET /api/products
-    B-->>F: List Produk
-    U->>F: Tambah ke Keranjang
-    F->>F: Simpan di State (Local Storage)
-    
-    Note over U, F: Proses Checkout
-    U->>F: Klik Checkout
-    alt Belum Login
-        F->>U: Redirect ke Login Page
-        U->>F: Input Email & Password
-        F->>B: POST /login
-        B-->>F: Token Valid
-    end
-    
-    U->>F: Konfirmasi Pembayaran
-    F->>B: POST /api/transactions
-    B-->>F: Transaksi Berhasil
-    F->>U: Tampilkan Halaman Sukses
-```
-
----
-
-## 💡 Penjelasan Teknis Khusus
-
-### Apa itu `?v=fix8` pada tag Script?
-
-Anda mungkin melihat kode seperti ini di `index.html`:
-```html
-<script src="./js/api.js?v=fix8"></script>
-```
-
-**Fungsinya:**
-Ini adalah teknik **Cache Busting**. Browser biasanya menyimpan file JavaScript di "cache" (memori sementara) agar website loading lebih cepat. Namun, saat kita mengupdate kode, browser kadang masih memuat file lama yang tersimpan di cache.
-
-Dengan menambahkan parameter unik seperti `?v=fix8` (Version Fix 8), kita "menipu" browser agar menganggap ini adalah file baru yang berbeda, sehingga browser dipaksa mendownload versi terbaru dari server. Ini memastikan user selalu mendapatkan perbaikan bug terbaru tanpa harus menghapus cache browser mereka secara manual.
-
----
-
 ## 🚀 Cara Menjalankan Aplikasi
 
 ### Prasyarat
 Pastikan Anda memiliki:
 - **Docker Desktop** (untuk Windows/macOS) atau **Docker Engine** (untuk Linux)
 - **Git** (opsional, untuk clone repository)
+- **Node.js & npm** (opsional, untuk menjalankan frontend secara lokal)
 
 ### 1. Menjalankan Semua Layanan (Docker)
 Pastikan Docker Desktop sudah menyala!
@@ -180,9 +135,7 @@ Pastikan Docker Desktop sudah menyala!
    cd Fullstack-Laundry
    ```
 
-2. Buat file `.env` di root project (contoh di bagian Environment).
-
-3. Jalankan semua layanan:
+2. Jalankan semua layanan:
    ```bash
    docker compose up -d --build
    ```

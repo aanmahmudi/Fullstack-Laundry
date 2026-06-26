@@ -1,62 +1,72 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import api from '../../services/api'
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import api from '../../services/api';
 
 function Orders({ user }) {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [message, setMessage] = useState('')
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders()
-  }, [])
+    if (user) {
+      fetchOrders();
+    }
+  }, [user]);
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get(`/customers/${user.customerId}/transactions`)
-      setOrders(res.data || [])
+      const res = await api.get('/transactions');
+      let allOrders = res.data || [];
+      
+      if (user && user.customerId) {
+        allOrders = allOrders.filter(order => order.customerId === user.customerId);
+      }
+      
+      setOrders(allOrders);
     } catch (error) {
-      setMessage('Gagal memuat pesanan')
+      console.error('Error fetching orders:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
-    return <div className="loading">Loading...</div>
-  }
-
-  if (orders.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
-        <h2>Pesanan Anda</h2>
-        <p>Belum ada pesanan</p>
-        <Link to="/products" style={{ marginTop: '1rem', display: 'inline-block' }}>
-          Belanja Sekarang
-        </Link>
-      </div>
-    )
+    return <div className="loading">Loading...</div>;
   }
 
   return (
-    <div>
-      <h2>Pesanan Anda</h2>
-      {message && <div className="alert alert-error">{message}</div>}
-      <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-        {orders.map((order) => (
-          <div key={order.id} className="product-card" style={{ padding: '1rem' }}>
-            <h3>Pesanan #{order.id}</h3>
-            <p>Tanggal: {new Date(order.createdAt).toLocaleDateString('id-ID')}</p>
-            <p>Status: <strong>{order.status}</strong></p>
-            <p>Total: Rp {order.total.toLocaleString('id-ID')}</p>
-            <Link to={`/orders/${order.id}`} className="btn btn-primary" style={{ display: 'inline-block', marginTop: '0.5rem', textDecoration: 'none' }}>
-              Lihat Detail
+    <div className="orders-container">
+      <h2>Daftar Pesanan</h2>
+      {orders.length === 0 ? (
+        <div className="card">
+          <p style={{ textAlign: 'center' }}>Anda belum memiliki pesanan</p>
+          <Link to="/products" className="btn btn-primary" style={{ display: 'inline-block', marginTop: '1.5rem', width: '100%', textAlign: 'center' }}>
+            Belanja Sekarang
+          </Link>
+        </div>
+      ) : (
+        orders.map((order) => (
+          <div key={order.id} className="order-card">
+            <div className="order-id">Order #{order.id} - {order.orderNumber || 'No Order Number'}</div>
+            <div className="order-date">
+              {order.transactionDate ? new Date(order.transactionDate).toLocaleString('id-ID') : 'Tanggal tidak tersedia'}
+            </div>
+            <div className={`order-status ${order.orderStatus?.toLowerCase() || 'pending'}`}>
+              Status: {order.orderStatus || 'PENDING'}
+            </div>
+            <div className="order-status paid">
+              Payment: {order.paymentStatus || 'UNPAID'}
+            </div>
+            <div className="order-total">
+              Total: Rp {Number(order.totalPrice || 0).toLocaleString('id-ID')}
+            </div>
+            <Link to={`/orders/${order.id}`} className="order-link">
+              Lihat Detail →
             </Link>
           </div>
-        ))}
-      </div>
+        ))
+      )}
     </div>
-  )
+  );
 }
 
-export default Orders
+export default Orders;

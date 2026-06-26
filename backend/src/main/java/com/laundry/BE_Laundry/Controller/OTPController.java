@@ -47,6 +47,11 @@ public class OTPController {
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "Failed to send OTP: " + ex.getMessage());
 			return ResponseEntity.badRequest().body(response);
+		} catch (IllegalStateException ex) {
+			logger.warn("Failed to send OTP to {} - {}", email, ex.getMessage());
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "Failed to send OTP: " + ex.getMessage());
+			return ResponseEntity.badRequest().body(response);
 		} catch (Exception ex) {
 			logger.error("Unexpected error while sending OTP to {}: {}", email, ex.getMessage(), ex);
 			Map<String, String> response = new HashMap<>();
@@ -65,6 +70,10 @@ public class OTPController {
 			response.put("message", "Verification via OTP Successful.");
 			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "Verification failed: " + ex.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (IllegalStateException ex) {
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "Verification failed: " + ex.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -88,6 +97,10 @@ public class OTPController {
 			Map<String, String> response = new HashMap<>();
 			response.put("message", ex.getMessage());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (IllegalStateException ex) {
+			Map<String, String> response = new HashMap<>();
+			response.put("message", ex.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception ex) {
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "An error occurred: " + ex.getMessage());
@@ -105,6 +118,11 @@ public class OTPController {
 			response.put("message", "OTP Resent");
 			return ResponseEntity.ok(response);
 		} catch (IllegalArgumentException ex) {
+			logger.warn("Failed to resend OTP to {} - {}", email, ex.getMessage());
+			Map<String, String> response = new HashMap<>();
+			response.put("message", "Failed to resend OTP: " + ex.getMessage());
+			return ResponseEntity.badRequest().body(response);
+		} catch (IllegalStateException ex) {
 			logger.warn("Failed to resend OTP to {} - {}", email, ex.getMessage());
 			Map<String, String> response = new HashMap<>();
 			response.put("message", "Failed to resend OTP: " + ex.getMessage());
