@@ -55,7 +55,7 @@ function OrderDetail() {
       <div className="order-item">
         <div className="order-item-name">Total Harga</div>
         <div className="order-item-info" style={{ fontWeight: 'bold', color: '#667eea', fontSize: '1.25rem' }}>
-          Rp {Number(order.totalPrice || 0).toLocaleString('id-ID')}
+          Rp. {Number(order.totalPrice || 0).toLocaleString('id-ID')}
         </div>
       </div>
 

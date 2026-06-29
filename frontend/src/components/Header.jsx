@@ -75,9 +75,17 @@ function Header({ user, logout, cartCount }) {
                   
                   {user.role === 'ADMIN' ? (
                     <>
-                      <Link to="/seller/products" className="dropdown-item">
+                      <Link to="/seller" className="dropdown-item">
                         <span className="icon">🏪</span>
-                        Kelola Produk
+                        Dashboard Toko
+                      </Link>
+                      <Link to="/seller/products/new" className="dropdown-item">
+                        <span className="icon">➕</span>
+                        Tambah Produk
+                      </Link>
+                      <Link to="/seller/products" className="dropdown-item">
+                        <span className="icon">🛍️</span>
+                        Produk Saya
                       </Link>
                       <Link to="/orders" className="dropdown-item">
                         <span className="icon">📦</span>

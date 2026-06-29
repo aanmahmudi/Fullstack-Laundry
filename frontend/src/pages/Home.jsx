@@ -22,12 +22,12 @@ function Home() {
         <h3>Kategori Pilihan</h3>
         <div className="categories-scroll">
           {categories.map((cat, idx) => (
-            <div key={idx} className="category-item" role="button" tabIndex={0}>
+            <Link key={idx} to={`/products?category=${encodeURIComponent(cat)}`} className="category-item">
               <div className="category-icon">
                 📦
               </div>
               <div className="category-label">{cat}</div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

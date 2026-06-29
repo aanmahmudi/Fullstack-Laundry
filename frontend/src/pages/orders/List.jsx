@@ -57,7 +57,7 @@ function Orders({ user }) {
               Payment: {order.paymentStatus || 'UNPAID'}
             </div>
             <div className="order-total">
-              Total: Rp {Number(order.totalPrice || 0).toLocaleString('id-ID')}
+              Total: Rp. {Number(order.totalPrice || 0).toLocaleString('id-ID')}
             </div>
             <Link to={`/orders/${order.id}`} className="order-link">
               Lihat Detail →

@@ -13,6 +13,8 @@ import Cart from './pages/cart/Cart'
 import Checkout from './pages/checkout/Checkout'
 import Orders from './pages/orders/List'
 import OrderDetail from './pages/orders/Detail'
+import SellerDashboard from './pages/seller/Dashboard'
+import SellerNewProduct from './pages/seller/NewProduct'
 import SellerProducts from './pages/seller/Products'
 import Header from './components/Header'
 import './App.css'
@@ -31,7 +33,16 @@ function App() {
       setUser(JSON.parse(savedUser))
     }
     if (savedCart) {
-      setCart(JSON.parse(savedCart))
+      const parsed = JSON.parse(savedCart)
+      const normalized = Array.isArray(parsed)
+        ? parsed.map((item) => {
+            const selectedSize = item?.selectedSize ?? null
+            const selectedColor = item?.selectedColor ?? null
+            const cartKey = item?.cartKey || `${item.id}|${selectedSize || ''}|${selectedColor || ''}`
+            return { ...item, selectedSize, selectedColor, cartKey }
+          })
+        : []
+      setCart(normalized)
     }
   }, [])
 
@@ -42,34 +53,47 @@ function App() {
   }
 
   const addToCart = (product, quantity = 1) => {
-    const existing = cart.find(item => item.id === product.id)
+    const selectedSize = product?.selectedSize ?? null
+    const selectedColor = product?.selectedColor ?? null
+    const cartKey = `${product.id}|${selectedSize || ''}|${selectedColor || ''}`
+
+    const existing = cart.find(item => item.cartKey === cartKey)
     let newCart
 
     if (existing) {
       newCart = cart.map(item =>
-        item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+        item.cartKey === cartKey ? { ...item, quantity: item.quantity + quantity } : item
       )
     } else {
-      newCart = [...cart, { ...product, quantity }]
+      newCart = [
+        ...cart,
+        {
+          ...product,
+          selectedSize,
+          selectedColor,
+          cartKey,
+          quantity,
+        },
+      ]
     }
 
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
   }
 
-  const removeFromCart = (productId) => {
-    const newCart = cart.filter(item => item.id !== productId)
+  const removeFromCart = (cartKey) => {
+    const newCart = cart.filter(item => item.cartKey !== cartKey)
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
   }
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (cartKey, newQuantity) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId)
+      removeFromCart(cartKey)
       return
     }
     const newCart = cart.map(item =>
-      item.id === productId ? { ...item, quantity: newQuantity } : item
+      item.cartKey === cartKey ? { ...item, quantity: newQuantity } : item
     )
     setCart(newCart)
     localStorage.setItem('cart', JSON.stringify(newCart))
@@ -140,6 +164,30 @@ function App() {
             path="/orders/:id"
             element={
               user ? <OrderDetail user={user} /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/seller"
+            element={
+              user && user.role === 'ADMIN' ? (
+                <SellerDashboard user={user} />
+              ) : user ? (
+                <Navigate to="/" />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/seller/products/new"
+            element={
+              user && user.role === 'ADMIN' ? (
+                <SellerNewProduct user={user} />
+              ) : user ? (
+                <Navigate to="/" />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route

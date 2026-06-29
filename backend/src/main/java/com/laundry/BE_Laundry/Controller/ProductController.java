@@ -52,10 +52,19 @@ public class ProductController {
 	@GetMapping
 	public ResponseEntity<List<Product>> getAllProducts(
 			@RequestParam(required = false) String search,
-			@RequestParam(required = false) Long shopId) {
+			@RequestParam(required = false) Long shopId,
+			@RequestParam(required = false) String category) {
 		
+		if (shopId != null && category != null && !category.trim().isEmpty()) {
+			return ResponseEntity.ok(productService.getProductsByShopIdAndCategory(shopId, category));
+		}
+
 		if (shopId != null) {
 			return ResponseEntity.ok(productService.getProductsByShopId(shopId));
+		}
+
+		if (category != null && !category.trim().isEmpty()) {
+			return ResponseEntity.ok(productService.getProductsByCategory(category));
 		}
 		
 		if (search != null && !search.trim().isEmpty()) {
