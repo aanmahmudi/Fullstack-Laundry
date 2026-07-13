@@ -39,35 +39,124 @@ services:
       TZ: Asia/Jakarta
       PGTZ: Asia/Jakarta
 
+  identity-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5434:5432"
+    volumes:
+      - identity_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: identity_db
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
+
+  catalog-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5435:5432"
+    volumes:
+      - catalog_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: catalog_db
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
+
+  order-db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5436:5432"
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: order_db
+      TZ: Asia/Jakarta
+      PGTZ: Asia/Jakarta
+
   frontend:
     build: ./frontend
     restart: always
     ports:
       - "3000:80"
     depends_on:
-      - app
+      - identity-service
+      - catalog-service
+      - order-service
     environment:
       TZ: Asia/Jakarta
 
-  app:
-    build: ./backend
+  identity-service:
+    build: ./microservices/identity-service
     restart: always
     ports:
       - "8081:8080"
     volumes:
       - ./uploads:/uploads
     depends_on:
-      - db
+      - identity-db
       - kafka
     environment:
+      SPRING_APPLICATION_NAME: identity-service
       TZ: Asia/Jakarta
       FILE_UPLOAD_DIR: /uploads/
-      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://identity-db:5432/identity_db
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     dns:
       - 8.8.8.8
 
+  catalog-service:
+    build: ./microservices/catalog-service
+    restart: always
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./uploads:/uploads
+    depends_on:
+      - catalog-db
+      - kafka
+    environment:
+      SPRING_APPLICATION_NAME: catalog-service
+      TZ: Asia/Jakarta
+      FILE_UPLOAD_DIR: /uploads/
+      SPRING_DATASOURCE_URL: jdbc:postgresql://catalog-db:5432/catalog_db
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    dns:
+      - 8.8.8.8
+
+  order-service:
+    build: ./microservices/order-service
+    restart: always
+    ports:
+      - "8083:8080"
+    depends_on:
+      - order-db
+      - kafka
+    environment:
+      SPRING_APPLICATION_NAME: order-service
+      TZ: Asia/Jakarta
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_db
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      IDENTITY_SERVICE_URL: http://identity-service:8080
+      CATALOG_SERVICE_URL: http://catalog-service:8080
+    dns:
+      - 8.8.8.8
+
 volumes:
   postgres_data:
+  identity_postgres_data:
+  catalog_postgres_data:
+  order_postgres_data:

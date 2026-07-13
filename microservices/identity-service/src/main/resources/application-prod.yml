@@ -1,0 +1,63 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jackson:
+    time-zone: Asia/Jakarta
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      connection-timeout: 300000
+      idle-timeout: 300000
+      max-lifetime: 1800000
+      maximum-pool-size: 10
+
+  jpa:
+    database: POSTGRESQL
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+    hibernate:
+      ddl-auto: update
+
+  sql:
+    init:
+      mode: never
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+
+  web:
+    resources:
+      static-locations: file:uploads/
+
+server:
+  port: 8080
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+logging:
+  level:
+    '[com.laundry.BE_Laundry]': INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+
+  mvc:
+    log-request-details: false

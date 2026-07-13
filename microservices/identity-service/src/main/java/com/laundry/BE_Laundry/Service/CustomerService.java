@@ -1,0 +1,220 @@
+package com.laundry.BE_Laundry.Service;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.laundry.BE_Laundry.DTO.CustomerLoginDTO;
+import com.laundry.BE_Laundry.DTO.CustomerSummaryDTO;
+import com.laundry.BE_Laundry.DTO.EmailEventDTO;
+import com.laundry.BE_Laundry.DTO.OTPVerificationDTO;
+import com.laundry.BE_Laundry.DTO.RegisterRequestDTO;
+import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
+import com.laundry.BE_Laundry.DTO.VerifyTokenDTO;
+import com.laundry.BE_Laundry.Model.Customer;
+import com.laundry.BE_Laundry.Model.Shop;
+import com.laundry.BE_Laundry.Repository.CustomerRepository;
+import com.laundry.BE_Laundry.Repository.ShopRepository;
+import com.laundry.BE_Laundry.Service.kafka.KafkaProducerService;
+import com.laundry.BE_Laundry.Service.otp.GenerateOTP;
+import com.laundry.BE_Laundry.Service.otp.OTPService;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class CustomerService {
+
+	private final CustomerRepository customerRepository;
+	private final ShopRepository shopRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final KafkaProducerService kafkaProducerService;
+	private final OTPService otpService;
+	
+	private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
+
+	public Customer registerCustomer(RegisterRequestDTO registerDTO) {
+		if (customerRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
+			throw new IllegalArgumentException("Email already exist");
+		}
+
+		if (registerDTO.getKtpNumber() != null && !registerDTO.getKtpNumber().isEmpty()) {
+			if (customerRepository.findByKtpNumber(registerDTO.getKtpNumber()).isPresent()) {
+				throw new IllegalArgumentException("KTP Number already registered");
+			}
+		}
+
+		// Map dari DTO ke entity
+		Customer customer = mapToCustomer(registerDTO);
+		
+		//Logika OTP
+		String otp = GenerateOTP.generateOTP();
+		customer.setVerificationOtp(otp);
+		customer.setOtpExpiry((OffsetDateTime.now(ZoneId.of("Asia/Jakarta")).plusMinutes(5)));
+		customer.setVerified(false);
+				
+		// Simpan ke database
+		Customer saved = customerRepository.save(customer);
+
+		// Jika role adalah ADMIN (Penjual), buat Toko otomatis
+		if (customer.getRole() == Customer.RoleType.ADMIN) {
+			Shop shop = new Shop();
+			shop.setName(registerDTO.getShopName() != null ? registerDTO.getShopName() : customer.getUsername() + " Shop");
+			shop.setDescription(registerDTO.getShopDescription() != null ? registerDTO.getShopDescription() : "Welcome to my shop!");
+			shop.setOwnerId(saved.getId());
+			shopRepository.save(shop);
+		}
+		
+		// Kirim OTP ke email via Kafka
+		EmailEventDTO otpEvent = EmailEventDTO.builder()
+				.type("OTP")
+				.to(customer.getEmail())
+				.otp(otp)
+				.build();
+		kafkaProducerService.sendEmailEvent(otpEvent);
+		
+		return saved;
+		
+	}
+
+	private Customer mapToCustomer(RegisterRequestDTO registerDTO) {
+		Customer customer = new Customer();
+		customer.setUsername(registerDTO.getUsername());
+		customer.setKtpNumber(registerDTO.getKtpNumber());
+		customer.setEmail(registerDTO.getEmail());
+		customer.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+		customer.setAddress(registerDTO.getAddress());
+		customer.setPlaceOfBirth(registerDTO.getPlaceOfBirth());
+		customer.setDateOfBirth(registerDTO.getDateOfBirth());
+		customer.setPhoneNumber(registerDTO.getPhoneNumber());
+		customer.setRole(registerDTO.getRole());
+		customer.setVerified(false);
+		return customer;
+
+	}
+
+	public Customer login(CustomerLoginDTO customerLoginDTO) {
+		String identifier = customerLoginDTO.getEmail();
+		Customer customer = customerRepository.findByEmail(identifier)
+				.or(() -> customerRepository.findByUsername(identifier))
+				.orElseThrow(() -> new RuntimeException("Customer not found"));
+
+		System.out.println("Verifying passowrd for user: " + customer.getEmail());
+
+		if (!passwordEncoder.matches(customerLoginDTO.getPassword(), customer.getPassword())) {
+			System.out.println("Password mismatch for user: " + customer.getEmail());
+			throw new RuntimeException("Invalid email or password");
+		}
+
+		if (!customer.isVerified()) {
+			System.out.println("Account is not verified for user: " + customer.getEmail());
+			throw new RuntimeException("Account not verified. Please Verify using OTP");
+		}
+
+		return customer;
+	}
+
+	public void updatePassword(UpdatePasswordRequestDTO updatePasswordDTO) {
+		String identifier = updatePasswordDTO.getEmail();
+		Customer customer = customerRepository.findByEmail(identifier)
+				.or(() -> customerRepository.findByUsername(identifier))
+				.orElseThrow(() -> new RuntimeException("User Not Found"));
+
+		if (!passwordEncoder.matches(updatePasswordDTO.getOldPassword(), customer.getPassword())) {
+			throw new RuntimeException("Old password is incorect");
+		}
+
+		customer.setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
+		customerRepository.save(customer);
+	}
+	
+	public void forgotPassword(String email) {
+		otpService.generateResetOtp(email);
+	}
+
+	public void resetPassword(String email, String otp, String newPassword) {
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User Not Found"));
+		
+		if (customer.getVerificationOtp() == null || !customer.getVerificationOtp().equals(otp)) {
+			throw new RuntimeException("Invalid OTP");
+		}
+		
+		if (customer.getOtpExpiry() == null || customer.getOtpExpiry().isBefore(OffsetDateTime.now(ZoneId.of("Asia/Jakarta")))) {
+			throw new RuntimeException("OTP Expired");
+		}
+		
+		customer.setPassword(passwordEncoder.encode(newPassword));
+		// Clear OTP after successful reset
+		customer.setVerificationOtp(null);
+		customer.setOtpExpiry(null);
+		
+		customerRepository.save(customer);
+	}
+
+
+	public void logout(String email) {
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("User Not Foundd"));
+
+		System.out.println("logged out: " + customer.getEmail());
+	}
+
+	public List<Customer> getAllCustomers() {
+		return customerRepository.findAll();
+	}
+
+	public Customer getCustomerById(Long id) {
+		return customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found"));
+	}
+
+	public CustomerSummaryDTO getCustomerSummaryById(Long id) {
+		Customer customer = getCustomerById(id);
+		return CustomerSummaryDTO.builder()
+				.id(customer.getId())
+				.username(customer.getUsername())
+				.email(customer.getEmail())
+				.phoneNumber(customer.getPhoneNumber())
+				.role(customer.getRole())
+				.build();
+	}
+
+	public CustomerSummaryDTO getCustomerSummaryByEmail(String email) {
+		Customer customer = customerRepository.findByEmail(email)
+				.orElseThrow(() -> new RuntimeException("Customer not found"));
+		return CustomerSummaryDTO.builder()
+				.id(customer.getId())
+				.username(customer.getUsername())
+				.email(customer.getEmail())
+				.phoneNumber(customer.getPhoneNumber())
+				.role(customer.getRole())
+				.build();
+	}
+
+	public Customer updateCustomer(Long id, Customer updatedCustomer) {
+		Customer existingCustomer = customerRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Customer not found"));
+		existingCustomer.setUsername(updatedCustomer.getUsername());
+		existingCustomer.setAddress(updatedCustomer.getAddress());
+		existingCustomer.setPhoneNumber(updatedCustomer.getPhoneNumber());
+		existingCustomer.setDocumentUrl(updatedCustomer.getDocumentUrl());
+		existingCustomer.setPhotoUrl(updatedCustomer.getPhotoUrl());
+		return customerRepository.save(existingCustomer);
+
+	}
+
+	public void deleteCustomer(Long id) {
+		customerRepository.deleteById(id);
+	}
+
+
+}
