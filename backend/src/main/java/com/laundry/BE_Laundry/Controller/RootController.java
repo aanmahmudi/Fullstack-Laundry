@@ -11,10 +11,10 @@ public class RootController {
     public String root() {
         return "<!doctype html>" +
                 "<html lang='id'><head><meta charset='utf-8'/>" +
-                "<title>Laundry API</title>" +
+                "<title>Ecommerce API</title>" +
                 "<style>body{font-family:system-ui;background:#0f172a;color:#e5e7eb;padding:24px}a{color:#22c55e;text-decoration:none}</style>" +
                 "</head><body>" +
-                "<h1>Laundry API</h1>" +
+                "<h1>Ecommerce API</h1>" +
                 "<p>Service berjalan. Coba endpoint berikut:</p>" +
                 "<ul>" +
                 "<li><a href='/api/products'>/api/products</a></li>" +

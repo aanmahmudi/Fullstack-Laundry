@@ -1,6 +1,6 @@
-# 🧺 Fullstack Laundry Application
+# 🧺 Fullstack Ecommerce Application
 
-Aplikasi manajemen laundry / ecommerce sederhana dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (React JS), dilengkapi dengan **Apache Kafka** untuk asynchronous processing!
+Aplikasi ecommerce sederhana dengan arsitektur **Monorepo** yang memisahkan Backend (Spring Boot) dan Frontend (React JS), dilengkapi dengan **Apache Kafka** untuk asynchronous processing!
 
 ## ✨ Ringkasan Singkat
 

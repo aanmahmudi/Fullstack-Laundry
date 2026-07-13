@@ -35,7 +35,7 @@ public class EmailService {
 
 			SimpleMailMessage message = new SimpleMailMessage();
 			message.setTo(to);
-			message.setSubject("Verifikasi Akun Laundry App");
+			message.setSubject("Verifikasi Akun Ecommerce App");
 			message.setText("Klik link berikut untuk verifikasi akun Anda:\n\n" + verificationUrl
 					+ "\n\nLink ini berlaku selama 24 jam.");
 
