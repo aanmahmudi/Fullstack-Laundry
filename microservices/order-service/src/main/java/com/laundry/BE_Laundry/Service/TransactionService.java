@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.laundry.BE_Laundry.DTO.CustomerSummaryDTO;
 import com.laundry.BE_Laundry.DTO.PaymentRequestDTO;
@@ -121,8 +123,13 @@ public class TransactionService {
 	public TransactionResponseDTO createTransaction(TransactionRequestDTO requestDTO) {
 		try {
 			System.out.println("Request DTO: " + requestDTO);
-		
-			CustomerSummaryDTO customer = identityClientService.getCustomerById(requestDTO.getCustomerId());
+
+			String email = SecurityUtil.getCurrentUserEmail();
+			if (email == null || email.isBlank()) {
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
+			}
+
+			CustomerSummaryDTO customer = identityClientService.getCustomerByEmail(email);
 			ProductSummaryDTO product = catalogClientService.getProductById(requestDTO.getProductId());
 			
 			Transaction transaction = new Transaction();

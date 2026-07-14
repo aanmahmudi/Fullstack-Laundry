@@ -28,6 +28,8 @@ services:
   db:
     image: postgres:16
     restart: always
+    profiles:
+      - monolith
     ports: 
       - "5433:5432"
     volumes:
@@ -140,12 +142,15 @@ services:
     restart: always
     ports:
       - "8083:8080"
+    volumes:
+      - ./uploads:/uploads
     depends_on:
       - order-db
       - kafka
     environment:
       SPRING_APPLICATION_NAME: order-service
       TZ: Asia/Jakarta
+      FILE_UPLOAD_DIR: /uploads/
       SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/order_db
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}

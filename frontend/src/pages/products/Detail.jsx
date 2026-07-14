@@ -225,55 +225,6 @@ function ProductDetail({ addToCart }) {
             </div>
           </div>
 
-          <div className="product-detail-meta">
-            <div className="product-meta-item">
-              <span className="product-meta-label">Kategori</span>
-              <strong>{product.category || 'Belum dipilih'}</strong>
-            </div>
-            <div className="product-meta-item">
-              <span className="product-meta-label">{variant1Name}</span>
-              {sizes.length ? (
-                <div className="chip-row">
-                  {sizes.map((s) => (
-                    <span key={s} className="chip">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <strong>-</strong>
-              )}
-            </div>
-            <div className="product-meta-item">
-              <span className="product-meta-label">{variant2Name}</span>
-              {colors.length ? (
-                <div className="chip-row">
-                  {colors.map((c) => (
-                    <span key={c} className="chip">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <strong>-</strong>
-              )}
-            </div>
-          </div>
-
-          {hasStockMap && stockVariant && (
-            <div className="product-detail-section">
-              <h3>{`Stok per ${stockVariant === 'variant2' ? variant2Name : variant1Name}`}</h3>
-              <div className="stock-list">
-                {Object.entries(stockMap).map(([color, pcs]) => (
-                  <div key={color} className="stock-list-row">
-                    <span className="stock-chip">{color}</span>
-                    <strong>{Number(pcs) || 0} pcs</strong>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="product-detail-section">
             <h3>Deskripsi Produk</h3>
             <p>{product.description || 'Produk berkualitas pilihan dari Remon Eccom.'}</p>
@@ -307,10 +258,7 @@ function ProductDetail({ addToCart }) {
                             onChange={() => setSelectedSize(opt.value)}
                             disabled={opt.disabled}
                           />
-                          <span>
-                            {opt.value}
-                            {stockVariant === 'variant1' && hasStockMap ? ` • ${opt.pcs} pcs` : ''}
-                          </span>
+                          <span className="variant-choice-text">{opt.value}</span>
                         </label>
                       ))}
                     </div>
@@ -333,10 +281,7 @@ function ProductDetail({ addToCart }) {
                             onChange={() => setSelectedColor(opt.value)}
                             disabled={opt.disabled}
                           />
-                          <span>
-                            {opt.value}
-                            {stockVariant === 'variant2' && hasStockMap ? ` • ${opt.pcs} pcs` : ''}
-                          </span>
+                          <span className="variant-choice-text">{opt.value}</span>
                         </label>
                       ))}
                     </div>

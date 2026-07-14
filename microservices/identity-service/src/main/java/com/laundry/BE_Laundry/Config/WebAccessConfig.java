@@ -28,6 +28,8 @@ public class WebAccessConfig {
 				"/api/customers/login",
 				"/api/customers/forgot-password",
 				"/api/customers/reset-password",
+				"/api/customers/*/summary",
+				"/api/customers/summary/by-email",
 				"/api/customers/*/chat/unread-count",
 				"/api/shops/*/messages/unread-count",
 				

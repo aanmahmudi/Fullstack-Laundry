@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -24,7 +25,8 @@ public class CustomLoggingFilter implements Filter {
 		String path = req.getRequestURI();
 		
 		if (!req.getRequestURI().equals("/favicon.ico")) {
-			logger.info("Incoming request: [{}] {}", req.getMethod(), req.getRequestURI());
+			boolean hasAuthHeader = req.getHeader(HttpHeaders.AUTHORIZATION) != null;
+			logger.info("Incoming request: [{}] {} (auth_header_present={})", req.getMethod(), req.getRequestURI(), hasAuthHeader);
 		}
 		
 		chain.doFilter(request, response);
