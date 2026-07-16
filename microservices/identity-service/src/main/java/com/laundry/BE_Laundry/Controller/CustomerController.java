@@ -17,8 +17,6 @@ import com.laundry.BE_Laundry.DTO.UpdatePasswordRequestDTO;
 import com.laundry.BE_Laundry.DTO.CustomerSummaryDTO;
 import com.laundry.BE_Laundry.Model.Customer;
 import com.laundry.BE_Laundry.Service.CustomerService;
-import com.laundry.BE_Laundry.Service.ShopMessageService;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class CustomerController {
 
 	private final CustomerService customerService;
-	private final ShopMessageService shopMessageService;
 
 	@PutMapping("/update-password")
 	public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequestDTO updatePasswordDTO) {
@@ -87,26 +84,14 @@ public class CustomerController {
 
 	@GetMapping("/{id}/chat/unread-count")
 	public ResponseEntity<Long> getChatUnreadCount(@PathVariable Long id) {
-		Customer c = customerService.getCustomerById(id);
-		if (c == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-		if (c.getRole() == Customer.RoleType.ADMIN) {
-			return ResponseEntity.ok(shopMessageService.countUnreadForAdminAllShops(id));
-		}
-		return ResponseEntity.ok(shopMessageService.countUnreadForCustomerAllShops(id));
+		// Moving chat features out of identity-service, return 0 for now
+		return ResponseEntity.ok(0L);
 	}
 
 	@GetMapping("/{id}/chat/conversations")
 	public ResponseEntity<?> listChatConversations(@PathVariable Long id) {
-		Customer c = customerService.getCustomerById(id);
-		if (c == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		}
-		if (c.getRole() == Customer.RoleType.ADMIN) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only USER can access conversations");
-		}
-		return ResponseEntity.ok(shopMessageService.listCustomerConversations(id));
+		// Moving chat features out of identity-service
+		return ResponseEntity.ok(List.of());
 	}
 
 }

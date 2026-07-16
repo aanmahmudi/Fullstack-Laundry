@@ -111,7 +111,9 @@ public class TransactionService {
 				.orElseThrow(() -> new RuntimeException("Transaction not found"));
 		
 		String email = SecurityUtil.getCurrentUserEmail();
-		if (!transaction.getCustomerEmail().equals(email)) {
+		CustomerSummaryDTO customer = identityClientService.getCustomerByEmail(email);
+		
+		if (!transaction.getCustomerEmail().equals(email) && !customer.getId().equals(transaction.getSellerId())) {
 			throw new RuntimeException("Unauthorized access to transaction");
 		}
 		
@@ -256,6 +258,14 @@ public class TransactionService {
 	public TransactionResponseDTO updateStatus(Long id, String status) {
 		Transaction transaction = transactionRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Transaction not found"));
+		
+		String email = SecurityUtil.getCurrentUserEmail();
+		CustomerSummaryDTO customer = identityClientService.getCustomerByEmail(email);
+		
+		if (!customer.getId().equals(transaction.getSellerId())) {
+			throw new RuntimeException("Only seller can update the order status");
+		}
+		
 		transaction.setOrderStatus(status);
 		transactionRepository.save(transaction);
 		return mapToResponseDTO(transaction);

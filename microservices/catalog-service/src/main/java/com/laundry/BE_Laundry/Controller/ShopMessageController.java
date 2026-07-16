@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.laundry.BE_Laundry.DTO.ShopMessageRequestDTO;
 import com.laundry.BE_Laundry.DTO.ShopMessageResponseDTO;
-import com.laundry.BE_Laundry.Model.Shop;
-import com.laundry.BE_Laundry.Repository.ShopRepository;
 import com.laundry.BE_Laundry.Service.ShopMessageService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class ShopMessageController {
 
 	private final ShopMessageService shopMessageService;
-	private final ShopRepository shopRepository;
 
 	@PostMapping("/{shopId}/messages")
 	public ResponseEntity<ShopMessageResponseDTO> createMessage(@PathVariable Long shopId,
@@ -71,7 +68,6 @@ public class ShopMessageController {
 
 	@PostMapping("/{shopId}/messages/mark-read")
 	public ResponseEntity<Void> markAllAsRead(@PathVariable Long shopId) {
-		shopRepository.findById(shopId).orElseThrow(() -> new RuntimeException("Shop not found"));
 		shopMessageService.markAllAsRead(shopId);
 		return ResponseEntity.ok().build();
 	}

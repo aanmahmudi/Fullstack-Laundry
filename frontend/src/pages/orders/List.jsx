@@ -17,7 +17,7 @@ function Orders({ user }) {
       const res = await api.get('/transactions');
       let allOrders = res.data || [];
       
-      if (user && user.customerId) {
+      if (user && user.role !== 'ADMIN' && user.customerId) {
         allOrders = allOrders.filter(order => order.customerId === user.customerId);
       }
       

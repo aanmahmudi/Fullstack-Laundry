@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 
-function OrderDetail() {
+function OrderDetail({ user }) {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
@@ -19,6 +19,18 @@ function OrderDetail() {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (e) => {
+    const newStatus = e.target.value;
+    try {
+      await api.put(`/transactions/${id}/status`, null, { params: { status: newStatus } });
+      setOrder(prev => ({ ...prev, orderStatus: newStatus }));
+      alert('Status pesanan berhasil diubah!');
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Gagal mengubah status pesanan');
     }
   };
 
@@ -62,7 +74,22 @@ function OrderDetail() {
       <div className="order-item">
         <div className="order-item-name">Status Pesanan</div>
         <div className={`order-status ${order.orderStatus?.toLowerCase() || 'pending'}`}>
-          {order.orderStatus || 'PENDING'}
+          {user && user.role === 'ADMIN' ? (
+            <select 
+              value={order.orderStatus || 'PENDING'} 
+              onChange={handleStatusChange}
+              style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+            >
+              <option value="BELUM_BAYAR">BELUM_BAYAR</option>
+              <option value="DIKEMAS">DIKEMAS</option>
+              <option value="DIPERJALANAN">DIPERJALANAN</option>
+              <option value="PENGIRIMAN_KURIR">PENGIRIMAN_KURIR</option>
+              <option value="SELESAI">SELESAI</option>
+              <option value="DIBATALKAN">DIBATALKAN</option>
+            </select>
+          ) : (
+            order.orderStatus || 'PENDING'
+          )}
         </div>
       </div>
 

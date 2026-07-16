@@ -8,32 +8,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 
 import jakarta.annotation.PostConstruct;
 
-import com.laundry.BE_Laundry.Controller.ProductController;
-import com.laundry.BE_Laundry.Controller.ProductImageController;
-import com.laundry.BE_Laundry.Controller.TransactionController;
-import com.laundry.BE_Laundry.Service.MigrationService;
-import com.laundry.BE_Laundry.Service.ProductService;
-import com.laundry.BE_Laundry.Service.TransactionService;
-
 @SpringBootApplication(scanBasePackages = "com.laundry.BE_Laundry")
-@ComponentScan(
-	basePackages = "com.laundry.BE_Laundry",
-	excludeFilters = {
-		@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-			ProductController.class,
-			ProductImageController.class,
-			TransactionController.class,
-			ProductService.class,
-			MigrationService.class,
-			TransactionService.class
-		})
-	}
-)
 public class BeLaundryApplication extends SpringBootServletInitializer{
 
 	@PostConstruct

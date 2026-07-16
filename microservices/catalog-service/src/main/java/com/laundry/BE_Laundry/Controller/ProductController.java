@@ -21,9 +21,6 @@ import com.laundry.BE_Laundry.Service.ProductService;
 import com.laundry.BE_Laundry.Model.ProductImage;
 import com.laundry.BE_Laundry.Repository.ProductImageRepository;
 import com.laundry.BE_Laundry.Repository.ProductRepository;
-import com.laundry.BE_Laundry.Repository.CustomerRepository;
-import com.laundry.BE_Laundry.Model.Customer;
-import com.laundry.BE_Laundry.Model.Customer.RoleType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import java.nio.file.Files;
@@ -41,7 +38,6 @@ public class ProductController {
 	private final ProductService productService;
 	private final ProductRepository productRepository;
 	private final ProductImageRepository productImageRepository;
-	private final CustomerRepository customerRepository;
 	@Value("${file.upload-dir}")
 	private String uploadDir;
 

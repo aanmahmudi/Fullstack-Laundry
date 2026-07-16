@@ -9,6 +9,7 @@ function SellerDashboard({ user }) {
     description: user?.shopDescription ?? '',
   })
   const [productCount, setProductCount] = useState(0)
+  const [ordersToday, setOrdersToday] = useState(0)
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
 
@@ -38,6 +39,16 @@ function SellerDashboard({ user }) {
           const productList = Array.isArray(productRes.data) ? productRes.data : []
           setProductCount(productList.length)
         }
+
+        const txRes = await api.get('/transactions')
+        const allTx = Array.isArray(txRes.data) ? txRes.data : []
+        const todayStr = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD local
+        const countToday = allTx.filter(tx => {
+          if (!tx.transactionDate) return false
+          const txDateStr = new Date(tx.transactionDate).toLocaleDateString('en-CA')
+          return txDateStr === todayStr
+        }).length
+        setOrdersToday(countToday)
       } catch (error) {
         setMessage('Gagal memuat dashboard toko.')
       } finally {
@@ -91,9 +102,9 @@ function SellerDashboard({ user }) {
           <p>Total produk aktif yang sudah ada di toko kamu.</p>
         </article>
         <article className="seller-stat-card">
-          <span className="seller-stat-label">Kategori Aktif</span>
-          <strong>6</strong>
-          <p>Pilih kategori agar produk tampil pada etalase yang tepat.</p>
+          <span className="seller-stat-label">Pesanan Hari Ini</span>
+          <strong>{loading ? '...' : ordersToday}</strong>
+          <p>Jumlah pesanan yang masuk ke tokomu hari ini.</p>
         </article>
         <article className="seller-stat-card">
           <span className="seller-stat-label">Aksi Cepat</span>
